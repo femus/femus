@@ -44,17 +44,26 @@ final class MotionSensor
     public function waitForMotion(?float $timeoutSeconds = null): bool
     {
         $detected = false;
-        $this->motionListeners[] = function () use (&$detected): void {
+        $listener = function () use (&$detected): void {
             $detected = true;
         };
+        $this->motionListeners[] = $listener;
         $deadline = $timeoutSeconds === null ? null : hrtime(true) / 1e9 + $timeoutSeconds;
-        while (!$detected) {
-            if ($deadline !== null && hrtime(true) / 1e9 >= $deadline) {
-                return false;
+        try {
+            while (!$detected) {
+                if ($deadline !== null && hrtime(true) / 1e9 >= $deadline) {
+                    return false;
+                }
+                $this->loop->tick(0.05);
             }
-            $this->loop->tick(0.05);
-        }
 
-        return true;
+            return true;
+        } finally {
+            $index = array_search($listener, $this->motionListeners, true);
+            if ($index !== false) {
+                unset($this->motionListeners[$index]);
+                $this->motionListeners = array_values($this->motionListeners);
+            }
+        }
     }
 }

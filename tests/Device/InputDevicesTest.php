@@ -56,3 +56,72 @@ it('motion sensor: движение и покой', function () {
     expect($events)->toBe(['motion', 'idle'])
         ->and($pir->isActive())->toBeFalse();
 });
+
+it('button: waitForPress удаляет временный слушатель при таймауте', function () {
+    $board = new FakeBoard(new StreamSelectLoop());
+    $button = $board->button(2);
+
+    // Первый вызов с таймаутом
+    $result1 = $button->waitForPress(timeoutSeconds: 0.01);
+    expect($result1)->toBeFalse();
+
+    // Второй вызов с таймаутом
+    $result2 = $button->waitForPress(timeoutSeconds: 0.01);
+    expect($result2)->toBeFalse();
+
+    // Проверяем через рефлексию что pressListeners пустой
+    $reflection = new ReflectionClass($button);
+    $property = $reflection->getProperty('pressListeners');
+    $property->setAccessible(true);
+    expect(count($property->getValue($button)))->toBe(0);
+});
+
+it('button: waitForPress удаляет временный слушатель при успехе', function () {
+    $board = new FakeBoard(new StreamSelectLoop());
+    $board->digitalPin(2, PinMode::InputPullUp)->write(true);
+    $button = $board->button(2);
+
+    $board->scheduleInput(0.01, 2, false);
+    $result = $button->waitForPress(timeoutSeconds: 0.5);
+    expect($result)->toBeTrue();
+
+    // Проверяем через рефлексию что pressListeners пустой
+    $reflection = new ReflectionClass($button);
+    $property = $reflection->getProperty('pressListeners');
+    $property->setAccessible(true);
+    expect(count($property->getValue($button)))->toBe(0);
+});
+
+it('motion sensor: waitForMotion удаляет временный слушатель при таймауте', function () {
+    $board = new FakeBoard(new StreamSelectLoop());
+    $pir = $board->motionSensor(4);
+
+    // Первый вызов с таймаутом
+    $result1 = $pir->waitForMotion(timeoutSeconds: 0.01);
+    expect($result1)->toBeFalse();
+
+    // Второй вызов с таймаутом
+    $result2 = $pir->waitForMotion(timeoutSeconds: 0.01);
+    expect($result2)->toBeFalse();
+
+    // Проверяем через рефлексию что motionListeners пустой
+    $reflection = new ReflectionClass($pir);
+    $property = $reflection->getProperty('motionListeners');
+    $property->setAccessible(true);
+    expect(count($property->getValue($pir)))->toBe(0);
+});
+
+it('motion sensor: waitForMotion удаляет временный слушатель при успехе', function () {
+    $board = new FakeBoard(new StreamSelectLoop());
+    $pir = $board->motionSensor(4);
+
+    $board->scheduleInput(0.01, 4, true);
+    $result = $pir->waitForMotion(timeoutSeconds: 0.5);
+    expect($result)->toBeTrue();
+
+    // Проверяем через рефлексию что motionListeners пустой
+    $reflection = new ReflectionClass($pir);
+    $property = $reflection->getProperty('motionListeners');
+    $property->setAccessible(true);
+    expect(count($property->getValue($pir)))->toBe(0);
+});

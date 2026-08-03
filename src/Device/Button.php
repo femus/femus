@@ -54,17 +54,26 @@ final class Button
     public function waitForPress(?float $timeoutSeconds = null): bool
     {
         $pressed = false;
-        $this->pressListeners[] = function () use (&$pressed): void {
+        $listener = function () use (&$pressed): void {
             $pressed = true;
         };
+        $this->pressListeners[] = $listener;
         $deadline = $timeoutSeconds === null ? null : hrtime(true) / 1e9 + $timeoutSeconds;
-        while (!$pressed) {
-            if ($deadline !== null && hrtime(true) / 1e9 >= $deadline) {
-                return false;
+        try {
+            while (!$pressed) {
+                if ($deadline !== null && hrtime(true) / 1e9 >= $deadline) {
+                    return false;
+                }
+                $this->loop->tick(0.05);
             }
-            $this->loop->tick(0.05);
-        }
 
-        return true;
+            return true;
+        } finally {
+            $index = array_search($listener, $this->pressListeners, true);
+            if ($index !== false) {
+                unset($this->pressListeners[$index]);
+                $this->pressListeners = array_values($this->pressListeners);
+            }
+        }
     }
 }
