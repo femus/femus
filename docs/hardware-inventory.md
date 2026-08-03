@@ -69,8 +69,10 @@ Led, Buzzer в v1).
   экосистема, вне скоупа femus
 - **Cinterion DSB Multi Adapter A4** — несущая плата для модемов Cinterion
   (HC25/MC75/MC55/EHS5) — вместе с EHS5-E это полноценный GSM-стенд с AT-доступом
-- **AVR dev board** (ATmega32(?), LCD1602, кнопки, DIP-переключатели, USB-UART FT232,
-  JTAG/ISP) — учебная AVR-плата; для femus вне скоупа (нет Arduino-загрузчика из коробки)
+- **Pinboard v1.1** (DI HALT) — AVR-отладочная плата: ATmega16/32, LCD1602, кнопки,
+  DIP-переключатели, энкодер, USB-UART на FTDI + битбанг-программатор (FT BB PROG),
+  JTAG/ISP. Доки у владельца: ~/Downloads/pinboard_v11_start.pdf, Pinboard11_Tech_Info.pdf.
+  Потенциал: залить Arduino-ядро MightyCore → StandardFirmata → третья Firmata-плата
 - **Собранная макетка**: Arduino Nano V3 + XFW-HX711 + HC-05 уже разведены —
   готовый стенд для плана 4 (LoadCell) и беспроводной Firmata
 
