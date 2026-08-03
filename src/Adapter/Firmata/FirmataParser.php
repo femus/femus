@@ -17,6 +17,9 @@ final class FirmataParser
     /** @var list<callable> */
     private array $analogListeners = [];
 
+    /** @var list<callable> */
+    private array $sysexListeners = [];
+
     public function onDigitalMessage(callable $fn): void
     {
         $this->digitalListeners[] = $fn;
@@ -30,6 +33,11 @@ final class FirmataParser
     public function onAnalogMessage(callable $fn): void
     {
         $this->analogListeners[] = $fn;
+    }
+
+    public function onSysex(callable $fn): void
+    {
+        $this->sysexListeners[] = $fn;
     }
 
     public function push(string $bytes): void
@@ -75,7 +83,11 @@ final class FirmataParser
                 if ($end === false) {
                     return; // sysex ещё не пришёл целиком
                 }
-                $this->buffer = substr($this->buffer, $end + 1); // v1: sysex игнорируем
+                $payload = substr($this->buffer, 1, $end - 1);
+                $this->buffer = substr($this->buffer, $end + 1);
+                foreach ($this->sysexListeners as $listener) {
+                    $listener($payload);
+                }
             } else {
                 $this->buffer = substr($this->buffer, 1); // неизвестный байт — ресинхронизация
             }
