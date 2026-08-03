@@ -6,13 +6,13 @@ namespace Femus;
 
 use Femus\Contracts\BoardInterface;
 use Femus\Contracts\PinMode;
-use Femus\Device\Led;
-use Femus\Device\Relay;
+use Femus\Device\AnalogSensor;
 use Femus\Device\Buzzer;
 use Femus\Device\Button;
-use Femus\Device\MotionSensor;
-use Femus\Device\AnalogSensor;
+use Femus\Device\Led;
 use Femus\Device\Lcd1602;
+use Femus\Device\MotionSensor;
+use Femus\Device\Relay;
 use Femus\Runtime\Loop;
 
 abstract class AbstractBoard implements BoardInterface
