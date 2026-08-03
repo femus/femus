@@ -12,6 +12,8 @@ interface BoardInterface
 
     public function analogPin(int $channel): AnalogPin;
 
+    public function i2c(): I2cBus;
+
     public function loop(): Loop;
 
     public function run(): void;
