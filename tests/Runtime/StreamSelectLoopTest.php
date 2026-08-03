@@ -45,3 +45,14 @@ it('читает данные из потока', function () {
     $loop->run();
     expect($received)->toBe('ping');
 });
+
+it('вызывает таймер с timeout > 1s корректно', function () {
+    $loop = new StreamSelectLoop();
+    $fired = false;
+    $start = microtime(true);
+    $loop->addTimer(0.01, function () use (&$fired) { $fired = true; });
+    $loop->tick(1.5);
+    $elapsed = microtime(true) - $start;
+    expect($fired)->toBeTrue();
+    expect($elapsed)->toBeLessThan(1.0);
+});
