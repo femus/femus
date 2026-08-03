@@ -12,6 +12,7 @@ use Femus\Device\Button;
 use Femus\Device\Led;
 use Femus\Device\Lcd1602;
 use Femus\Device\MotionSensor;
+use Femus\Device\Mpu6050;
 use Femus\Device\Relay;
 use Femus\Runtime\Loop;
 
@@ -69,5 +70,10 @@ abstract class AbstractBoard implements BoardInterface
     public function lcd1602(int $address = 0x27): Lcd1602
     {
         return new Lcd1602($this->i2c(), $address);
+    }
+
+    public function mpu6050(int $address = 0x68): Mpu6050
+    {
+        return new Mpu6050($this->i2c(), $address);
     }
 }
