@@ -50,7 +50,7 @@ final class FirmataParser
 
             if (($first & 0xF0) === Firmata::DIGITAL_MESSAGE) {
                 if ($length < 3) {
-                    return; // ждём остаток
+                    return; // wait for the rest
                 }
                 $port = $first & 0x0F;
                 $bitmask = ord($this->buffer[1]) | (ord($this->buffer[2]) << 7);
@@ -81,7 +81,7 @@ final class FirmataParser
             } elseif ($first === Firmata::SYSEX_START) {
                 $end = strpos($this->buffer, chr(Firmata::SYSEX_END));
                 if ($end === false) {
-                    return; // sysex ещё не пришёл целиком
+                    return; // sysex not yet complete
                 }
                 $payload = substr($this->buffer, 1, $end - 1);
                 $this->buffer = substr($this->buffer, $end + 1);
@@ -89,7 +89,7 @@ final class FirmataParser
                     $listener($payload);
                 }
             } else {
-                $this->buffer = substr($this->buffer, 1); // неизвестный байт — ресинхронизация
+                $this->buffer = substr($this->buffer, 1); // unknown byte — resync
             }
         }
     }

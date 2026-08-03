@@ -19,7 +19,7 @@ final class FirmataBoard extends AbstractBoard
     /** @var array<int, FirmataPin> */
     private array $pins = [];
 
-    /** @var array<int, int> битмаски выходных портов */
+    /** @var array<int, int> output port bitmasks */
     private array $portState = [];
 
     /** @var array<int, FirmataAnalogPin> */
@@ -66,7 +66,7 @@ final class FirmataBoard extends AbstractBoard
             $remaining = $deadline - hrtime(true) / 1e9;
             if ($remaining <= 0) {
                 throw new BoardException(
-                    'Arduino не ответила. Прошита ли StandardFirmata? Верный ли порт?',
+                    'Arduino did not respond. Is StandardFirmata flashed? Is the port correct?',
                 );
             }
             $this->loop->tick(min(0.1, $remaining));

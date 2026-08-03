@@ -58,7 +58,7 @@ final class StreamSelectLoop implements Loop
         $this->stopped = true;
     }
 
-    /** Ждёт события не дольше $timeoutSeconds и исполняет готовые таймеры; таймеры срабатывают даже после stop(). */
+    /** Waits for an event up to $timeoutSeconds and fires due timers; timers fire even after stop(). */
     public function tick(float $timeoutSeconds): void
     {
         $timeout = max(0.0, min($timeoutSeconds, $this->timeUntilNextTimer() ?? $timeoutSeconds));
@@ -121,7 +121,7 @@ final class StreamSelectLoop implements Loop
             }
             ($timer['cb'])();
             if (!isset($this->timers[$id])) {
-                continue; // отменён внутри колбэка
+                continue; // cancelled inside the callback
             }
             if ($timer['interval'] === null) {
                 unset($this->timers[$id]);

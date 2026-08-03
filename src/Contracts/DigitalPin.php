@@ -12,6 +12,6 @@ interface DigitalPin
 
     public function read(): bool;
 
-    /** @param callable(bool): void $listener получает новое состояние пина */
+    /** @param callable(bool): void $listener receives the new pin state */
     public function onChange(callable $listener): void;
 }

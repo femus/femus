@@ -8,10 +8,10 @@ interface Transport
 {
     public function write(string $bytes): void;
 
-    /** @return resource поток для регистрации в event loop */
+    /** @return resource stream to register in the event loop */
     public function stream();
 
-    /** Прочитать всё, что накопилось, без блокировки. */
+    /** Read all available bytes without blocking. */
     public function readAvailable(): string;
 
     public function close(): void;

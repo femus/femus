@@ -8,12 +8,12 @@ interface AnalogPin
 {
     public function channel(): int;
 
-    /** Нормализованное значение 0.0–1.0. */
+    /** Normalised value 0.0–1.0. */
     public function read(): float;
 
-    /** Сырое 10-битное значение 0–1023. */
+    /** Raw 10-bit value 0–1023. */
     public function readRaw(): int;
 
-    /** @param callable(float): void $listener получает нормализованное значение */
+    /** @param callable(float): void $listener receives the normalised value */
     public function onChange(callable $listener): void;
 }

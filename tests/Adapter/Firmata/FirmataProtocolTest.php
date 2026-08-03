@@ -6,33 +6,33 @@ use Femus\Adapter\Firmata\Firmata;
 use Femus\Adapter\Firmata\FirmataEncoder;
 use Femus\Adapter\Firmata\FirmataParser;
 
-it('кодирует setPinMode', function () {
+it('encodes setPinMode', function () {
     expect(FirmataEncoder::setPinMode(13, Firmata::MODE_OUTPUT))->toBe("\xF4\x0D\x01");
 });
 
-it('кодирует digitalWrite: pin 13 = порт 1, бит 5', function () {
+it('encodes digitalWrite: pin 13 = port 1, bit 5', function () {
     expect(FirmataEncoder::digitalWrite(1, 0b00100000))->toBe("\x91\x20\x00");
 });
 
-it('кодирует digitalWrite с битом 7 в старшем байте', function () {
+it('encodes digitalWrite with bit 7 in the high byte', function () {
     expect(FirmataEncoder::digitalWrite(0, 0b10000001))->toBe("\x90\x01\x01");
 });
 
-it('кодирует включение репортинга порта', function () {
+it('encodes enabling digital port reporting', function () {
     expect(FirmataEncoder::reportDigitalPort(0, true))->toBe("\xD0\x01");
 });
 
-it('парсит digital message', function () {
+it('parses a digital message', function () {
     $parser = new FirmataParser();
     $got = null;
     $parser->onDigitalMessage(function (int $port, int $bitmask) use (&$got) {
         $got = [$port, $bitmask];
     });
-    $parser->push("\x90\x04\x00"); // порт 0, пин 2 HIGH
+    $parser->push("\x90\x04\x00"); // port 0, pin 2 HIGH
     expect($got)->toBe([0, 4]);
 });
 
-it('парсит сообщение, разрезанное между push', function () {
+it('parses a message split across push calls', function () {
     $parser = new FirmataParser();
     $got = null;
     $parser->onDigitalMessage(function (int $port, int $bitmask) use (&$got) {
@@ -44,7 +44,7 @@ it('парсит сообщение, разрезанное между push', fu
     expect($got)->toBe([0, 4]);
 });
 
-it('парсит версию протокола', function () {
+it('parses the protocol version', function () {
     $parser = new FirmataParser();
     $got = null;
     $parser->onVersion(function (int $major, int $minor) use (&$got) {
@@ -54,13 +54,13 @@ it('парсит версию протокола', function () {
     expect($got)->toBe('2.5');
 });
 
-it('пропускает sysex-блоки и мусор, не теряя следующие сообщения', function () {
+it('skips sysex blocks and garbage without losing subsequent messages', function () {
     $parser = new FirmataParser();
     $got = null;
     $parser->onDigitalMessage(function (int $port, int $bitmask) use (&$got) {
         $got = [$port, $bitmask];
     });
-    // sysex (например, отчёт о прошивке при старте) + мусорный байт + наше сообщение
+    // sysex (e.g. firmware report on start) + garbage byte + our message
     $parser->push("\xF0\x79\x02\x05\xF7" . "\x42" . "\x90\x04\x00");
     expect($got)->toBe([0, 4]);
 });

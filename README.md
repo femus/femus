@@ -1,7 +1,7 @@
 # femus
 
-PHP hardware framework: датчики, реле, кнопки и модули — из обычного PHP.
-Один код работает через Arduino (Firmata по USB) и Raspberry Pi (в планах).
+PHP hardware framework: sensors, relays, buttons and modules — from plain PHP.
+One codebase runs on Arduino (Firmata over USB) and Raspberry Pi (planned).
 
 ```php
 use Femus\Board;
@@ -17,14 +17,14 @@ $button->onRelease(fn () => $led->off());
 $board->run();
 ```
 
-## Быстрый старт
+## Quick start
 
-1. Прошей Arduino стандартной прошивкой StandardFirmata
+1. Flash your Arduino with the StandardFirmata firmware
    (Arduino IDE → File → Examples → Firmata → StandardFirmata).
-2. Пока пакет не опубликован на Packagist — установка из репозитория:
-   добавь в composer.json своего проекта:
+2. The package is not yet published on Packagist — install from the repository:
+   add to your project's composer.json:
    `"repositories": [{"type": "vcs", "url": "https://github.com/sanchescom/femus"}]`
-   затем: `composer require sanchescom/femus:dev-main`
+   then: `composer require sanchescom/femus:dev-main`
 3. `php examples/blink.php /dev/ttyUSB0`
 
 ## Status

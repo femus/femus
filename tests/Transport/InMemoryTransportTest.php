@@ -5,14 +5,14 @@ declare(strict_types=1);
 use Femus\Runtime\StreamSelectLoop;
 use Femus\Transport\InMemoryTransport;
 
-it('копит исходящие байты', function () {
+it('accumulates outgoing bytes', function () {
     $transport = new InMemoryTransport();
     $transport->write("\x01");
     $transport->write("\x02");
     expect($transport->written)->toBe("\x01\x02");
 });
 
-it('feed доставляет байты через event loop', function () {
+it('feed delivers bytes via the event loop', function () {
     $transport = new InMemoryTransport();
     $loop = new StreamSelectLoop();
     $received = '';

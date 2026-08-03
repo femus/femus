@@ -15,7 +15,7 @@ function readyAnalogBoard(InMemoryTransport $transport): FirmataBoard
     return $board;
 }
 
-it('запрос аналогового пина включает репортинг канала', function () {
+it('requesting an analog pin enables channel reporting', function () {
     $transport = new InMemoryTransport();
     $board = readyAnalogBoard($transport);
     $transport->written = '';
@@ -25,7 +25,7 @@ it('запрос аналогового пина включает репорти
     expect($transport->written)->toBe("\xC3\x01");
 });
 
-it('входящее analog message обновляет пин и зовёт onChange', function () {
+it('an incoming analog message updates the pin and calls onChange', function () {
     $transport = new InMemoryTransport();
     $board = readyAnalogBoard($transport);
     $pin = $board->analogPin(0);
@@ -44,12 +44,12 @@ it('входящее analog message обновляет пин и зовёт onCh
         ->and($seen)->toEqualWithDelta(1.0, 0.001);
 });
 
-it('сообщение чужого канала не трогает пин', function () {
+it('a message for a different channel does not affect the pin', function () {
     $transport = new InMemoryTransport();
     $board = readyAnalogBoard($transport);
     $pin = $board->analogPin(0);
 
-    $transport->feed("\xE5\x0A\x00"); // канал 5
+    $transport->feed("\xE5\x0A\x00"); // channel 5
     $board->loop()->addTimer(0.05, fn () => $board->stop());
     $board->run();
 

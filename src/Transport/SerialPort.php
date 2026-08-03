@@ -21,13 +21,13 @@ final class SerialPort implements Transport
         exec($command . ' 2>&1', $output, $exitCode);
         if ($exitCode !== 0) {
             throw new TransportException(
-                "Не удалось настроить порт {$device}: " . implode("\n", $output),
+                "Failed to configure port {$device}: " . implode("\n", $output),
             );
         }
 
         $stream = @fopen($device, 'r+b');
         if ($stream === false) {
-            throw new TransportException("Не удалось открыть {$device} (права? устройство подключено?)");
+            throw new TransportException("Failed to open {$device} (permissions? device connected?)");
         }
         stream_set_blocking($stream, false);
         $this->stream = $stream;
@@ -36,7 +36,7 @@ final class SerialPort implements Transport
     public function write(string $bytes): void
     {
         if (@fwrite($this->stream, $bytes) === false) {
-            throw new TransportException('Ошибка записи в порт (устройство отключено?)');
+            throw new TransportException('Write error (device disconnected?)');
         }
     }
 

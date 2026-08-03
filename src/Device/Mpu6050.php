@@ -43,6 +43,7 @@ final class Mpu6050
         return ['x' => $x / 131.0, 'y' => $y / 131.0, 'z' => $z / 131.0];
     }
 
+    /** Temperature in °C. */
     public function readTemperature(): float
     {
         $raw = $this->readRegister(self::REG_TEMP, 2);

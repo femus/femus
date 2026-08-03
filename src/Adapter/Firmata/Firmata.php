@@ -4,15 +4,15 @@ declare(strict_types=1);
 
 namespace Femus\Adapter\Firmata;
 
-/** Константы протокола Firmata 2.x. */
+/** Firmata 2.x protocol constants. */
 final class Firmata
 {
     public const REPORT_VERSION = 0xF9;
     public const SET_PIN_MODE = 0xF4;
-    public const DIGITAL_MESSAGE = 0x90; // | номер порта (8 пинов на порт)
-    public const REPORT_DIGITAL = 0xD0;  // | номер порта
-    public const ANALOG_MESSAGE = 0xE0; // | канал (0-15)
-    public const REPORT_ANALOG = 0xC0;  // | канал
+    public const DIGITAL_MESSAGE = 0x90; // | port number (8 pins per port)
+    public const REPORT_DIGITAL = 0xD0;  // | port number
+    public const ANALOG_MESSAGE = 0xE0; // | channel (0-15)
+    public const REPORT_ANALOG = 0xC0;  // | channel
     public const SYSEX_START = 0xF0;
     public const SYSEX_END = 0xF7;
 

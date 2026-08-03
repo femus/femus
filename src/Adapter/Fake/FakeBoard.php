@@ -46,14 +46,14 @@ final class FakeBoard extends AbstractBoard
     public function pin(int $number): FakeDigitalPin
     {
         return $this->pins[$number]
-            ?? throw new \LogicException("Пин {$number} ещё не запрошен через digitalPin()");
+            ?? throw new \LogicException("Pin {$number} has not been requested via digitalPin() yet");
     }
 
-    /** Доступ к тестовому пину; бросает LogicException, если канал не запрошен. */
+    /** Access a test analog pin; throws LogicException if the channel has not been requested. */
     public function fakeAnalogPin(int $channel): FakeAnalogPin
     {
         return $this->analogPins[$channel]
-            ?? throw new \LogicException("Аналоговый канал {$channel} ещё не запрошен");
+            ?? throw new \LogicException("Analog channel {$channel} has not been requested yet");
     }
 
     public function simulateInput(int $pin, bool $high): void
@@ -61,13 +61,13 @@ final class FakeBoard extends AbstractBoard
         $this->pin($pin)->simulate($high);
     }
 
-    /** Сценарий: инжект события через $delaySeconds внутри event loop. */
+    /** Scenario: inject an event after $delaySeconds inside the event loop. */
     public function scheduleInput(float $delaySeconds, int $pin, bool $high): void
     {
         $this->loop->addTimer($delaySeconds, fn () => $this->simulateInput($pin, $high));
     }
 
-    /** Имитация отсчёта АЦП. Канал должен быть заранее запрошен через analogPin(). */
+    /** Simulates an ADC reading. The channel must be requested via analogPin() beforehand. */
     public function simulateAnalog(int $channel, int $raw): void
     {
         $this->fakeAnalogPin($channel)->simulate($raw);

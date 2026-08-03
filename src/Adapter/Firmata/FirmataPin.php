@@ -26,7 +26,7 @@ final class FirmataPin implements DigitalPin
         return $this->number;
     }
 
-    /** Записывает состояние выходного пина; onChange-листенеры намеренно не вызываются. */
+    /** Writes the state of an output pin; onChange listeners are intentionally not called. */
     public function write(bool $high): void
     {
         $this->board->writeDigital($this->number, $high);
@@ -43,7 +43,7 @@ final class FirmataPin implements DigitalPin
         $this->listeners[] = $listener;
     }
 
-    /** @internal вызывается FirmataBoard при входящем digital message */
+    /** @internal called by FirmataBoard on an incoming digital message */
     public function updateFromBoard(bool $high): void
     {
         if ($high === $this->state) {

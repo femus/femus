@@ -7,7 +7,7 @@ namespace Tests\Adapter\Fake;
 use Femus\Adapter\Fake\FakeBoard;
 use Femus\Runtime\StreamSelectLoop;
 
-it('read нормализует 10-битное значение', function () {
+it('read normalises a 10-bit value', function () {
     $board = new FakeBoard(new StreamSelectLoop());
     $pin = $board->analogPin(0);
     $board->simulateAnalog(0, 1023);
@@ -17,18 +17,18 @@ it('read нормализует 10-битное значение', function () {
     expect($pin->read())->toEqualWithDelta(0.5005, 0.001);
 });
 
-it('onChange зовётся только при изменении значения', function () {
+it('onChange is called only when the value changes', function () {
     $board = new FakeBoard(new StreamSelectLoop());
     $pin = $board->analogPin(2);
     $seen = [];
     $pin->onChange(function (float $v) use (&$seen) { $seen[] = $v; });
     $board->simulateAnalog(2, 100);
-    $board->simulateAnalog(2, 100); // без изменения — не событие
+    $board->simulateAnalog(2, 100); // no change — not an event
     $board->simulateAnalog(2, 200);
     expect($seen)->toHaveCount(2);
 });
 
-it('scheduleAnalog инжектит значение через event loop', function () {
+it('scheduleAnalog injects a value via the event loop', function () {
     $board = new FakeBoard(new StreamSelectLoop());
     $pin = $board->analogPin(1);
     $board->scheduleAnalog(0.01, 1, 300);
@@ -37,7 +37,7 @@ it('scheduleAnalog инжектит значение через event loop', fun
     expect($pin->readRaw())->toBe(300);
 });
 
-it('канал возвращается и пин кэшируется', function () {
+it('channel is returned and the pin is cached', function () {
     $board = new FakeBoard(new StreamSelectLoop());
     $pin = $board->analogPin(3);
     expect($pin->channel())->toBe(3)

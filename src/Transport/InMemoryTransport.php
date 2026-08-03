@@ -4,15 +4,15 @@ declare(strict_types=1);
 
 namespace Femus\Transport;
 
-/** Тестовый транспорт: written копит исходящее, feed() подаёт входящее. */
+/** Test transport: written accumulates outgoing bytes, feed() injects incoming bytes. */
 final class InMemoryTransport implements Transport
 {
     public string $written = '';
 
-    /** @var resource читаемая сторона (отдаётся в event loop) */
+    /** @var resource readable side (passed to the event loop) */
     private $local;
 
-    /** @var resource пишущая сторона (feed) */
+    /** @var resource writable side (feed) */
     private $remote;
 
     public function __construct()
