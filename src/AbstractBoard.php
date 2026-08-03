@@ -5,6 +5,10 @@ declare(strict_types=1);
 namespace Femus;
 
 use Femus\Contracts\BoardInterface;
+use Femus\Contracts\PinMode;
+use Femus\Device\Led;
+use Femus\Device\Relay;
+use Femus\Device\Buzzer;
 use Femus\Runtime\Loop;
 
 abstract class AbstractBoard implements BoardInterface
@@ -26,5 +30,20 @@ abstract class AbstractBoard implements BoardInterface
     public function stop(): void
     {
         $this->loop->stop();
+    }
+
+    public function led(int $pin): Led
+    {
+        return new Led($this->digitalPin($pin, PinMode::Output), $this->loop);
+    }
+
+    public function relay(int $pin): Relay
+    {
+        return new Relay($this->digitalPin($pin, PinMode::Output));
+    }
+
+    public function buzzer(int $pin): Buzzer
+    {
+        return new Buzzer($this->digitalPin($pin, PinMode::Output), $this->loop);
     }
 }
