@@ -59,6 +59,21 @@ Led, Buzzer в v1).
 - Стартовый кит: макетка, MB102, резисторы/конденсаторы, LEDs, кнопки, зуммеры,
   оптопара 4N35, сдвиговый регистр (74HC595), транзисторы, потенциометр — обвязка
 
+### Дополнено 2026-08-03 (третья партия фото)
+- **STM32MP157C-DK2 Discovery Kit** — Linux-MPU плата (2×Cortex-A7 650МГц + M4,
+  4" TFT touch, WiFi/BT LE, Gigabit Ethernet, 40-pin RPi-совместимый разъём GPIO).
+  ⭐ Второй целевой девайс Linux-адаптера (план 2): тот же libgpiod, что и на Pi
+- **HY32D** — 3.2" TFT LCD (ILI932x, параллельная 16-битная шина + touch) — вне
+  универсального слоя v1 (как OV7670); возможен на STM32MP1/Linux через fbdev
+- **mikroElektronika TFT Developer kit 3 (XMEGA)** — mikromedia + mikroC — отдельная
+  экосистема, вне скоупа femus
+- **Cinterion DSB Multi Adapter A4** — несущая плата для модемов Cinterion
+  (HC25/MC75/MC55/EHS5) — вместе с EHS5-E это полноценный GSM-стенд с AT-доступом
+- **AVR dev board** (ATmega32(?), LCD1602, кнопки, DIP-переключатели, USB-UART FT232,
+  JTAG/ISP) — учебная AVR-плата; для femus вне скоупа (нет Arduino-загрузчика из коробки)
+- **Собранная макетка**: Arduino Nano V3 + XFW-HX711 + HC-05 уже разведены —
+  готовый стенд для плана 4 (LoadCell) и беспроводной Firmata
+
 ## Прочее
 - Камера OV7670 (параллельная шина — вне универсального слоя, Linux-only путь)
 - WLAN mini-PCIe карта, LiPo аккумулятор, блоки питания, макетка, провода
