@@ -40,7 +40,7 @@ final class Lcd1602
 
     public function setCursor(int $col, int $row): void
     {
-        $this->command(0x80 | ($col + ($row === 0 ? 0x00 : 0x40)));
+        $this->command(0x80 | $col | ($row === 0 ? 0x00 : 0x40));
     }
 
     public function write(string $text): void
