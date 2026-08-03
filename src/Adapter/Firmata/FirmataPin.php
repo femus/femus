@@ -26,6 +26,7 @@ final class FirmataPin implements DigitalPin
         return $this->number;
     }
 
+    /** Записывает состояние выходного пина; onChange-листенеры намеренно не вызываются. */
     public function write(bool $high): void
     {
         $this->board->writeDigital($this->number, $high);

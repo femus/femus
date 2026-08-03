@@ -71,6 +71,25 @@ it('входящее digital message обновляет пин и зовёт onC
     expect($seen)->toBeTrue()->and($pin->read())->toBeTrue();
 });
 
+it('входящий LOW сбрасывает пин и зовёт onChange с false', function () {
+    $transport = new InMemoryTransport();
+    $board = readyBoard($transport);
+    $pin = $board->digitalPin(2, PinMode::Input);
+    $transport->feed("\x90\x04\x00"); // пин 2 HIGH
+
+    $seen = null;
+    $pin->onChange(function (bool $high) use (&$seen, $board) {
+        $seen = $high;
+        $board->stop();
+    });
+
+    $transport->feed("\x90\x00\x00"); // пин 2 LOW
+    $board->loop()->addTimer(1.0, fn () => $board->stop()); // страховка от зависания
+    $board->run();
+
+    expect($seen)->toBeFalse()->and($pin->read())->toBeFalse();
+});
+
 it('два выходных пина одного порта не затирают друг друга', function () {
     $transport = new InMemoryTransport();
     $board = readyBoard($transport);

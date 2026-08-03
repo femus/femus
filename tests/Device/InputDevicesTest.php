@@ -111,6 +111,19 @@ it('motion sensor: waitForMotion удаляет временный слушат�
     expect(count($property->getValue($pir)))->toBe(0);
 });
 
+it('button: onRelease срабатывает после debounce-окна', function () {
+    $board = new FakeBoard(new StreamSelectLoop());
+    $board->digitalPin(2, PinMode::InputPullUp)->write(true); // начальное состояние: не нажата
+    $button = $board->button(2, debounceSeconds: 0.0);
+    $presses = 0;
+    $releases = 0;
+    $button->onPress(function () use (&$presses) { $presses++; });
+    $button->onRelease(function () use (&$releases) { $releases++; });
+    $board->simulateInput(2, false); // нажали (LOW = pressed для active-low)
+    $board->simulateInput(2, true);  // отпустили
+    expect($presses)->toBe(1)->and($releases)->toBe(1);
+});
+
 it('motion sensor: waitForMotion удаляет временный слушатель при успехе', function () {
     $board = new FakeBoard(new StreamSelectLoop());
     $pir = $board->motionSensor(4);

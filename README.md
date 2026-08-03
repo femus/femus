@@ -21,7 +21,10 @@ $board->run();
 
 1. Прошей Arduino стандартной прошивкой StandardFirmata
    (Arduino IDE → File → Examples → Firmata → StandardFirmata).
-2. `composer require sanchescom/femus`
+2. Пока пакет не опубликован на Packagist — установка из репозитория:
+   добавь в composer.json своего проекта:
+   `"repositories": [{"type": "vcs", "url": "https://github.com/sanchescom/femus"}]`
+   затем: `composer require sanchescom/femus:dev-main`
 3. `php examples/blink.php /dev/ttyUSB0`
 
 ## Статус

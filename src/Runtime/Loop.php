@@ -25,6 +25,6 @@ interface Loop
 
     public function stop(): void;
 
-    /** Одна итерация: ждёт события не дольше $timeoutSeconds, исполняет готовые таймеры. */
+    /** Одна итерация: ждёт события не дольше $timeoutSeconds, исполняет готовые таймеры; таймеры срабатывают даже после stop(). */
     public function tick(float $timeoutSeconds): void;
 }
