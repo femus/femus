@@ -58,6 +58,7 @@ final class StreamSelectLoop implements Loop
         $this->stopped = true;
     }
 
+    /** Ждёт события не дольше $timeoutSeconds и исполняет готовые таймеры; таймеры срабатывают даже после stop(). */
     public function tick(float $timeoutSeconds): void
     {
         $timeout = max(0.0, min($timeoutSeconds, $this->timeUntilNextTimer() ?? $timeoutSeconds));
