@@ -24,6 +24,11 @@ final class FirmataEncoder
         return chr(Firmata::REPORT_DIGITAL | $port) . chr($enable ? 1 : 0);
     }
 
+    public static function reportAnalogChannel(int $channel, bool $enable): string
+    {
+        return chr(Firmata::REPORT_ANALOG | $channel) . chr($enable ? 1 : 0);
+    }
+
     private function __construct()
     {
     }

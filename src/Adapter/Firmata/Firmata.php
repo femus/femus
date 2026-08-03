@@ -11,6 +11,8 @@ final class Firmata
     public const SET_PIN_MODE = 0xF4;
     public const DIGITAL_MESSAGE = 0x90; // | номер порта (8 пинов на порт)
     public const REPORT_DIGITAL = 0xD0;  // | номер порта
+    public const ANALOG_MESSAGE = 0xE0; // | канал (0-15)
+    public const REPORT_ANALOG = 0xC0;  // | канал
     public const SYSEX_START = 0xF0;
     public const SYSEX_END = 0xF7;
 

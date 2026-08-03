@@ -14,6 +14,9 @@ final class FirmataParser
     /** @var list<callable> */
     private array $versionListeners = [];
 
+    /** @var list<callable> */
+    private array $analogListeners = [];
+
     public function onDigitalMessage(callable $fn): void
     {
         $this->digitalListeners[] = $fn;
@@ -22,6 +25,11 @@ final class FirmataParser
     public function onVersion(callable $fn): void
     {
         $this->versionListeners[] = $fn;
+    }
+
+    public function onAnalogMessage(callable $fn): void
+    {
+        $this->analogListeners[] = $fn;
     }
 
     public function push(string $bytes): void
@@ -51,6 +59,16 @@ final class FirmataParser
                 $this->buffer = substr($this->buffer, 3);
                 foreach ($this->versionListeners as $listener) {
                     $listener($major, $minor);
+                }
+            } elseif (($first & 0xF0) === Firmata::ANALOG_MESSAGE) {
+                if ($length < 3) {
+                    return;
+                }
+                $channel = $first & 0x0F;
+                $value = ord($this->buffer[1]) | (ord($this->buffer[2]) << 7);
+                $this->buffer = substr($this->buffer, 3);
+                foreach ($this->analogListeners as $listener) {
+                    $listener($channel, $value);
                 }
             } elseif ($first === Firmata::SYSEX_START) {
                 $end = strpos($this->buffer, chr(Firmata::SYSEX_END));
