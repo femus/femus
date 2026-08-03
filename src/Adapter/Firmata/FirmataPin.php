@@ -28,8 +28,8 @@ final class FirmataPin implements DigitalPin
 
     public function write(bool $high): void
     {
-        $this->state = $high;
         $this->board->writeDigital($this->number, $high);
+        $this->state = $high;
     }
 
     public function read(): bool
