@@ -55,12 +55,13 @@ final class FirmataBoard extends AbstractBoard
     {
         $deadline = hrtime(true) / 1e9 + $this->handshakeTimeout;
         while (!$this->ready) {
-            if (hrtime(true) / 1e9 >= $deadline) {
+            $remaining = $deadline - hrtime(true) / 1e9;
+            if ($remaining <= 0) {
                 throw new BoardException(
                     'Arduino не ответила. Прошита ли StandardFirmata? Верный ли порт?',
                 );
             }
-            $this->loop->tick(0.1);
+            $this->loop->tick(min(0.1, $remaining));
         }
     }
 
