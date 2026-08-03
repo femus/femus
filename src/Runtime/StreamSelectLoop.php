@@ -66,7 +66,9 @@ final class StreamSelectLoop implements Loop
             $read = array_values($this->readStreams);
             $write = null;
             $except = null;
-            $changed = @stream_select($read, $write, $except, 0, (int) round($timeout * 1_000_000));
+            $tvSec = (int) $timeout;
+            $tvUsec = (int) round(($timeout - $tvSec) * 1_000_000);
+            $changed = @stream_select($read, $write, $except, $tvSec, $tvUsec);
             if ($changed !== false && $changed > 0) {
                 foreach ($read as $stream) {
                     $listener = $this->readListeners[(int) $stream] ?? null;
@@ -76,7 +78,11 @@ final class StreamSelectLoop implements Loop
                 }
             }
         } elseif ($timeout > 0) {
-            usleep((int) round($timeout * 1_000_000));
+            $tvSec = (int) $timeout;
+            if ($tvSec > 0) {
+                sleep($tvSec);
+            }
+            usleep((int) round(($timeout - $tvSec) * 1_000_000));
         }
 
         $this->fireDueTimers();
