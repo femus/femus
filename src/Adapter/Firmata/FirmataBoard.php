@@ -7,6 +7,7 @@ namespace Femus\Adapter\Firmata;
 use Femus\AbstractBoard;
 use Femus\Contracts\AnalogPin;
 use Femus\Contracts\DigitalPin;
+use Femus\Contracts\I2cBus;
 use Femus\Contracts\PinMode;
 use Femus\Runtime\Loop;
 use Femus\Runtime\StreamSelectLoop;
@@ -25,6 +26,8 @@ final class FirmataBoard extends AbstractBoard
     private array $analogPins = [];
 
     private readonly FirmataParser $parser;
+
+    private ?FirmataI2cBus $i2c = null;
 
     private bool $ready = false;
 
@@ -86,6 +89,11 @@ final class FirmataBoard extends AbstractBoard
         }
 
         return $this->pins[$number];
+    }
+
+    public function i2c(): I2cBus
+    {
+        return $this->i2c ??= new FirmataI2cBus($this->transport, $this->parser, $this->loop);
     }
 
     public function analogPin(int $channel): AnalogPin

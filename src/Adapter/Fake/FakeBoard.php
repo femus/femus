@@ -7,6 +7,7 @@ namespace Femus\Adapter\Fake;
 use Femus\AbstractBoard;
 use Femus\Contracts\AnalogPin;
 use Femus\Contracts\DigitalPin;
+use Femus\Contracts\I2cBus;
 use Femus\Contracts\PinMode;
 
 final class FakeBoard extends AbstractBoard
@@ -17,6 +18,8 @@ final class FakeBoard extends AbstractBoard
     /** @var array<int, FakeAnalogPin> */
     private array $analogPins = [];
 
+    private ?FakeI2cBus $i2c = null;
+
     public function digitalPin(int $number, PinMode $mode): DigitalPin
     {
         return $this->pins[$number] ??= new FakeDigitalPin($number, $mode);
@@ -25,6 +28,19 @@ final class FakeBoard extends AbstractBoard
     public function analogPin(int $channel): AnalogPin
     {
         return $this->analogPins[$channel] ??= new FakeAnalogPin($channel);
+    }
+
+    public function i2c(): I2cBus
+    {
+        return $this->i2c ??= new FakeI2cBus();
+    }
+
+    public function fakeI2c(): FakeI2cBus
+    {
+        $bus = $this->i2c();
+        assert($bus instanceof FakeI2cBus);
+
+        return $bus;
     }
 
     public function pin(int $number): FakeDigitalPin
