@@ -10,6 +10,8 @@ interface BoardInterface
 {
     public function digitalPin(int $number, PinMode $mode): DigitalPin;
 
+    public function analogPin(int $channel): AnalogPin;
+
     public function loop(): Loop;
 
     public function run(): void;

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Femus\Adapter\Firmata;
 
 use Femus\AbstractBoard;
+use Femus\Contracts\AnalogPin;
 use Femus\Contracts\DigitalPin;
 use Femus\Contracts\PinMode;
 use Femus\Runtime\Loop;
@@ -81,6 +82,11 @@ final class FirmataBoard extends AbstractBoard
         }
 
         return $this->pins[$number];
+    }
+
+    public function analogPin(int $channel): AnalogPin
+    {
+        throw new BoardException('Аналоговые пины Firmata реализуются в следующей задаче');
     }
 
     /** @internal */
