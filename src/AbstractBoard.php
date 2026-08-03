@@ -11,6 +11,7 @@ use Femus\Device\Relay;
 use Femus\Device\Buzzer;
 use Femus\Device\Button;
 use Femus\Device\MotionSensor;
+use Femus\Device\AnalogSensor;
 use Femus\Runtime\Loop;
 
 abstract class AbstractBoard implements BoardInterface
@@ -57,5 +58,10 @@ abstract class AbstractBoard implements BoardInterface
     public function motionSensor(int $pin): MotionSensor
     {
         return new MotionSensor($this->digitalPin($pin, PinMode::Input), $this->loop);
+    }
+
+    public function analogSensor(int $channel, float $threshold = 0.01): AnalogSensor
+    {
+        return new AnalogSensor($this->analogPin($channel), $this->loop, $threshold);
     }
 }
