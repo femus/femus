@@ -27,9 +27,10 @@ $board->run();
    затем: `composer require sanchescom/femus:dev-main`
 3. `php examples/blink.php /dev/ttyUSB0`
 
-## Статус
+## Status
 
-В разработке. Готово: event loop, Firmata-адаптер (цифровой I/O),
-Led / Relay / Buzzer / Button / MotionSensor, FakeBoard для тестов без железа.
-Дальше по roadmap: Linux/FFI-адаптер (Raspberry Pi), аналоговые входы, I2C,
-тензодатчик HX711, GSM/AT-стек, CLI-отладка.
+In development. Ready: event loop, Firmata adapter (digital I/O, analog inputs,
+I2C), devices Led / Relay / Buzzer / Button / MotionSensor /
+AnalogSensor / Lcd1602 / Mpu6050, FakeBoard for tests without hardware.
+Next on the roadmap: Linux/FFI adapter (Raspberry Pi), load cell HX711,
+GSM/AT stack, CLI debugging.
