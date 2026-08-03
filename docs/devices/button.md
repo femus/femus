@@ -1,24 +1,25 @@
-# Кнопка (модуль KY-004 или любая тактовая кнопка)
+# Button (KY-004 module or any tactile button)
 
-## Подключение к Arduino (Firmata-адаптер)
+## Wiring to Arduino (Firmata adapter)
 
-| Пин кнопки | Arduino |
-|------------|---------|
-| S (сигнал) | D2      |
-| — (земля)  | GND     |
+| Button pin  | Arduino |
+|-------------|---------|
+| S (signal)  | D2      |
+| − (ground)  | GND     |
 
-Средний пин (+) модуля KY-004 не подключаем: femus включает внутреннюю
-подтяжку (INPUT_PULLUP), нажатие замыкает сигнал на землю (active-low).
+The middle (+) pin of the KY-004 module is left unconnected: femus enables the
+internal pull-up (INPUT_PULLUP), so pressing the button pulls the signal line to
+ground (active-low).
 
-## Код
+## Code
 
 ```php
 $button = $board->button(2);
-$button->onPress(fn () => print("нажата\n"));
+$button->onPress(fn () => print("pressed\n"));
 $board->run();
 ```
 
-## Проверка
+## Verification
 
-`php examples/button-led.php /dev/ttyUSB0` — при удержании кнопки горит
-светодиод на плате (пин 13).
+`php examples/button-led.php /dev/ttyUSB0` — hold the button and the on-board
+LED (pin 13) lights up.

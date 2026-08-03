@@ -6,9 +6,9 @@ use Femus\Adapter\Fake\FakeBoard;
 use Femus\Contracts\PinMode;
 use Femus\Runtime\StreamSelectLoop;
 
-it('цепочка: кнопка включает реле, PIR включает зуммер', function () {
+it('chain: button turns relay on, PIR turns buzzer on', function () {
     $board = new FakeBoard(new StreamSelectLoop());
-    $board->digitalPin(2, PinMode::InputPullUp)->write(true); // подтяжка кнопки
+    $board->digitalPin(2, PinMode::InputPullUp)->write(true); // button pull-up
     $button = $board->button(2);
     $relay = $board->relay(7);
     $pir = $board->motionSensor(4);
@@ -17,8 +17,8 @@ it('цепочка: кнопка включает реле, PIR включает
     $button->onPress(fn () => $relay->on());
     $pir->onMotion(fn () => $buzzer->on());
 
-    $board->scheduleInput(0.01, 2, false);   // t+10мс: нажатие
-    $board->scheduleInput(0.02, 4, true);    // t+20мс: движение
+    $board->scheduleInput(0.01, 2, false);   // t+10ms: button press
+    $board->scheduleInput(0.02, 4, true);    // t+20ms: motion detected
     $board->loop()->addTimer(0.05, fn () => $board->stop());
 
     $board->run();

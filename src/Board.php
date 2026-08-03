@@ -15,7 +15,7 @@ final class Board
         return new FakeBoard(new StreamSelectLoop());
     }
 
-    /** Arduino с прошивкой StandardFirmata, подключённая по USB. */
+    /** Arduino with StandardFirmata firmware connected via USB. */
     public static function firmata(string $device, int $baudRate = 57600): FirmataBoard
     {
         return FirmataBoard::open($device, $baudRate);

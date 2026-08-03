@@ -8,11 +8,11 @@ use Femus\Board;
 
 $board = Board::firmata($argv[1] ?? '/dev/ttyUSB0');
 
-$button = $board->button(2);   // кнопка: пин 2 — GND (внутренняя подтяжка)
+$button = $board->button(2);   // button: pin 2 — GND (internal pull-up)
 $led = $board->led(13);
 
 $button->onPress(fn () => $led->on());
 $button->onRelease(fn () => $led->off());
 
-echo "Держи кнопку — горит светодиод. Ctrl+C для выхода.\n";
+echo "Hold the button — LED lights up. Press Ctrl+C to quit.\n";
 $board->run();

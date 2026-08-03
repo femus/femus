@@ -11,7 +11,7 @@ final class FirmataEncoder
         return chr(Firmata::SET_PIN_MODE) . chr($pin) . chr($mode);
     }
 
-    /** Firmata передаёт 14-битные значения по 7 бит: младшие 7, затем старшие. */
+    /** Firmata transmits 14-bit values as 7-bit pairs: lower 7 bits first, then upper. */
     public static function digitalWrite(int $port, int $bitmask): string
     {
         return chr(Firmata::DIGITAL_MESSAGE | $port)
@@ -53,7 +53,7 @@ final class FirmataEncoder
             . chr(Firmata::SYSEX_END);
     }
 
-    /** Каждый байт → пара 7-битных: LSB, затем старший бит. */
+    /** Each byte → a 7-bit pair: LSB first, then the high bit. */
     private static function encode7bitPairs(string $bytes): string
     {
         $out = '';

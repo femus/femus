@@ -40,7 +40,7 @@ final class FakeDigitalPin implements DigitalPin
         $this->listeners[] = $listener;
     }
 
-    /** Тестовый вход: имитация внешнего сигнала на пине. */
+    /** Test input: simulates an external signal on the pin. */
     public function simulate(bool $high): void
     {
         if ($high === $this->state) {

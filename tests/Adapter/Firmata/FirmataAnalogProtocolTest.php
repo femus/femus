@@ -6,12 +6,12 @@ use Femus\Adapter\Firmata\Firmata;
 use Femus\Adapter\Firmata\FirmataEncoder;
 use Femus\Adapter\Firmata\FirmataParser;
 
-it('кодирует включение репортинга аналогового канала', function () {
+it('encodes enabling analog channel reporting', function () {
     expect(FirmataEncoder::reportAnalogChannel(0, true))->toBe("\xC0\x01")
         ->and(FirmataEncoder::reportAnalogChannel(5, false))->toBe("\xC5\x00");
 });
 
-it('парсит analog message: канал 2, значение 1023', function () {
+it('parses analog message: channel 2, value 1023', function () {
     $parser = new FirmataParser();
     $got = null;
     $parser->onAnalogMessage(function (int $ch, int $value) use (&$got) {
@@ -21,7 +21,7 @@ it('парсит analog message: канал 2, значение 1023', function 
     expect($got)->toBe([2, 1023]);
 });
 
-it('парсит analog message, разрезанное между push', function () {
+it('parses an analog message split across push calls', function () {
     $parser = new FirmataParser();
     $got = null;
     $parser->onAnalogMessage(function (int $ch, int $value) use (&$got) {
@@ -32,7 +32,7 @@ it('парсит analog message, разрезанное между push', functi
     expect($got)->toBe([0, 192]);
 });
 
-it('digital и analog сообщения в одном потоке не мешают друг другу', function () {
+it('digital and analog messages in the same stream do not interfere', function () {
     $parser = new FirmataParser();
     $events = [];
     $parser->onDigitalMessage(function (int $port, int $mask) use (&$events) {

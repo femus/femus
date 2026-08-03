@@ -13,7 +13,7 @@ final class I2cReply
     ) {
     }
 
-    /** Разбирает payload sysex-фрейма; null, если это не I2C_REPLY. */
+    /** Parses the sysex frame payload; returns null if it is not an I2C_REPLY. */
     public static function fromSysexPayload(string $payload): ?self
     {
         if ($payload === '' || ord($payload[0]) !== Firmata::I2C_REPLY || strlen($payload) < 5) {

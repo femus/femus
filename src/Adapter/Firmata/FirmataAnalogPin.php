@@ -37,7 +37,7 @@ final class FirmataAnalogPin implements AnalogPin
         $this->listeners[] = $listener;
     }
 
-    /** @internal вызывается FirmataBoard при входящем analog message */
+    /** @internal called by FirmataBoard on an incoming analog message */
     public function updateFromBoard(int $raw): void
     {
         if ($raw === $this->raw) {

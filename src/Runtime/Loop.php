@@ -12,19 +12,19 @@ interface Loop
     /** @param resource $stream */
     public function removeReadStream($stream): void;
 
-    /** @return string id таймера */
+    /** @return string timer id */
     public function addTimer(float $delaySeconds, callable $callback): string;
 
-    /** @return string id таймера */
+    /** @return string timer id */
     public function addPeriodicTimer(float $intervalSeconds, callable $callback): string;
 
     public function cancelTimer(string $timerId): void;
 
-    /** Крутится, пока не вызван stop() и пока есть таймеры или потоки. */
+    /** Runs until stop() is called and there are no remaining timers or streams. */
     public function run(): void;
 
     public function stop(): void;
 
-    /** Одна итерация: ждёт события не дольше $timeoutSeconds, исполняет готовые таймеры; таймеры срабатывают даже после stop(). */
+    /** Single iteration: waits up to $timeoutSeconds, fires due timers; timers fire even after stop(). */
     public function tick(float $timeoutSeconds): void;
 }

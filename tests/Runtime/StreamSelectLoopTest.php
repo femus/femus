@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 use Femus\Runtime\StreamSelectLoop;
 
-it('вызывает одноразовый таймер ровно один раз', function () {
+it('fires a one-shot timer exactly once', function () {
     $loop = new StreamSelectLoop();
     $calls = 0;
     $loop->addTimer(0.01, function () use (&$calls) { $calls++; });
@@ -12,7 +12,7 @@ it('вызывает одноразовый таймер ровно один р�
     expect($calls)->toBe(1);
 });
 
-it('вызывает периодический таймер до отмены', function () {
+it('fires a periodic timer until cancelled', function () {
     $loop = new StreamSelectLoop();
     $calls = 0;
     $id = null;
@@ -25,14 +25,14 @@ it('вызывает периодический таймер до отмены',
     expect($calls)->toBe(3);
 });
 
-it('останавливается по stop() изнутри колбэка', function () {
+it('stops on stop() called from within a callback', function () {
     $loop = new StreamSelectLoop();
     $loop->addPeriodicTimer(0.001, fn () => $loop->stop());
-    $loop->run(); // не должен зависнуть
+    $loop->run(); // must not hang
     expect(true)->toBeTrue();
 });
 
-it('читает данные из потока', function () {
+it('reads data from a stream', function () {
     $loop = new StreamSelectLoop();
     [$a, $b] = stream_socket_pair(STREAM_PF_UNIX, STREAM_SOCK_STREAM, STREAM_IPPROTO_IP);
     stream_set_blocking($a, false);
@@ -46,7 +46,7 @@ it('читает данные из потока', function () {
     expect($received)->toBe('ping');
 });
 
-it('вызывает таймер с timeout > 1s корректно', function () {
+it('fires a timer with timeout > 1s correctly', function () {
     $loop = new StreamSelectLoop();
     $fired = false;
     $start = microtime(true);

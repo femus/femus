@@ -37,7 +37,7 @@ final class FakeAnalogPin implements AnalogPin
         $this->listeners[] = $listener;
     }
 
-    /** Тестовый вход: имитация нового отсчёта АЦП. */
+    /** Test input: simulates a new ADC reading. */
     public function simulate(int $raw): void
     {
         if ($raw === $this->raw) {

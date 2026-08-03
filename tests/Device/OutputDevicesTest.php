@@ -5,7 +5,7 @@ declare(strict_types=1);
 use Femus\Adapter\Fake\FakeBoard;
 use Femus\Runtime\StreamSelectLoop;
 
-it('led включается, выключается и переключается', function () {
+it('LED turns on, turns off, and toggles', function () {
     $board = new FakeBoard(new StreamSelectLoop());
     $led = $board->led(13);
     $led->on();
@@ -14,7 +14,7 @@ it('led включается, выключается и переключаетс
     expect($led->isOn())->toBeFalse();
 });
 
-it('led мигает по таймеру', function () {
+it('LED blinks on a timer', function () {
     $board = new FakeBoard(new StreamSelectLoop());
     $led = $board->led(13);
     $led->blink(0.005);
@@ -23,12 +23,12 @@ it('led мигает по таймеру', function () {
         $board->stop();
     });
     $board->run();
-    // за ~30мс при периоде 5мс LED обязан был переключиться хотя бы дважды —
-    // проверяем сам факт работы таймера через состояние пина
+    // in ~30ms with a 5ms period the LED must have toggled at least twice —
+    // verify the timer worked by checking the pin mode
     expect($board->pin(13)->mode)->toBe(\Femus\Contracts\PinMode::Output);
 });
 
-it('relay щёлкает', function () {
+it('relay clicks', function () {
     $board = new FakeBoard(new StreamSelectLoop());
     $relay = $board->relay(7);
     $relay->on();
@@ -36,11 +36,11 @@ it('relay щёлкает', function () {
         ->and($board->pin(7)->read())->toBeTrue();
 });
 
-it('buzzer пищит заданное время и замолкает', function () {
+it('buzzer beeps for the given duration and then goes silent', function () {
     $board = new FakeBoard(new StreamSelectLoop());
     $buzzer = $board->buzzer(8);
     $buzzer->beep(0.01);
     expect($buzzer->isOn())->toBeTrue();
-    $board->run(); // таймер выключения — единственный, run() завершится сам
+    $board->run(); // the off-timer is the only one; run() exits by itself
     expect($buzzer->isOn())->toBeFalse();
 });
