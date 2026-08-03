@@ -12,6 +12,7 @@ use Femus\Device\Buzzer;
 use Femus\Device\Button;
 use Femus\Device\MotionSensor;
 use Femus\Device\AnalogSensor;
+use Femus\Device\Lcd1602;
 use Femus\Runtime\Loop;
 
 abstract class AbstractBoard implements BoardInterface
@@ -63,5 +64,10 @@ abstract class AbstractBoard implements BoardInterface
     public function analogSensor(int $channel, float $threshold = 0.01): AnalogSensor
     {
         return new AnalogSensor($this->analogPin($channel), $this->loop, $threshold);
+    }
+
+    public function lcd1602(int $address = 0x27): Lcd1602
+    {
+        return new Lcd1602($this->i2c(), $address);
     }
 }
