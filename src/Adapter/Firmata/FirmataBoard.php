@@ -21,6 +21,9 @@ final class FirmataBoard extends AbstractBoard
     /** @var array<int, int> битмаски выходных портов */
     private array $portState = [];
 
+    /** @var array<int, FirmataAnalogPin> */
+    private array $analogPins = [];
+
     private readonly FirmataParser $parser;
 
     private bool $ready = false;
@@ -37,6 +40,7 @@ final class FirmataBoard extends AbstractBoard
             $this->ready = true;
         });
         $this->parser->onDigitalMessage($this->handleDigitalMessage(...));
+        $this->parser->onAnalogMessage($this->handleAnalogMessage(...));
 
         $loop->addReadStream(
             $transport->stream(),
@@ -86,7 +90,12 @@ final class FirmataBoard extends AbstractBoard
 
     public function analogPin(int $channel): AnalogPin
     {
-        throw new BoardException('Аналоговые пины Firmata реализуются в следующей задаче');
+        if (!isset($this->analogPins[$channel])) {
+            $this->transport->write(FirmataEncoder::reportAnalogChannel($channel, true));
+            $this->analogPins[$channel] = new FirmataAnalogPin($channel);
+        }
+
+        return $this->analogPins[$channel];
     }
 
     /** @internal */
@@ -107,6 +116,13 @@ final class FirmataBoard extends AbstractBoard
                 continue;
             }
             $pin->updateFromBoard((bool) ($bitmask & (1 << ($number % 8))));
+        }
+    }
+
+    private function handleAnalogMessage(int $channel, int $value): void
+    {
+        if (isset($this->analogPins[$channel])) {
+            $this->analogPins[$channel]->updateFromBoard($value);
         }
     }
 }
