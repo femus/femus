@@ -26,6 +26,10 @@ final class Firmata
     public const MODE_OUTPUT = 0x01;
     public const MODE_PULLUP = 0x0B;
 
+    public const FEMUS_HX711 = 0x0E;
+    public const HX711_ATTACH = 0x00;
+    public const HX711_READING = 0x01;
+
     private function __construct()
     {
     }

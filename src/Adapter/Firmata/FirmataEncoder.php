@@ -53,6 +53,13 @@ final class FirmataEncoder
             . chr(Firmata::SYSEX_END);
     }
 
+    public static function hx711Attach(int $doutPin, int $sckPin): string
+    {
+        return chr(Firmata::SYSEX_START) . chr(Firmata::FEMUS_HX711) . chr(Firmata::HX711_ATTACH)
+            . chr($doutPin) . chr($sckPin)
+            . chr(Firmata::SYSEX_END);
+    }
+
     /** Each byte → a 7-bit pair: LSB first, then the high bit. */
     private static function encode7bitPairs(string $bytes): string
     {
