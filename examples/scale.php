@@ -7,9 +7,14 @@ require __DIR__ . '/../vendor/autoload.php';
 use Femus\Board;
 
 // HX711: VCC -> 5V, GND -> GND, DT -> D3, SCK -> D2 (FemusFirmata required)
+// Usage: php examples/scale.php [port] [dout-pin] [sck-pin]
 $board = Board::firmata($argv[1] ?? null);
 
-$cell = $board->loadCell(3, 2, thresholdGrams: 0.5);
+$doutPin = (int) ($argv[2] ?? 3);
+$sckPin = (int) ($argv[3] ?? 2);
+printf("HX711 on DT=D%d SCK=D%d.\n", $doutPin, $sckPin);
+
+$cell = $board->loadCell($doutPin, $sckPin, thresholdGrams: 0.5);
 
 $cell->onChange(function (float $grams) {
     printf("Weight: %+.1f (raw units until calibrated)\n", $grams);
