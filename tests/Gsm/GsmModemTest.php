@@ -81,3 +81,14 @@ it('init sends the setup sequence and fails loudly on rejection', function () {
     $modem->init();
     expect($transport->written)->toBe("ATE0\rAT+CMGF=1\rAT+CNMI=2,1,0,0,0\r");
 });
+
+it('init fails loudly when the modem rejects a setup command', function () {
+    [$modem, $transport, $loop] = gsmModem();
+    $loop->addTimer(0.01, fn () => $transport->feed("ERROR\r\n"));
+    $modem->init();
+})->throws(AtException::class);
+
+it('sendSms rejects malformed numbers', function () {
+    [$modem] = gsmModem();
+    $modem->sendSms('+79" evil', 'Hello');
+})->throws(\InvalidArgumentException::class);
