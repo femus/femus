@@ -10,6 +10,37 @@
 
 Channels A0–A5 correspond to analogSensor(0)…analogSensor(5).
 
+## Breadboard
+
+```
+      Arduino Nano
+      ┌─────────┐
+   5V │ ●       │
+  GND │ ●       │
+   A0 │ ●       │
+      └─────────┘
+        │   │   │
+        │   │   └── A0 ────────────── sensor S (signal) pin
+        │   └─────── GND rail (blue) ── sensor − (ground) pin
+        └─────────── 5V rail (red)  ── sensor + (power)  pin
+
+  All three sensor wires land in three separate breadboard rows;
+  the power rails distribute 5V and GND across the board.
+```
+
+Resistors: none needed — analog sensor modules (water level, photoresistor,
+joystick) include onboard resistors; the Arduino ADC input has no pull-down
+requirement for these module types.
+
+**Common mistakes**
+
+1. Swapping S and + — the signal line goes to 5V permanently, ADC reads ~1023
+   regardless of the physical input; check the label printed on the module.
+2. Using 3.3V instead of 5V — most KY-style modules are rated for 5V;
+   the reading will be clipped and noisy on 3.3V.
+3. Leaving the ground wire disconnected — the floating reference causes
+   random, drifting ADC values even when the sensor is untouched.
+
 ## Code
 
 ```php
