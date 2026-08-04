@@ -9,6 +9,7 @@ use Femus\Contracts\AnalogPin;
 use Femus\Contracts\DigitalPin;
 use Femus\Contracts\I2cBus;
 use Femus\Contracts\PinMode;
+use Femus\Contracts\RadioLink;
 use Femus\Contracts\ScaleInput;
 
 final class FakeBoard extends AbstractBoard
@@ -23,6 +24,9 @@ final class FakeBoard extends AbstractBoard
 
     /** @var array<string, FakeScaleInput> */
     private array $scaleInputs = [];
+
+    /** @var array<int, FakeRadioLink> */
+    private array $radioLinks = [];
 
     public function digitalPin(int $number, PinMode $mode): DigitalPin
     {
@@ -101,5 +105,21 @@ final class FakeBoard extends AbstractBoard
     public function scheduleScaleReading(float $delaySeconds, int $doutPin, int $sckPin, int $raw): void
     {
         $this->loop->addTimer($delaySeconds, fn () => $this->simulateScaleReading($doutPin, $sckPin, $raw));
+    }
+
+    public function radioLink(int $address, int $rxPin = 11, int $txPin = 12): RadioLink
+    {
+        return $this->radioLinks[$address] ??= new FakeRadioLink($address);
+    }
+
+    public function fakeRadio(int $address): FakeRadioLink
+    {
+        return $this->radioLinks[$address]
+            ?? throw new \LogicException("Radio link {$address} has not been requested yet");
+    }
+
+    public function simulateRadioMessage(int $address, int $from, int $to, string $message): void
+    {
+        $this->fakeRadio($address)->simulateMessage($from, $to, $message);
     }
 }

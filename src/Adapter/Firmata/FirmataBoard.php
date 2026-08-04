@@ -9,6 +9,7 @@ use Femus\Contracts\AnalogPin;
 use Femus\Contracts\DigitalPin;
 use Femus\Contracts\I2cBus;
 use Femus\Contracts\PinMode;
+use Femus\Contracts\RadioLink;
 use Femus\Contracts\ScaleInput;
 use Femus\Runtime\Loop;
 use Femus\Runtime\StreamSelectLoop;
@@ -32,6 +33,9 @@ final class FirmataBoard extends AbstractBoard
 
     /** @var array<string, FirmataScaleInput> */
     private array $scaleInputs = [];
+
+    /** @var array<int, FirmataRadioLink> */
+    private array $radioLinks = [];
 
     private bool $ready = false;
 
@@ -150,5 +154,11 @@ final class FirmataBoard extends AbstractBoard
     {
         return $this->scaleInputs["{$doutPin}:{$sckPin}"]
             ??= new FirmataScaleInput($this->transport, $this->parser, $doutPin, $sckPin);
+    }
+
+    public function radioLink(int $address, int $rxPin = 11, int $txPin = 12): RadioLink
+    {
+        return $this->radioLinks[$address]
+            ??= new FirmataRadioLink($this->transport, $this->parser, $address, $rxPin, $txPin);
     }
 }
