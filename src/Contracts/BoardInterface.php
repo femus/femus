@@ -16,6 +16,8 @@ interface BoardInterface
 
     public function scaleInput(int $doutPin, int $sckPin): ScaleInput;
 
+    public function radioLink(int $address, int $rxPin = 11, int $txPin = 12): RadioLink;
+
     public function loop(): Loop;
 
     public function run(): void;
