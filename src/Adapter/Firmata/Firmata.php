@@ -30,6 +30,11 @@ final class Firmata
     public const HX711_ATTACH = 0x00;
     public const HX711_READING = 0x01;
 
+    public const FEMUS_RADIO = 0x0D;
+    public const RADIO_ATTACH = 0x00;
+    public const RADIO_SEND = 0x01;
+    public const RADIO_RECV = 0x02;
+
     private function __construct()
     {
     }

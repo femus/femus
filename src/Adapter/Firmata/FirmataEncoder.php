@@ -60,8 +60,23 @@ final class FirmataEncoder
             . chr(Firmata::SYSEX_END);
     }
 
+    public static function radioAttach(int $address, int $rxPin, int $txPin): string
+    {
+        return chr(Firmata::SYSEX_START) . chr(Firmata::FEMUS_RADIO) . chr(Firmata::RADIO_ATTACH)
+            . chr($address) . chr($rxPin) . chr($txPin)
+            . chr(Firmata::SYSEX_END);
+    }
+
+    public static function radioSend(int $toAddress, string $message): string
+    {
+        return chr(Firmata::SYSEX_START) . chr(Firmata::FEMUS_RADIO) . chr(Firmata::RADIO_SEND)
+            . chr($toAddress)
+            . self::encode7bitPairs($message)
+            . chr(Firmata::SYSEX_END);
+    }
+
     /** Each byte → a 7-bit pair: LSB first, then the high bit. */
-    private static function encode7bitPairs(string $bytes): string
+    public static function encode7bitPairs(string $bytes): string
     {
         $out = '';
         foreach (str_split($bytes) as $byte) {
