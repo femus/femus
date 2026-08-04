@@ -17,11 +17,14 @@ Manual hardware verification with live Arduino is pending. When executed, verify
 ---
 
 ### Run 1
-- Date: (pending)
-- OS: (pending)
-- Board: (pending)
-- Port: (pending)
-- Result: (pending)
+- Date: 2026-08-04
+- OS: macOS (Darwin 25.5)
+- Board: Arduino Nano (ATmega328P; bootloader is the NEW one despite the 2011 board — flash with plain "ATmega328P" processor option, not Old Bootloader)
+- Port: /dev/cu.usbserial-A50285BI (FT232, found by auto-discovery)
+- Result: blink.php PASS — LED blinks. Two real bugs caught and fixed during this run:
+  1. examples defaulted to Linux-only /dev/ttyUSB0 instead of auto-discovery (b904864)
+  2. macOS termios reset: stty ran before fopen so the baud never stuck (garbled bytes), and the 3s probe timeout was shorter than the Nano's ~3.7s boot (652a5a2)
+- button-led.php: pending
 
 ---
 
