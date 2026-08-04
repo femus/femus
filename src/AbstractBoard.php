@@ -9,8 +9,9 @@ use Femus\Contracts\PinMode;
 use Femus\Device\AnalogSensor;
 use Femus\Device\Buzzer;
 use Femus\Device\Button;
-use Femus\Device\Led;
 use Femus\Device\Lcd1602;
+use Femus\Device\Led;
+use Femus\Device\LoadCell;
 use Femus\Device\MotionSensor;
 use Femus\Device\Mpu6050;
 use Femus\Device\Relay;
@@ -75,5 +76,10 @@ abstract class AbstractBoard implements BoardInterface
     public function mpu6050(int $address = 0x68): Mpu6050
     {
         return new Mpu6050($this->i2c(), $address);
+    }
+
+    public function loadCell(int $doutPin, int $sckPin, float $thresholdGrams = 1.0): LoadCell
+    {
+        return new LoadCell($this->scaleInput($doutPin, $sckPin), $this->loop, $thresholdGrams);
     }
 }
