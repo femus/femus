@@ -13,21 +13,21 @@
 class Hx711Feature : public FirmataFeature
 {
 public:
-  boolean handlePinMode(byte pin, int mode)
+  boolean handlePinMode(byte pin, int mode) override
   {
     return false;
   }
 
-  void handleCapability(byte pin)
+  void handleCapability(byte pin) override
   {
   }
 
-  void reset()
+  void reset() override
   {
     attached = false;
   }
 
-  boolean handleSysex(byte command, byte argc, byte *argv)
+  boolean handleSysex(byte command, byte argc, byte *argv) override
   {
     if (command != FEMUS_HX711_COMMAND) {
       return false;
