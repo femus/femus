@@ -9,6 +9,7 @@ use Femus\Contracts\AnalogPin;
 use Femus\Contracts\DigitalPin;
 use Femus\Contracts\I2cBus;
 use Femus\Contracts\PinMode;
+use Femus\Contracts\ScaleInput;
 use Femus\Runtime\Loop;
 use Femus\Runtime\StreamSelectLoop;
 use Femus\Transport\SerialPort;
@@ -28,6 +29,9 @@ final class FirmataBoard extends AbstractBoard
     private readonly FirmataParser $parser;
 
     private ?FirmataI2cBus $i2c = null;
+
+    /** @var array<string, FirmataScaleInput> */
+    private array $scaleInputs = [];
 
     private bool $ready = false;
 
@@ -132,5 +136,11 @@ final class FirmataBoard extends AbstractBoard
         if (isset($this->analogPins[$channel])) {
             $this->analogPins[$channel]->updateFromBoard($value);
         }
+    }
+
+    public function scaleInput(int $doutPin, int $sckPin): ScaleInput
+    {
+        return $this->scaleInputs["{$doutPin}:{$sckPin}"]
+            ??= new FirmataScaleInput($this->transport, $this->parser, $doutPin, $sckPin);
     }
 }

@@ -14,6 +14,8 @@ interface BoardInterface
 
     public function i2c(): I2cBus;
 
+    public function scaleInput(int $doutPin, int $sckPin): ScaleInput;
+
     public function loop(): Loop;
 
     public function run(): void;
