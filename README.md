@@ -27,6 +27,38 @@ $board->run();
    then: `composer require sanchescom/femus:dev-main`
 3. `php examples/blink.php /dev/ttyUSB0`
 
+## Port discovery
+
+`Board::firmata()` with no arguments (or `null`) automatically probes available serial ports
+and connects to the first Firmata board it finds:
+
+```php
+$board = Board::firmata(); // auto-discovery
+```
+
+To see available ports manually:
+- macOS: `ls /dev/cu.*`
+- Linux: `ls /dev/ttyUSB*` or `ls /dev/ttyACM*`
+
+## Multiple boards
+
+Run multiple boards from a single PHP process by sharing a `StreamSelectLoop`:
+
+```php
+use Femus\Board;
+use Femus\Runtime\StreamSelectLoop;
+
+$loop = new StreamSelectLoop();
+$board1 = Board::firmata('/dev/cu.usbserial-A', loop: $loop);
+$board2 = Board::firmata('/dev/cu.usbserial-B', loop: $loop);
+
+// ... use board1, board2 ...
+
+$loop->run(); // drives both boards
+```
+
+See `examples/two-boards.php` for a complete example (button on one board drives LED on another).
+
 ## Status
 
 In development. Ready: event loop, Firmata adapter (digital I/O, analog inputs,
