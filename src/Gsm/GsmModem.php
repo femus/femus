@@ -51,6 +51,10 @@ final class GsmModem
 
     public function sendSms(string $number, string $text): void
     {
+        if (preg_match('/^\+?\d{3,15}$/', $number) !== 1) {
+            throw new \InvalidArgumentException("Invalid phone number '{$number}' — expected digits with an optional leading +");
+        }
+
         $response = $this->channel->sendExpectingPrompt(sprintf('AT+CMGS="%s"', $number), $text);
         if (!$response->ok) {
             throw new AtException("Modem failed to send the SMS to {$number}");
@@ -71,6 +75,7 @@ final class GsmModem
 
     public function deleteSms(int $index): void
     {
+        // best-effort: modem errors are intentionally ignored
         $this->channel->send('AT+CMGD=' . $index);
     }
 
