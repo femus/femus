@@ -100,3 +100,15 @@ it('throws when the prompt never arrives', function () {
     [$channel] = atChannel(timeout: 0.05);
     $channel->sendExpectingPrompt('AT+CMGS="+79161234567"', 'Hello');
 })->throws(AtException::class);
+
+it('delivers queued unsolicited lines when the sms prompt times out', function () {
+    [$channel, $transport, $loop] = atChannel(timeout: 0.05);
+    $seen = [];
+    $channel->onUnsolicited(function (string $line) use (&$seen) { $seen[] = $line; });
+    $loop->addTimer(0.01, fn () => $transport->feed("+CMTI: \"SM\",9\r\n")); // no prompt ever
+    try {
+        $channel->sendExpectingPrompt('AT+CMGS="+79161234567"', 'Hello');
+    } catch (AtException) {
+    }
+    expect($seen)->toBe(['+CMTI: "SM",9']);
+});
