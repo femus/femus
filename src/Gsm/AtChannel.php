@@ -102,6 +102,7 @@ final class AtChannel
         } catch (AtException $e) {
             $this->pendingCommand = null;
             $this->awaitingPrompt = false;
+            $this->flushQueuedUnsolicited();
             throw $e;
         }
         $this->awaitingPrompt = false;
@@ -111,6 +112,7 @@ final class AtChannel
             $remaining = $deadline - hrtime(true) / 1e9;
             if ($remaining <= 0) {
                 $this->pendingCommand = null;
+                $this->flushQueuedUnsolicited();
                 throw new AtException(sprintf("Modem did not confirm the SMS for '%s'", $command));
             }
             $this->loop->tick(min(0.05, $remaining));
