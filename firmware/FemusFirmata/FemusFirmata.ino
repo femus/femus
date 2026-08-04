@@ -12,12 +12,14 @@
 #include <FirmataExt.h>
 #include <FirmataReporting.h>
 #include "Hx711Feature.h"
+#include "RadioFeature.h"
 
 DigitalInputFirmata digitalInput;
 DigitalOutputFirmata digitalOutput;
 AnalogInputFirmata analogInput;
 I2CFirmata i2c;
 Hx711Feature hx711;
+RadioFeature radio;
 FirmataExt firmataExt;
 FirmataReporting reporting;
 
@@ -34,6 +36,7 @@ void setup()
   firmataExt.addFeature(analogInput);
   firmataExt.addFeature(i2c);
   firmataExt.addFeature(hx711);
+  firmataExt.addFeature(radio);
   firmataExt.addFeature(reporting);
   Firmata.attach(SYSTEM_RESET, systemResetCallback);
   Firmata.begin(57600);
@@ -50,4 +53,5 @@ void loop()
     i2c.report(elapsed);
   }
   hx711.report(elapsed);
+  radio.report(elapsed);
 }
