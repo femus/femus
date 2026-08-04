@@ -85,3 +85,18 @@ it('delivers queued unsolicited lines even when the command times out', function
     }
     expect($seen)->toBe(['+CMTI: "SM",5']);
 });
+
+it('sends a payload after the prompt', function () {
+    [$channel, $transport, $loop] = atChannel();
+    $loop->addTimer(0.01, fn () => $transport->feed("\r\n> "));
+    $loop->addTimer(0.03, fn () => $transport->feed("\r\n+CMGS: 4\r\n\r\nOK\r\n"));
+    $response = $channel->sendExpectingPrompt('AT+CMGS="+79161234567"', 'Hello');
+    expect($transport->written)->toBe("AT+CMGS=\"+79161234567\"\rHello\x1A")
+        ->and($response->ok)->toBeTrue()
+        ->and($response->lines)->toBe(['+CMGS: 4']);
+});
+
+it('throws when the prompt never arrives', function () {
+    [$channel] = atChannel(timeout: 0.05);
+    $channel->sendExpectingPrompt('AT+CMGS="+79161234567"', 'Hello');
+})->throws(AtException::class);
