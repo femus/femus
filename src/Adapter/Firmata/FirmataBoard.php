@@ -66,12 +66,20 @@ final class FirmataBoard extends AbstractBoard
     public function awaitReady(): void
     {
         $deadline = hrtime(true) / 1e9 + $this->handshakeTimeout;
+        $nextQueryAt = 0.0;
         while (!$this->ready) {
-            $remaining = $deadline - hrtime(true) / 1e9;
+            $now = hrtime(true) / 1e9;
+            $remaining = $deadline - $now;
             if ($remaining <= 0) {
                 throw new BoardException(
                     'Arduino did not respond. Is StandardFirmata flashed? Is the port correct?',
                 );
+            }
+            if ($now >= $nextQueryAt) {
+                // Actively query the version: over Bluetooth/network links the
+                // board does not reset on connect, so it never announces itself.
+                $this->transport->write(chr(Firmata::REPORT_VERSION));
+                $nextQueryAt = $now + 1.0;
             }
             $this->loop->tick(min(0.1, $remaining));
         }
