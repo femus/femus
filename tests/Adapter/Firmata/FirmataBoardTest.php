@@ -102,3 +102,14 @@ it('two output pins on the same port do not overwrite each other', function () {
 
     expect($transport->written)->toBe("\x90\x0C\x00"); // 0b1100
 });
+
+it('awaitReady actively queries the protocol version', function () {
+    $transport = new InMemoryTransport();
+    $board = new FirmataBoard($transport, new StreamSelectLoop(), handshakeTimeout: 0.05);
+    try {
+        $board->awaitReady();
+    } catch (BoardException) {
+    }
+    // boards on Bluetooth links do not reset on connect — we must ask (0xF9)
+    expect($transport->written)->toContain("\xF9");
+});
