@@ -121,11 +121,11 @@ echo "SMS sent.\n";
 
 // Receive SMS (blocking loop)
 $modem->onSmsReceived(function ($sms) {
-    printf("From: %s\n", $sms->fromNumber);
+    printf("From: %s\n", $sms->from);
     printf("Text: %s\n", $sms->text);
 });
 
-$modem->loop()->run();  // event loop
+$modem->run();  // event loop
 ```
 
 See `examples/sms-send.php` for a complete standalone script.
@@ -151,8 +151,8 @@ $modem->onSmsReceived(callable $listener): void
 
 ```php
 $listener(Sms $sms): void {
-    echo $sms->fromNumber;  // string
-    echo $sms->text;        // string
+    echo $sms->from;  // string
+    echo $sms->text;  // string
 }
 ```
 
@@ -162,7 +162,7 @@ Register a callback. When an SMS arrives, the modem sends an unsolicited `+CMTI`
 
 | Symptom | Cause | Fix |
 |---------|-------|-----|
-| "Modem rejected 'ATE0'" | Baud mismatch or wrong port | Try 9600 or wrong port in GsmModem::open() |
+| "Modem rejected 'ATE0'" | Baud mismatch or wrong port | Try 9600, and double-check the port in GsmModem::open() |
 | "Not registered on the network yet" | SIM not detected or network unavailable | Check SIM physically, try another location, verify antenna |
 | SMS sends but never arrives | Wrong number format or low signal | Check phone format matches +XXXX convention; verify signal quality |
 | Modem resets during send | Insufficient power | Increase power supply capacity (2 A+ buck converter or LiPo); reduce TX power if modem supports it |

@@ -47,6 +47,12 @@ final class AtChannel
         $this->unsolicitedListeners[] = $listener;
     }
 
+    /** Runs the event loop until stopped — used by receive-only applications. */
+    public function run(): void
+    {
+        $this->loop->run();
+    }
+
     public function isBusy(): bool
     {
         return $this->pendingCommand !== null;
