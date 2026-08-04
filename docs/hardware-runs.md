@@ -24,7 +24,7 @@ Manual hardware verification with live Arduino is pending. When executed, verify
 - Result: blink.php PASS — LED blinks. Two real bugs caught and fixed during this run:
   1. examples defaulted to Linux-only /dev/ttyUSB0 instead of auto-discovery (b904864)
   2. macOS termios reset: stty ran before fopen so the baud never stuck (garbled bytes), and the 3s probe timeout was shorter than the Nano's ~3.7s boot (652a5a2)
-- button-led.php: pending
+- button-led.php: PASS — bare tact switch on D12 + right-side GND (no external resistor, internal pull-up), hold → LED on, release → off. Root cause of the first failed attempt: a power/GND wire was not actually connected. Release 2026-08-02 checklist: COMPLETE ✓
 
 ---
 
