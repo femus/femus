@@ -14,6 +14,9 @@ final class FakeDigitalPin implements DigitalPin
     /** @var list<callable> */
     private array $listeners = [];
 
+    /** @var list<bool> */
+    public array $writes = [];
+
     public function __construct(
         private readonly int $number,
         public readonly PinMode $mode,
@@ -28,6 +31,7 @@ final class FakeDigitalPin implements DigitalPin
     public function write(bool $high): void
     {
         $this->state = $high;
+        $this->writes[] = $high;
     }
 
     public function read(): bool
