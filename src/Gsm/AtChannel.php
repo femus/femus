@@ -21,6 +21,10 @@ final class AtChannel
 
     private ?bool $pendingOk = null;
 
+    private bool $awaitingPrompt = false;
+
+    private bool $promptSeen = false;
+
     /** @var list<string> */
     private array $queuedUnsolicited = [];
 
@@ -77,9 +81,55 @@ final class AtChannel
         return $response;
     }
 
+    public function sendExpectingPrompt(string $command, string $payload): AtResponse
+    {
+        $this->pendingCommand = $command;
+        $this->pendingLines = [];
+        $this->pendingOk = null;
+        $this->awaitingPrompt = true;
+        $this->promptSeen = false;
+        $this->transport->write($command . "\r");
+
+        $deadline = hrtime(true) / 1e9 + $this->commandTimeout;
+        try {
+            while (!$this->promptSeen) {
+                $remaining = $deadline - hrtime(true) / 1e9;
+                if ($remaining <= 0) {
+                    throw new AtException(sprintf("Modem did not show the SMS prompt for '%s'", $command));
+                }
+                $this->loop->tick(min(0.05, $remaining));
+            }
+        } catch (AtException $e) {
+            $this->pendingCommand = null;
+            $this->awaitingPrompt = false;
+            throw $e;
+        }
+        $this->awaitingPrompt = false;
+        $this->transport->write($payload . "\x1A");
+
+        while ($this->pendingOk === null) {
+            $remaining = $deadline - hrtime(true) / 1e9;
+            if ($remaining <= 0) {
+                $this->pendingCommand = null;
+                throw new AtException(sprintf("Modem did not confirm the SMS for '%s'", $command));
+            }
+            $this->loop->tick(min(0.05, $remaining));
+        }
+
+        $response = new AtResponse($this->pendingOk, $this->pendingLines);
+        $this->pendingCommand = null;
+        $this->flushQueuedUnsolicited();
+
+        return $response;
+    }
+
     private function ingest(string $chunk): void
     {
         $this->buffer .= $chunk;
+        if ($this->awaitingPrompt && str_starts_with(ltrim($this->buffer, "\r\n"), '> ')) {
+            $this->promptSeen = true;
+            $this->buffer = substr(ltrim($this->buffer, "\r\n"), 2);
+        }
         while (($pos = strpos($this->buffer, "\n")) !== false) {
             $line = rtrim(substr($this->buffer, 0, $pos), "\r");
             $this->buffer = substr($this->buffer, $pos + 1);
