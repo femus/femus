@@ -9,6 +9,7 @@ use Femus\Contracts\AnalogPin;
 use Femus\Contracts\DigitalPin;
 use Femus\Contracts\I2cBus;
 use Femus\Contracts\PinMode;
+use Femus\Contracts\ScaleInput;
 
 final class FakeBoard extends AbstractBoard
 {
@@ -19,6 +20,9 @@ final class FakeBoard extends AbstractBoard
     private array $analogPins = [];
 
     private ?FakeI2cBus $i2c = null;
+
+    /** @var array<string, FakeScaleInput> */
+    private array $scaleInputs = [];
 
     public function digitalPin(int $number, PinMode $mode): DigitalPin
     {
@@ -76,5 +80,26 @@ final class FakeBoard extends AbstractBoard
     public function scheduleAnalog(float $delaySeconds, int $channel, int $raw): void
     {
         $this->loop->addTimer($delaySeconds, fn () => $this->simulateAnalog($channel, $raw));
+    }
+
+    public function scaleInput(int $doutPin, int $sckPin): ScaleInput
+    {
+        return $this->scaleInputs["{$doutPin}:{$sckPin}"] ??= new FakeScaleInput();
+    }
+
+    public function fakeScale(int $doutPin, int $sckPin): FakeScaleInput
+    {
+        return $this->scaleInputs["{$doutPin}:{$sckPin}"]
+            ?? throw new \LogicException("Scale input {$doutPin}:{$sckPin} has not been requested yet");
+    }
+
+    public function simulateScaleReading(int $doutPin, int $sckPin, int $raw): void
+    {
+        $this->fakeScale($doutPin, $sckPin)->simulate($raw);
+    }
+
+    public function scheduleScaleReading(float $delaySeconds, int $doutPin, int $sckPin, int $raw): void
+    {
+        $this->loop->addTimer($delaySeconds, fn () => $this->simulateScaleReading($doutPin, $sckPin, $raw));
     }
 }
