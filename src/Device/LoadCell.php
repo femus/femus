@@ -44,6 +44,7 @@ final class LoadCell
     {
         $this->offset = $this->input->lastRaw()
             ?? throw new \LogicException('No reading received yet — is the scale attached?');
+        $this->lastReported = 0.0;
     }
 
     public function calibrate(float $knownGrams): void
