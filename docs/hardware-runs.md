@@ -38,9 +38,14 @@ Manual hardware verification with live Arduino is pending. When executed, verify
 4. Record results below
 
 ### Run 1
-- Date: (pending)
-- Board: (pending)
-- Result: (pending)
+- Date: 2026-08-04
+- Board: Arduino Nano (StandardFirmata), macOS host
+- Result: lcd-clock-parallel.php PASS — QAPASS 1602A (no backpack) via the parallel driver:
+  "femus" + ticking clock. Field notes: display must be powered when the script starts
+  (init sequence is lost otherwise — a row of black boxes means "restart the script");
+  a backlight wire landed on a signal pin first (backlight blinked in sync with the
+  clock — moved to 5V). I2C lcd-clock.php: not testable (owner's LCD has no backpack).
+  water-level / gyro-dump: pending
 
 ---
 
