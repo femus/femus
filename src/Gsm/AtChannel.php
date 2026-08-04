@@ -7,6 +7,9 @@ namespace Femus\Gsm;
 use Femus\Runtime\Loop;
 use Femus\Transport\Transport;
 
+/**
+ * Unsolicited listeners may issue their own send() calls: they run only while the channel is idle.
+ */
 final class AtChannel
 {
     private string $buffer = '';
@@ -57,6 +60,7 @@ final class AtChannel
             $remaining = $deadline - hrtime(true) / 1e9;
             if ($remaining <= 0) {
                 $this->pendingCommand = null;
+                $this->flushQueuedUnsolicited();
                 throw new AtException(sprintf(
                     "Modem did not respond to '%s' within %.1fs (is it powered and on the right port?)",
                     $command,
