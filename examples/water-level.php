@@ -7,7 +7,7 @@ require __DIR__ . '/../vendor/autoload.php';
 use Femus\Board;
 
 // Water level sensor: S -> A0, + -> 5V, - -> GND
-$board = Board::firmata($argv[1] ?? '/dev/ttyUSB0');
+$board = Board::firmata($argv[1] ?? null);
 
 $sensor = $board->analogSensor(0, threshold: 0.02);
 

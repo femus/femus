@@ -7,7 +7,7 @@ require __DIR__ . '/../vendor/autoload.php';
 use Femus\Board;
 
 // GY-521: VCC -> 5V, GND -> GND, SDA -> A4, SCL -> A5
-$board = Board::firmata($argv[1] ?? '/dev/ttyUSB0');
+$board = Board::firmata($argv[1] ?? null);
 
 $mpu = $board->mpu6050();
 

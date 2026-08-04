@@ -7,7 +7,7 @@ require __DIR__ . '/../vendor/autoload.php';
 use Femus\Board;
 
 // LCD1602 with I2C backpack: VCC -> 5V, GND -> GND, SDA -> A4, SCL -> A5
-$board = Board::firmata($argv[1] ?? '/dev/ttyUSB0');
+$board = Board::firmata($argv[1] ?? null);
 
 $lcd = $board->lcd1602();
 $lcd->write('femus');

@@ -6,7 +6,7 @@ require __DIR__ . '/../vendor/autoload.php';
 
 use Femus\Board;
 
-$board = Board::firmata($argv[1] ?? '/dev/ttyUSB0');
+$board = Board::firmata($argv[1] ?? null);
 
 $button = $board->button(2);   // button: pin 2 — GND (internal pull-up)
 $led = $board->led(13);
