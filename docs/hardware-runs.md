@@ -59,7 +59,11 @@ Manual hardware verification with live Arduino is pending. When executed, verify
 4. Record results below
 
 ### Run 1
-- Date: (pending)
-- Board: (pending)
-- Result: (pending)
+- Date: 2026-08-04
+- Board: Arduino Nano + FemusFirmata (ConfigurableFirmata 3.3.0 + custom Hx711Feature)
+- Wiring: XFW-HX711, DT=D4 SCK=D5 (scale.php pin args), bar load cell red/black/white/green → E+/E−/A−/A+
+- Result: scale.php PASS — auto-tare works, raw readings stream at 10 Hz and react to
+  pressing the bar (±100 raw units of finger pressure/noise around zero). The full
+  custom-firmware path (C++ Hx711Feature → femus sysex 0x0E → PHP LoadCell) is
+  verified on hardware. Calibration with a known weight: pending
 
