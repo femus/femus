@@ -46,7 +46,7 @@ final class Board
             }
 
             try {
-                $board = new FirmataBoard($transport, $sharedLoop, handshakeTimeout: 3.0);
+                $board = new FirmataBoard($transport, $sharedLoop, handshakeTimeout: 5.0);
                 $board->awaitReady();
 
                 return $board;
