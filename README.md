@@ -63,6 +63,9 @@ See `examples/two-boards.php` for a complete example (button on one board drives
 
 In development. Ready: event loop, Firmata adapter (digital I/O, analog inputs,
 I2C), devices Led / Relay / Buzzer / Button / MotionSensor /
-AnalogSensor / Lcd1602 / Mpu6050, FakeBoard for tests without hardware.
-Next on the roadmap: Linux/FFI adapter (Raspberry Pi), load cell HX711,
+AnalogSensor / Lcd1602 / Mpu6050 / LoadCell (HX711), FakeBoard for tests without hardware.
+
+**Note**: LoadCell (HX711) requires the FemusFirmata sketch. See [firmware/README.md](firmware/README.md) for flashing.
+
+Next on the roadmap: Linux/FFI adapter (Raspberry Pi),
 GSM/AT stack, CLI debugging.

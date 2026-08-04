@@ -39,3 +39,19 @@ Manual hardware verification with live Arduino is pending. When executed, verify
 - Board: (pending)
 - Result: (pending)
 
+---
+
+## Release 2026-08-04-hx711
+
+### Testing Checklist (Pending Human Execution)
+
+1. Flash firmware/FemusFirmata (see firmware/README.md) — blink/button examples still work (regression)
+2. Wire HX711 per docs/devices/hx711.md, run `php examples/scale.php` — raw deltas react to pressing the load cell
+3. Calibrate with a known weight (e.g. a 100 g weight or 6.1 g five-ruble coin stack), verify grams
+4. Record results below
+
+### Run 1
+- Date: (pending)
+- Board: (pending)
+- Result: (pending)
+
