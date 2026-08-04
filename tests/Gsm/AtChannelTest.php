@@ -112,3 +112,16 @@ it('delivers queued unsolicited lines when the sms prompt times out', function (
     }
     expect($seen)->toBe(['+CMTI: "SM",9']);
 });
+
+it('run() processes unsolicited lines until stopped', function () {
+    [$channel, $transport, $loop] = atChannel();
+    $seen = [];
+    $channel->onUnsolicited(function (string $line) use (&$seen, $loop) {
+        $seen[] = $line;
+        $loop->stop();
+    });
+    $loop->addTimer(0.01, fn () => $transport->feed("+CMTI: \"SM\",3\r\n"));
+    $loop->addTimer(1.0, fn () => $loop->stop()); // fallback stop in case listener doesn't
+    $channel->run();
+    expect($seen)->toBe(['+CMTI: "SM",3']);
+});

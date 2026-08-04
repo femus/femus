@@ -70,6 +70,7 @@ final class GsmModem
             throw new AtException("Failed to read SMS at index {$index}");
         }
 
+        // only body lines reach pendingLines — OK/ERROR terminals are consumed by the channel
         return new Sms($m[1], implode("\n", array_slice($response->lines, 1)));
     }
 
@@ -88,5 +89,11 @@ final class GsmModem
             }
             $listener($this->readSms((int) $m[1]));
         });
+    }
+
+    /** Blocks processing incoming notifications (SMS etc.) until interrupted. */
+    public function run(): void
+    {
+        $this->channel->run();
     }
 }
