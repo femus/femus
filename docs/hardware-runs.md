@@ -67,3 +67,19 @@ Manual hardware verification with live Arduino is pending. When executed, verify
   custom-firmware path (C++ Hx711Feature → femus sysex 0x0E → PHP LoadCell) is
   verified on hardware. Calibration with a known weight: pending
 
+---
+
+## Release 2026-08-04-gsm-at
+
+### Testing Checklist (Pending Human Execution)
+
+1. Power the modem correctly (SIM800L: external 3.4–4.2 V source, common GND — see docs/devices/gsm-modem.md)
+2. Insert a SIM (PIN disabled), connect via USB-TTL, `php examples/sms-send.php <port> <your number> "test"`
+3. SMS arrives on the phone; reply to it — onSmsReceived demo prints it
+4. Record results below
+
+### Run 1
+- Date: (pending)
+- Modem: (pending)
+- Result: (pending)
+
