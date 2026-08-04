@@ -73,3 +73,15 @@ it('queues unsolicited lines during a command and delivers them after', function
     // unsolicited delivered after command completed (busy=0), before send() returned
     expect($order)->toBe(['unsolicited:+CMTI: "SM",7:busy=0', 'response:ok']);
 });
+
+it('delivers queued unsolicited lines even when the command times out', function () {
+    [$channel, $transport, $loop] = atChannel(timeout: 0.05);
+    $seen = [];
+    $channel->onUnsolicited(function (string $line) use (&$seen) { $seen[] = $line; });
+    $loop->addTimer(0.01, fn () => $transport->feed("+CMTI: \"SM\",5\r\n")); // no OK ever
+    try {
+        $channel->send('AT');
+    } catch (AtException) {
+    }
+    expect($seen)->toBe(['+CMTI: "SM",5']);
+});
