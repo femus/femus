@@ -131,13 +131,9 @@ incoming radio messages are echoed back to the BLE UART (terminated by `\n`).
 
 ## Addressing
 
-The RadioBleBridge node is **Node 2** (hardcoded `NODE_ADDRESS 2`).
-It communicates with **Node 1** (hardcoded `PEER_ADDRESS 1`), typically the main femus board.
-
-- All BLE-to-radio messages are sent **to Node 1**.
-- All radio messages **from Node 1** are forwarded to BLE.
-
-To add more peers, modify `PEER_ADDRESS` and rebuild.
+Адреса узлов (свой и собеседника) конфигурируются динамически с телефона через BLE
+и сохраняются в EEPROM. Нет необходимости пересобирать прошивку. Используйте команды
+в разделе ниже: `/addr`, `/peer` и `/show`.
 
 ---
 
