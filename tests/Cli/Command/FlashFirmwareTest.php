@@ -15,13 +15,6 @@ function makeFlash(FakeCommandRunner $runner, array $ports): FlashFirmware
     return new FlashFirmware(new ArduinoCli($runner), $locator, '/project');
 }
 
-function sink(): array
-{
-    return [[], static function (string $line) use (&$lines): void {
-        $lines[] = $line;
-    }];
-}
-
 it('rejects an unknown target with usage exit code 2', function () {
     $runner = new FakeCommandRunner();
     $lines = [];
