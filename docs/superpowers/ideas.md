@@ -45,9 +45,17 @@ sysex: SEND/RECV, адресация+CRC+повторы) + PHP RadioLink; (2) м
 Демо: выключить WiFi/сотовую → переписка идёт. Апгрейд позже: 2× Si4432 (RH_RF22).
 ФЛАГМАН №2 (следом): умная кладовка = станция с весами + BLE + приложение.
 
-## femus firmware:flash (в CLI-план)
-Раздавать готовые .hex FemusFirmata (компилировать в CI) + команда `femus firmware:flash
-[--port]` через arduino-cli upload: пользователю не нужны Arduino IDE и библиотеки.
-Принцип прошивок: FemusFirmata = универсальные сервисы (вся логика в PHP);
-спец-скетчи (RadioBleBridge) — только для узлов без компа, конфиг константами + README;
-позже — конфигурация таких узлов по BLE + EEPROM.
+## Утверждено владельцем 2026-08-05 — в ближайшие планы
+
+### 1. femus firmware:flash — прошивка без Arduino IDE (в CLI-план)
+Раздавать готовые скомпилированные .hex (FemusFirmata, RadioBleBridge — собирать в CI
+через arduino-cli) прямо в составе composer-пакета или релизов GitHub. Команда:
+`femus firmware:flash [femus|radio-bridge] [--port=auto]` — находит плату (SerialPortLocator),
+заливает hex через arduino-cli/avrdude. Пользовательский путь сжимается до:
+composer require → femus firmware:flash → пишешь PHP. Ни IDE, ни библиотек, ни C++.
+
+### 2. Конфигурируемый RadioBleBridge — адреса по Bluetooth + EEPROM
+Убрать константы NODE_ADDRESS/PEER_ADDRESS из кода: спец-команды по BLE
+(например строки `/addr 2` и `/peer 1` перехватываются мостом, не уходят в радио),
+значения сохраняются в EEPROM и переживают перезагрузку. Один готовый hex
+подходит любому пользователю без перекомпиляции — настройка прямо с телефона.
