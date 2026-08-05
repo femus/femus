@@ -44,3 +44,10 @@ sysex: SEND/RECV, адресация+CRC+повторы) + PHP RadioLink; (2) м
 (3) SwiftUI-терминал (без публикации, free provisioning); (4) схемы двух узлов в docs.
 Демо: выключить WiFi/сотовую → переписка идёт. Апгрейд позже: 2× Si4432 (RH_RF22).
 ФЛАГМАН №2 (следом): умная кладовка = станция с весами + BLE + приложение.
+
+## femus firmware:flash (в CLI-план)
+Раздавать готовые .hex FemusFirmata (компилировать в CI) + команда `femus firmware:flash
+[--port]` через arduino-cli upload: пользователю не нужны Arduino IDE и библиотеки.
+Принцип прошивок: FemusFirmata = универсальные сервисы (вся логика в PHP);
+спец-скетчи (RadioBleBridge) — только для узлов без компа, конфиг константами + README;
+позже — конфигурация таких узлов по BLE + EEPROM.
