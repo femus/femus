@@ -83,3 +83,26 @@ Manual hardware verification with live Arduino is pending. When executed, verify
 - Modem: (pending)
 - Result: (pending)
 
+---
+
+## Release 2026-08-04-radio
+
+### Testing Checklist (Pending Human Execution)
+
+1. Flash both Arduino Nano boards with FemusFirmata (see firmware/README.md)
+2. Solder 17.3 cm antenna wires to ANT pads on both FS1000A and MX-RM-5V modules (critical for range)
+3. Wire radio modules per docs/devices/radio-433.md (FS1000A DATA→D12, MX-RM-5V DATA→D11)
+4. Run radio-chat on two stations:
+   - Terminal 1: `php examples/radio-chat.php <port1> 1 2`
+   - Terminal 2: `php examples/radio-chat.php <port2> 2 1`
+5. Exchange messages between nodes; verify round-trip delivery
+6. Test integration with Node B (RadioBleBridge): connect Node A to Node B via 433 MHz, send/receive via BLE
+7. Record results below
+
+### Run 1
+- Date: (pending)
+- Board: Arduino Nano + FemusFirmata (radio support)
+- Wiring: FS1000A DATA→D12 VCC→5V GND→GND, MX-RM-5V DATA→D11 VCC→5V GND→GND
+- Antenna: 17.3 cm copper wire on ANT pads of both modules
+- Result: (pending)
+
