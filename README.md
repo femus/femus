@@ -65,7 +65,8 @@ In development. Ready: event loop, Firmata adapter (digital I/O, analog inputs,
 I2C), devices Led / Relay / Buzzer / Button / MotionSensor /
 AnalogSensor / Lcd1602 / Mpu6050 / LoadCell (HX711), FakeBoard for tests without hardware,
 GSM/AT stack (Femus\Gsm: AtChannel, GsmModem — SMS send/receive),
-433 MHz radio (RadioLink — addressed packets, CRC).
+433 MHz radio (RadioLink — addressed packets, CRC),
+phone-side BLE terminal ([ios/FemusRadioTerminal](ios/FemusRadioTerminal/README.md) — SwiftUI iOS app for the radio messenger).
 
 **Note**: LoadCell (HX711) and radio require the FemusFirmata sketch. See [firmware/README.md](firmware/README.md) for flashing.
 
