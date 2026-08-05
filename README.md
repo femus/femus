@@ -27,6 +27,16 @@ $board->run();
    then: `composer require sanchescom/femus:dev-main`
 3. `php examples/blink.php /dev/ttyUSB0`
 
+### Прошивка платы одной командой
+
+```bash
+composer require sanchescom/femus
+vendor/bin/femus firmware:flash radio-bridge   # или femus
+```
+
+Ставится только `arduino-cli`; femus подтянет ядро и библиотеки и зальёт готовый
+скетч. Ни IDE, ни ручного управления библиотеками, ни C++.
+
 ## Port discovery
 
 `Board::firmata()` with no arguments (or `null`) automatically probes available serial ports
