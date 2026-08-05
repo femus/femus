@@ -140,3 +140,21 @@ Send `ATTACH address rxPin txPin` (e.g. `0x01 0x0B 0x0C`) from PHP to activate t
 incoming ASK packets — which arrive in a tight bit-bang ISR window — are drained as fast as
 possible. Missed packets are not retransmitted; implement acknowledgement at the application layer
 if reliability is required.
+
+## Заливка прошивки: `femus firmware:flash`
+
+Без Arduino IDE. Нужен только [arduino-cli](https://arduino.github.io/arduino-cli/latest/installation/)
+(`brew install arduino-cli`) — femus сам поставит ядро `arduino:avr` и библиотеки.
+
+```bash
+# телефонный узел (мост BLE⇄радио)
+vendor/bin/femus firmware:flash radio-bridge
+
+# станция (ConfigurableFirmata + Radio + HX711)
+vendor/bin/femus firmware:flash femus
+```
+
+Флаги:
+- `--port=/dev/cu.usbserial-XXXX` — явный порт (по умолчанию `auto`, ищется сам).
+- `--fqbn=arduino:avr:nano` — для Nano с новым бутлоадером (по умолчанию
+  `arduino:avr:nano:cpu=atmega328old` — плата с Old Bootloader).
