@@ -106,3 +106,40 @@ Manual hardware verification with live Arduino is pending. When executed, verify
 - Antenna: 17.3 cm copper wire on ANT pads of both modules
 - Result: (pending)
 
+## Release 2026-08-06-radio-messenger (bench bring-up)
+
+Full two-node messenger on the bench: both nodes USB-powered, ~10 cm apart, **no antennas**.
+Node B uses DSD TECH HM-10 (BLE) + AMS1117-3.3 + BSS138 level converter (Option A).
+
+### Node A — station (talks to Mac over USB)
+1. [ ] Wire FS1000A: DATA→D12, VCC→5V, GND→GND
+2. [ ] Wire MX-RM-5V: DATA→D11, VCC→5V, GND→GND
+3. [ ] Flash: `vendor/bin/femus firmware:flash femus` (auto-installs core + libs)
+4. [ ] Leave Node A plugged into the Mac by USB
+
+### Node B — phone node (talks to iPhone over BLE)
+1. [ ] Confirm the BLE module is **HM-10** (BLE), not HC-05 (Classic)
+2. [ ] Power rail: Nano 5V → +5V rail; Nano GND → GND rail
+3. [ ] AMS1117-3.3: VIN←+5V, GND←GND, OUT→3.3V mini-rail (LV reference)
+4. [ ] HM-10: VCC←+5V, GND←GND
+5. [ ] Level converter: HV←+5V, LV←3.3V(AMS1117), both GND←GND
+6. [ ] Level converter channels: HV1←D8 / LV1→HM-10 RXD ; HV2←D7 / LV2→HM-10 TXD
+7. [ ] Wire FS1000A: DATA→D12, VCC→5V, GND→GND
+8. [ ] Wire MX-RM-5V: DATA→D11, VCC→5V, GND→GND
+9. [ ] Flash: `vendor/bin/femus firmware:flash radio-bridge`
+10. [ ] Power Node B from any USB (spare Mac port / charger)
+
+### Bring-up
+1. [ ] Node A: `php examples/radio-chat.php <port> 1 2` (station = node 1 → peer 2)
+2. [ ] iPhone: build & run FemusRadioTerminal (see ios/FemusRadioTerminal/README.md); it auto-connects to service FFE0
+3. [ ] In the app send `/show` → expect `addr=2 peer=1` (defaults match — no config needed)
+4. [ ] Send a message from the app → appears in the Mac terminal
+5. [ ] Send a message from the Mac terminal → appears in the app
+6. [ ] Demo: turn off Wi-Fi/cellular → chat still works
+
+### Run 1
+- Date: (pending)
+- Nodes: A = Nano+FemusFirmata (USB→Mac); B = Nano+RadioBleBridge + HM-10 + AMS1117 + level converter (USB power)
+- Antennas: none (bench, ~10 cm)
+- Result: (pending)
+

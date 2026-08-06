@@ -8,29 +8,58 @@ line received from BLE is sent via radio, and each radio message is echoed to BL
 
 ## Wiring to Arduino Nano
 
-### HM-10 (Bluetooth Low Energy)
+### HM-10 (DSD TECH, Bluetooth Low Energy)
 
-| HM-10 pin | Arduino Nano pin | Notes |
-|-----------|------------------|-------|
-| VCC | 5V or 3.3V* | Depends on board: 5V-tolerant modules use 5V; others use 3.3V regulator output |
-| GND | GND | Common ground |
-| TXD | D7 (SoftwareSerial RX) | Direct connection (3.3V signal is safe on AVR input) |
-| RXD | D8 (SoftwareSerial TX) | **Through 1k/2k voltage divider** (Arduino TX is 5V; HM-10 RXD is 3.3V-tolerant only) |
+**Use the HM-10 (BLE) — NOT HC-05.** iPhone connects only over Bluetooth LE; HC-05
+(Bluetooth Classic) is invisible to iOS. If you have both DSD TECH modules (identical
+clear cases), pick the one labelled **HM-10** (chip CC2541).
 
-**Voltage divider on Arduino D8 → HM-10 RXD line:**
+The DSD TECH HM-10 backplane is labelled `Power 3.6–6V` / `LEVEL:3.3V`: it has an
+onboard regulator, so **VCC takes 5 V directly**, while the logic pins are 3.3 V.
+
+| HM-10 pin | Arduino Nano | Notes |
+|-----------|--------------|-------|
+| VCC | 5V | onboard regulator (Power 3.6–6V) |
+| GND | GND | common ground |
+| TXD | → level converter LV2 → D7 | 3.3 V logic |
+| RXD | ← level converter LV1 ← D8 | 3.3 V logic |
+| STATE / BRK(EN) | — | not used |
+
+Because the logic is 3.3 V, the two UART lines (D8→RXD, D7←TXD) must be level-shifted.
+Two options — **this build uses Option A**.
+
+#### Option A (recommended): level converter + AMS1117-3.3
+
+A bidirectional level converter (BSS138) shifts both UART lines and protects the HM-10
+input. It needs a 3.3 V reference on its LV side, supplied by an **AMS1117-3.3** regulator
+(VIN from the 5 V rail). The HM-10 itself is still powered from 5 V — the AMS1117's 3.3 V
+is used only as the converter's LV reference.
 
 ```
-Arduino D8 (TX, 5V) ──── 1 kΩ ──── HM-10 RXD
-                                        │
-                                       2 kΩ
-                                        │
-                                       GND
+AMS1117-3.3:  VIN ← 5V    GND ← GND    OUT → 3.3 V rail (LV reference only)
+
+Level converter:
+  HV ← 5V          LV ← 3.3 V (AMS1117 OUT)      both GND ← GND
+  HV1 ← Nano D8    LV1 → HM-10 RXD
+  HV2 ← Nano D7    LV2 → HM-10 TXD
 ```
 
-The divider produces ~3.33 V at the HM-10 RXD pin: `5V × 2kΩ / (1kΩ + 2kΩ) ≈ 3.33V`.
+Match HV1↔LV1 and HV2↔LV2 by the channel numbers printed on the converter.
 
-*HM-10 default VCC varies. Check your module: 5V-tolerant versions connect to Arduino 5V;
-others require the 3.3V regulator output (often available on Nano).
+#### Option B (simplest, no extra modules): resistor divider
+
+No level converter or AMS1117 — drop only the D8→RXD line with a 1k/2k divider; D7←TXD
+runs direct (3.3 V is enough for the AVR input). HM-10 VCC still takes 5 V.
+
+```
+Arduino D8 (5V) ── 1 kΩ ──┬── HM-10 RXD
+                          2 kΩ
+                           │
+                          GND
+Arduino D7 ─────────────────── HM-10 TXD (direct)
+```
+
+The divider gives ~3.33 V: `5V × 2kΩ / (1kΩ + 2kΩ) ≈ 3.33V`. Fine for 9600 baud UART.
 
 ---
 
@@ -57,6 +86,10 @@ others require the 3.3V regulator output (often available on Nano).
 ---
 
 ## Breadboard Layout
+
+> The diagram below shows **Option B (divider)**. For the build in use here
+> (**Option A: level converter + AMS1117**), see the HM-10 wiring section above —
+> D8/D7 route through the converter instead of the divider.
 
 ```
       Arduino Nano
@@ -93,14 +126,18 @@ others require the 3.3V regulator output (often available on Nano).
 
 ## Power
 
-**USB powerbank** (5V, ≥1A) supplies:
-- Arduino Nano: ~50 mA idle + ≈200 mA during transmit/BLE activity
-- HM-10: ≈50 mA
-- FS1000A: ≈20 mA during TX
-- MX-RM-5V: ≈5 mA during RX
+The whole node runs off a single **5 V** rail. On the bench, power the Nano from **any USB
+source** (a spare Mac port, a hub, or a phone charger) — the phone node talks to the iPhone
+over BLE, so its USB is used only for power, not data.
 
-**Total:** ~300 mA typical, ≈400 mA during active radio burst. A 5000 mAh powerbank gives
-≈12 hours of field operation.
+Distribution from the Nano 5V pin:
+- +5 V rail → AMS1117 VIN, HM-10 VCC, level converter HV, FS1000A VCC, MX-RM-5V VCC
+- AMS1117 OUT (3.3 V) → level converter LV
+- GND rail → common to all
+
+Current budget: HM-10 ≈40 mA + FS1000A ≈20 mA + MX-RM-5V ≈5 mA + Nano ≈30 mA ≈ 100 mA
+typical — well within USB's 500 mA. For field use later, a USB powerbank (5 V, ≥1 A) gives
+many hours; a 5000 mAh pack ≈ 12 h.
 
 ---
 
@@ -173,6 +210,9 @@ Maximum line length: **50 bytes** (including any terminator stripping).
 ---
 
 ## Antenna
+
+> **Bench note:** for a first bring-up with the two nodes ~10 cm apart you can skip antennas
+> entirely — ASK couples fine at that range. Add antennas for any real distance.
 
 For 433 MHz ASK, both FS1000A and MX-RM-5V require a **17.3 cm quarter-wave monopole antenna**:
 

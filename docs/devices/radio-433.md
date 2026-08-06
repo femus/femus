@@ -31,6 +31,9 @@ Communicates with Node B (RadioBleBridge) and other nodes in the same network.
 
 **Critical:** Without an antenna, range is < 1 meter and packet loss is severe.
 
+> **Bench note:** for a first bring-up with the two nodes ~10 cm apart you can skip antennas —
+> ASK couples fine at that range. Solder the 17.3 cm antennas only once you want real distance.
+
 Each module requires a **17.3 cm quarter-wave monopole antenna** soldered to the ANT pad:
 
 ```
@@ -184,12 +187,13 @@ iPhone BLE messages to 433 MHz radio.
 
 Typical setup:
 - **Node A** (this station, address 1): `php examples/radio-chat.php <port> 1 2`
-- **Node B** (RadioBleBridge on another Nano): hardcoded to address 2, sends all BLE input to Node 1
+- **Node B** (RadioBleBridge on another Nano): defaults to address 2 (configurable over BLE
+  via `/addr`/`/peer`, stored in EEPROM), sends all BLE input to Node 1
 
 To test:
-1. Flash Node B Arduino with RadioBleBridge sketch
+1. Flash Node B Arduino: `vendor/bin/femus firmware:flash radio-bridge`
 2. Wire BLE + radio modules to Node B (see radio-ble-bridge.md)
-3. Connect Node A to USB
+3. Flash Node A: `vendor/bin/femus firmware:flash femus`; connect Node A to USB
 4. Run radio-chat.php on Node A
 5. Connect iPhone to Node B's HM-10 BLE device
 6. Type in iPhone BLE terminal → Node A receives
