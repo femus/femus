@@ -138,8 +138,13 @@ Node B uses DSD TECH HM-10 (BLE) + AMS1117-3.3 + BSS138 level converter (Option 
 6. [ ] Demo: turn off Wi-Fi/cellular → chat still works
 
 ### Run 1
-- Date: (pending)
-- Nodes: A = Nano+FemusFirmata (USB→Mac); B = Nano+RadioBleBridge + HM-10 + AMS1117 + level converter (USB power)
-- Antennas: none (bench, ~10 cm)
-- Result: (pending)
+- Date: 2026-08-06
+- Node B built & verified in isolation via nRF Connect (BLE `/show` on FFE1 → reply `addr=2 peer=1`).
+- **Bootloader:** Node B's Nano is NEW bootloader → flash with `--fqbn=arduino:avr:nano:cpu=atmega328`
+  (default `atmega328old` gives `not in sync`).
+- **Wiring fix:** `HM-10 TXD → Arduino D7` wired DIRECT (3.3 V→5 V needs no shifting). Level
+  converter Chan1 on this line was miswired and is not needed; converter is only required on
+  `D8 → HM-10 RXD` (5 V→3.3 V). Reply path (D8→converter→RXD) confirmed via a heartbeat test sketch.
+- Node A (station) + full end-to-end (radio A↔B, iPhone app): pending.
+- Result: **Node B OK.**
 
