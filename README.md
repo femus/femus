@@ -34,8 +34,8 @@ composer require sanchescom/femus
 vendor/bin/femus firmware:flash radio-bridge   # или femus
 ```
 
-Ставится только `arduino-cli`; femus подтянет ядро и библиотеки и зальёт готовый
-скетч. Ни IDE, ни ручного управления библиотеками, ни C++.
+Ставится только `arduino-cli`; готовый `.hex` уже лежит в пакете — femus найдёт
+плату и зальёт его как есть, без компиляции. Ни IDE, ни библиотек, ни C++.
 
 ## Port discovery
 

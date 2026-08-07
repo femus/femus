@@ -144,7 +144,9 @@ if reliability is required.
 ## Заливка прошивки: `femus firmware:flash`
 
 Без Arduino IDE. Нужен только [arduino-cli](https://arduino.github.io/arduino-cli/latest/installation/)
-(`brew install arduino-cli`) — femus сам поставит ядро `arduino:avr` и библиотеки.
+(`brew install arduino-cli`). Готовые прошивки лежат в `firmware/build/*.ino.hex`
+и едут с пакетом — по умолчанию заливается hex как есть: ни компиляции,
+ни установки библиотек, femus ставит только ядро `arduino:avr` (ради avrdude).
 
 ```bash
 # телефонный узел (мост BLE⇄радио)
@@ -157,4 +159,14 @@ vendor/bin/femus firmware:flash femus
 Флаги:
 - `--port=/dev/cu.usbserial-XXXX` — явный порт (по умолчанию `auto`, ищется сам).
 - `--fqbn=arduino:avr:nano` — для Nano с новым бутлоадером (по умолчанию
-  `arduino:avr:nano:cpu=atmega328old` — плата с Old Bootloader).
+  `arduino:avr:nano:cpu=atmega328old` — плата с Old Bootloader). Hex один и тот же:
+  бутлоадер влияет только на скорость заливки, не на прошивку.
+- `--build` — собрать из исходников вместо готового hex (нужно после правок
+  скетчей; femus сам поставит библиотеки: ConfigurableFirmata, RadioHead, HX711).
+
+После изменения скетча пересобери hex'ы в пакете:
+
+```bash
+arduino-cli compile --fqbn arduino:avr:nano firmware/FemusFirmata --output-dir firmware/build
+arduino-cli compile --fqbn arduino:avr:nano firmware/RadioBleBridge --output-dir firmware/build
+```
