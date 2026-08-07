@@ -23,14 +23,14 @@ $board->run();
    (Arduino IDE → File → Examples → Firmata → StandardFirmata).
 2. The package is not yet published on Packagist — install from the repository:
    add to your project's composer.json:
-   `"repositories": [{"type": "vcs", "url": "https://github.com/sanchescom/femus"}]`
-   then: `composer require sanchescom/femus:dev-main`
+   `"repositories": [{"type": "vcs", "url": "https://github.com/femus/femus"}]`
+   then: `composer require femus/femus:dev-main`
 3. `php examples/blink.php /dev/ttyUSB0`
 
 ### Прошивка платы одной командой
 
 ```bash
-composer require sanchescom/femus
+composer require femus/femus
 vendor/bin/femus firmware:flash radio-bridge   # или femus
 ```
 
