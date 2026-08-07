@@ -1,5 +1,5 @@
 {
-    "name": "sanchescom/femus",
+    "name": "femus/femus",
     "description": "PHP hardware framework: sensors, relays, Arduino (Firmata) and Raspberry Pi from plain PHP",
     "license": "MIT",
     "type": "library",
