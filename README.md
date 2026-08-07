@@ -1,5 +1,8 @@
 # femus
 
+[![CI](https://github.com/femus/femus/actions/workflows/ci.yml/badge.svg)](https://github.com/femus/femus/actions/workflows/ci.yml)
+[![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
+
 PHP hardware framework: sensors, relays, buttons and modules — from plain PHP.
 One codebase runs on Arduino (Firmata over USB) and Raspberry Pi (planned).
 
