@@ -36,7 +36,7 @@ final class Application
         }
 
         $out('femus — PHP hardware framework CLI');
-        $out('usage: femus firmware:flash <femus|radio-bridge> [--port=auto] [--fqbn=...]');
+        $out('usage: femus firmware:flash <femus|radio-bridge> [--port=auto] [--fqbn=...] [--build]');
 
         return $command === null ? 0 : 2;
     }

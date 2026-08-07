@@ -30,6 +30,16 @@ final class ArduinoCli
         return $this->runner->run([$this->binary, 'lib', 'install', $lib]);
     }
 
+    public function uploadHex(string $hexFile, string $fqbn, string $port): CommandResult
+    {
+        return $this->runner->run([
+            $this->binary, 'upload',
+            '--fqbn', $fqbn,
+            '-p', $port,
+            '--input-file', $hexFile,
+        ]);
+    }
+
     public function compileAndUpload(string $sketchDir, string $fqbn, string $port): CommandResult
     {
         return $this->runner->run([

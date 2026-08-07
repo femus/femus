@@ -8,11 +8,20 @@ use Femus\Cli\Process\CommandResult;
 use Femus\Tests\Cli\FakeCommandRunner;
 use Femus\Transport\SerialPortLocator;
 
-function makeFlash(FakeCommandRunner $runner, array $ports): FlashFirmware
+function makeFlash(FakeCommandRunner $runner, array $ports, string $projectRoot = '/project'): FlashFirmware
 {
     $locator = new SerialPortLocator(fn (string $pattern): array => $ports);
 
-    return new FlashFirmware(new ArduinoCli($runner), $locator, '/project');
+    return new FlashFirmware(new ArduinoCli($runner), $locator, $projectRoot);
+}
+
+function makeRootWithHex(string $hexName): string
+{
+    $root = sys_get_temp_dir() . '/femus-flash-' . bin2hex(random_bytes(4));
+    mkdir($root . '/firmware/build', 0777, true);
+    file_put_contents($root . '/firmware/build/' . $hexName, ':00000001FF');
+
+    return $root;
 }
 
 it('rejects an unknown target with usage exit code 2', function () {
@@ -60,6 +69,40 @@ it('fails when no board is found on auto port', function () {
     foreach ($runner->calls as $call) {
         expect($call[1] ?? '')->not->toBe('compile');
     }
+});
+
+it('uploads a bundled hex without installing libraries or compiling', function () {
+    $runner = new FakeCommandRunner();
+    $root = makeRootWithHex('RadioBleBridge.ino.hex');
+    $code = makeFlash($runner, [], $root)->run('radio-bridge', ['port' => '/dev/ttyUSB9'], static fn (string $l) => null);
+
+    expect($code)->toBe(0);
+    expect(end($runner->calls))->toBe([
+        'arduino-cli', 'upload',
+        '--fqbn', 'arduino:avr:nano:cpu=atmega328old',
+        '-p', '/dev/ttyUSB9',
+        '--input-file', $root . '/firmware/build/RadioBleBridge.ino.hex',
+    ]);
+    foreach ($runner->calls as $call) {
+        expect($call[1] ?? '')->not->toBe('compile')
+            ->and($call[1] ?? '')->not->toBe('lib');
+    }
+});
+
+it('compiles from source when --build is passed despite a bundled hex', function () {
+    $runner = new FakeCommandRunner();
+    $root = makeRootWithHex('FemusFirmata.ino.hex');
+    $code = makeFlash($runner, [], $root)->run('femus', ['port' => '/dev/ttyUSB9', 'build' => ''], static fn (string $l) => null);
+
+    expect($code)->toBe(0);
+    expect($runner->calls)->toContain(['arduino-cli', 'lib', 'install', 'RadioHead']);
+    expect(end($runner->calls))->toBe([
+        'arduino-cli', 'compile',
+        '--fqbn', 'arduino:avr:nano:cpu=atmega328old',
+        '--upload',
+        '-p', '/dev/ttyUSB9',
+        $root . '/firmware/FemusFirmata',
+    ]);
 });
 
 it('honors an explicit --fqbn and --port', function () {

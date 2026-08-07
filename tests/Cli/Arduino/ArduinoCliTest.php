@@ -25,6 +25,17 @@ it('builds the compile-and-upload argv', function () {
     ]);
 });
 
+it('builds the prebuilt hex upload argv', function () {
+    $runner = new FakeCommandRunner();
+    (new ArduinoCli($runner))->uploadHex('firmware/build/RadioBleBridge.ino.hex', 'arduino:avr:nano:cpu=atmega328old', '/dev/cu.usbserial-1420');
+    expect($runner->calls[0])->toBe([
+        'arduino-cli', 'upload',
+        '--fqbn', 'arduino:avr:nano:cpu=atmega328old',
+        '-p', '/dev/cu.usbserial-1420',
+        '--input-file', 'firmware/build/RadioBleBridge.ino.hex',
+    ]);
+});
+
 it('builds core and lib install argv', function () {
     $runner = new FakeCommandRunner();
     $cli = new ArduinoCli($runner);

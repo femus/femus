@@ -2,3 +2,5 @@
 .phpunit.result.cache
 .DS_Store
 /.idea/
+/firmware/build/*
+!/firmware/build/*.ino.hex
