@@ -4,3 +4,6 @@
 /.idea/
 /firmware/build/*
 !/firmware/build/*.ino.hex
+/website/node_modules/
+/website/.vitepress/dist/
+/website/.vitepress/cache/
