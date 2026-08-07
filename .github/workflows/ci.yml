@@ -1,0 +1,33 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  tests:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        php: ['8.2', '8.3', '8.4']
+    name: pest (PHP ${{ matrix.php }})
+    steps:
+      - uses: actions/checkout@v4
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php }}
+          coverage: none
+      - uses: ramsey/composer-install@v3
+      - run: vendor/bin/pest
+
+  firmware:
+    runs-on: ubuntu-latest
+    name: arduino compile
+    steps:
+      - uses: actions/checkout@v4
+      - uses: arduino/setup-arduino-cli@v2
+      - run: arduino-cli core update-index && arduino-cli core install arduino:avr
+      - run: arduino-cli lib install ConfigurableFirmata RadioHead HX711
+      - run: arduino-cli compile --fqbn arduino:avr:nano firmware/FemusFirmata
+      - run: arduino-cli compile --fqbn arduino:avr:nano firmware/RadioBleBridge
