@@ -8,12 +8,14 @@ use Femus\Board;
 use Femus\Contracts\RadioLink;
 use Femus\Contracts\RadioMessage;
 
-// Usage: php examples/radio-chat.php [port] [my-address] [peer-address]
+// Usage: php examples/radio-chat.php [port] [my-address] [peer-address] [rx-pin] [tx-pin]
 $board = Board::firmata($argv[1] ?? null);
 $address = (int) ($argv[2] ?? 1);
 $peer = (int) ($argv[3] ?? RadioLink::BROADCAST);
+$rxPin = (int) ($argv[4] ?? 11);
+$txPin = (int) ($argv[5] ?? 12);
 
-$radio = $board->radioLink($address);
+$radio = $board->radioLink($address, $rxPin, $txPin);
 
 $radio->onMessage(function (RadioMessage $m) {
     printf("\r[node %d] %s\n> ", $m->from, $m->message);
