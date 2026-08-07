@@ -11,14 +11,16 @@ final class FlashFirmware
 {
     private const DEFAULT_FQBN = 'arduino:avr:nano:cpu=atmega328old';
 
-    /** @var array<string, array{dir: string, libs: list<string>}> */
+    /** @var array<string, array{dir: string, hex: string, libs: list<string>}> */
     private const TARGETS = [
         'femus' => [
             'dir' => 'firmware/FemusFirmata',
+            'hex' => 'firmware/build/FemusFirmata.ino.hex',
             'libs' => ['ConfigurableFirmata', 'RadioHead', 'HX711'],
         ],
         'radio-bridge' => [
             'dir' => 'firmware/RadioBleBridge',
+            'hex' => 'firmware/build/RadioBleBridge.ino.hex',
             'libs' => ['RadioHead'],
         ],
     ];
@@ -37,7 +39,7 @@ final class FlashFirmware
     public function run(?string $target, array $options, callable $out): int
     {
         if ($target === null || !isset(self::TARGETS[$target])) {
-            $out('usage: femus firmware:flash <femus|radio-bridge> [--port=auto] [--fqbn=...]');
+            $out('usage: femus firmware:flash <femus|radio-bridge> [--port=auto] [--fqbn=...] [--build]');
 
             return 2;
         }
@@ -69,6 +71,21 @@ final class FlashFirmware
             return 1;
         }
 
+        $hexFile = $this->projectRoot . '/' . $spec['hex'];
+        if (!array_key_exists('build', $options) && is_file($hexFile)) {
+            $out("Flashing {$target} ({$fqbn}, prebuilt hex) ...");
+
+            if (!$this->arduino->uploadHex($hexFile, $fqbn, $port)->succeeded()) {
+                $out('Flash failed.');
+
+                return 1;
+            }
+
+            $out('Done.');
+
+            return 0;
+        }
+
         foreach ($spec['libs'] as $lib) {
             if (!$this->arduino->libInstall($lib)->succeeded()) {
                 $out("Failed to install library: {$lib}");
@@ -78,7 +95,7 @@ final class FlashFirmware
         }
 
         $sketchDir = $this->projectRoot . '/' . $spec['dir'];
-        $out("Flashing {$target} ({$fqbn}) ...");
+        $out("Flashing {$target} ({$fqbn}, from source) ...");
 
         if (!$this->arduino->compileAndUpload($sketchDir, $fqbn, $port)->succeeded()) {
             $out('Flash failed.');
