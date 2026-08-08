@@ -46,6 +46,7 @@ export default defineConfig({
           { text: '433 MHz Radio', link: '/guide/radio' },
           { text: 'GSM & SMS', link: '/guide/gsm' },
           { text: 'Firmware & CLI', link: '/guide/firmware' },
+          { text: 'AI Agents (MCP)', link: '/guide/mcp' },
         ],
       },
     ],

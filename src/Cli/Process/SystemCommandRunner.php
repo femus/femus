@@ -6,6 +6,11 @@ namespace Femus\Cli\Process;
 
 final class SystemCommandRunner implements CommandRunner
 {
+    /** @param bool $echo stream child output to STDOUT as it arrives (off for protocol modes like MCP) */
+    public function __construct(private readonly bool $echo = true)
+    {
+    }
+
     public function run(array $argv): CommandResult
     {
         $command = implode(' ', array_map('escapeshellarg', $argv));
@@ -28,7 +33,9 @@ final class SystemCommandRunner implements CommandRunner
             foreach ($read as $pipe) {
                 $chunk = fread($pipe, 4096);
                 if ($chunk !== false && $chunk !== '') {
-                    fwrite(STDOUT, $chunk);
+                    if ($this->echo) {
+                        fwrite(STDOUT, $chunk);
+                    }
                     $output .= $chunk;
                 }
             }

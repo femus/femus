@@ -33,6 +33,10 @@ $board->run();
   hardware logic in CI, no soldering required.
 - **Not just blinking LEDs.** Addressed 433 MHz packet radio, load cells, GSM/SMS,
   I2C, LCDs — enough to build a real device, not a demo.
+- **AI-native.** `femus mcp` exposes the hardware to AI agents over MCP
+  (`claude mcp add femus -- php vendor/bin/femus mcp` — and Claude can scan ports,
+  flash firmware and read pins), and the docs ship as
+  [llms-full.txt](https://femus.github.io/femus/llms-full.txt) for any model to ingest.
 
 ## Quick start
 
