@@ -4,10 +4,14 @@ declare(strict_types=1);
 
 namespace Femus\Cli;
 
+use Femus\Board;
 use Femus\Cli\Arduino\ArduinoCli;
 use Femus\Cli\Command\FlashFirmware;
 use Femus\Cli\Command\FlashOptions;
 use Femus\Cli\Process\SystemCommandRunner;
+use Femus\Mcp\McpServer;
+use Femus\Mcp\ToolRegistry;
+use Femus\Mcp\Tools\FemusTools;
 use Femus\Transport\SerialPortLocator;
 
 final class Application
@@ -35,8 +39,23 @@ final class Application
             return $flash->run($parsed->target, $parsed->options, $out);
         }
 
+        if ($command === 'mcp') {
+            $locator = new SerialPortLocator();
+            $registry = new ToolRegistry();
+            $tools = new FemusTools(
+                $locator,
+                new FlashFirmware(new ArduinoCli(new SystemCommandRunner(echo: false)), $locator, $this->projectRoot),
+                static fn (?string $port) => Board::firmata($port),
+            );
+            $tools->registerOn($registry);
+            (new McpServer(STDIN, STDOUT, $registry))->run();
+
+            return 0;
+        }
+
         $out('femus — PHP hardware framework CLI');
         $out('usage: femus firmware:flash <femus|radio-bridge> [--port=auto] [--fqbn=...] [--build]');
+        $out('       femus mcp   (MCP server over stdio — hardware tools for AI agents)');
 
         return $command === null ? 0 : 2;
     }
