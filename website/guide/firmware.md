@@ -1,5 +1,26 @@
 # Firmware & CLI
 
+## femus scan
+
+Before anything else, find your board:
+
+```bash
+vendor/bin/femus scan
+```
+
+```
+Found 1 serial port:
+  ✓ /dev/ttyUSB0 — Firmata board — femus-ready
+```
+
+It lists every serial port and tells you, in plain language, what each one is:
+
+| Mark | Meaning |
+|---|---|
+| `✓ … femus-ready` | a Firmata board answered — you're good to go |
+| `· … no response` | a port opened but nothing answered — flash it (`femus firmware:flash femus`) |
+| `· … in use` | the port is held by another program — close the Arduino IDE / serial monitor |
+
 ## The firmware model
 
 You never write or edit Arduino code with femus. Two sketches ship **precompiled**

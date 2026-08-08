@@ -43,6 +43,7 @@ $board->run();
 
 ```bash
 composer require femus/femus            # not on Packagist yet — see note below
+vendor/bin/femus scan                   # find your board and check it's femus-ready
 vendor/bin/femus firmware:flash femus   # flashes the bundled firmware to your Arduino
 php vendor/femus/femus/examples/blink.php
 ```
