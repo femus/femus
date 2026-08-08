@@ -1,11 +1,33 @@
 # AI Agents (MCP)
 
-femus ships an [MCP](https://modelcontextprotocol.io) server — an AI agent like
-Claude can discover your boards, flash firmware and drive pins **on real hardware**.
+::: tip Optional
+Everything on this page is an add-on. femus is fully usable without any AI —
+the CLI, the docs and the examples assume nothing but a human and a terminal.
+:::
 
-```bash
+femus ships an [MCP](https://modelcontextprotocol.io) server — an AI agent can
+discover your boards, flash firmware and drive pins **on real hardware**. MCP is an
+open standard: the server is plain JSON-RPC over stdio and works with any MCP
+client — Claude Code, Cursor, VS Code, Windsurf, Cline, Zed, Gemini CLI and others.
+
+::: code-group
+
+```bash [Claude Code]
 claude mcp add femus -- php vendor/bin/femus mcp
 ```
+
+```json [Cursor / VS Code / generic]
+{
+    "mcpServers": {
+        "femus": {
+            "command": "php",
+            "args": ["vendor/bin/femus", "mcp"]
+        }
+    }
+}
+```
+
+:::
 
 Then just ask:
 
