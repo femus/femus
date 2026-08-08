@@ -30,6 +30,7 @@ export default defineConfig({
         text: 'The Basics',
         items: [
           { text: 'Board & Ports', link: '/guide/board' },
+          { text: 'Raspberry Pi GPIO', link: '/guide/linux-board' },
           { text: 'Event Loop', link: '/guide/event-loop' },
           { text: 'Testing Without Hardware', link: '/guide/testing' },
         ],
