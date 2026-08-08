@@ -1,0 +1,21 @@
+[Unit]
+# femus autonomous node — runs a femus PHP script at boot on a headless board.
+# Install: see deploy/README.md. Edit User/WorkingDirectory/ExecStart for your setup.
+Description=femus autonomous node
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=femus
+WorkingDirectory=/home/femus/femus
+# EnvironmentFile lets you set FEMUS_PORT without editing this unit (optional).
+EnvironmentFile=-/etc/femus-node.env
+ExecStart=/usr/bin/php examples/heartbeat.php ${FEMUS_PORT}
+Restart=always
+RestartSec=3
+# Give a USB serial adapter a moment to enumerate after boot.
+ExecStartPre=/bin/sleep 2
+
+[Install]
+WantedBy=multi-user.target
