@@ -1,10 +1,15 @@
 import { defineConfig } from 'vitepress'
+import llmstxt from 'vitepress-plugin-llms'
 
 export default defineConfig({
   title: 'femus',
   description: 'Hardware for PHP developers — Arduino, sensors, radio and GSM from plain PHP',
   base: '/femus/',
   cleanUrls: true,
+
+  vite: {
+    plugins: [llmstxt()],
+  },
 
   themeConfig: {
     nav: [
