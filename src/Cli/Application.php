@@ -83,7 +83,9 @@ final class Application
         }
 
         try {
-            (new FirmataBoard($serial, new StreamSelectLoop(), handshakeTimeout: 2.0))->awaitReady();
+            // Cold-open pulses DTR and resets the board; the bootloader eats ~2s
+            // before the sketch answers, so allow generous time here.
+            (new FirmataBoard($serial, new StreamSelectLoop(), handshakeTimeout: 4.0))->awaitReady();
 
             return 'firmata';
         } catch (BoardException) {
