@@ -44,6 +44,7 @@ export default defineConfig({
       {
         text: 'Going Further',
         items: [
+          { text: 'PWM — brightness & RGB', link: '/guide/pwm' },
           { text: '433 MHz Radio', link: '/guide/radio' },
           { text: 'GSM & SMS', link: '/guide/gsm' },
           { text: 'Firmware & CLI', link: '/guide/firmware' },

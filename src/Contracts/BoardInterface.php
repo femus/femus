@@ -10,6 +10,8 @@ interface BoardInterface
 {
     public function digitalPin(int $number, PinMode $mode): DigitalPin;
 
+    public function pwmPin(int $pin): PwmPin;
+
     public function analogPin(int $channel): AnalogPin;
 
     public function i2c(): I2cBus;

@@ -9,6 +9,7 @@ use Femus\Contracts\AnalogPin;
 use Femus\Contracts\DigitalPin;
 use Femus\Contracts\I2cBus;
 use Femus\Contracts\PinMode;
+use Femus\Contracts\PwmPin;
 use Femus\Contracts\RadioLink;
 use Femus\Contracts\ScaleInput;
 
@@ -19,6 +20,9 @@ final class FakeBoard extends AbstractBoard
 
     /** @var array<int, FakeAnalogPin> */
     private array $analogPins = [];
+
+    /** @var array<int, FakePwmPin> */
+    private array $pwmPins = [];
 
     private ?FakeI2cBus $i2c = null;
 
@@ -36,6 +40,19 @@ final class FakeBoard extends AbstractBoard
     public function analogPin(int $channel): AnalogPin
     {
         return $this->analogPins[$channel] ??= new FakeAnalogPin($channel);
+    }
+
+    public function pwmPin(int $pin): PwmPin
+    {
+        return $this->pwmPins[$pin] ??= new FakePwmPin($pin);
+    }
+
+    public function fakePwmPin(int $pin): FakePwmPin
+    {
+        $p = $this->pwmPin($pin);
+        assert($p instanceof FakePwmPin);
+
+        return $p;
     }
 
     public function i2c(): I2cBus
