@@ -7,6 +7,7 @@ namespace Femus;
 use Femus\Adapter\Fake\FakeBoard;
 use Femus\Adapter\Firmata\BoardException;
 use Femus\Adapter\Firmata\FirmataBoard;
+use Femus\Adapter\Linux\LinuxBoard;
 use Femus\Runtime\Loop;
 use Femus\Runtime\StreamSelectLoop;
 use Femus\Transport\SerialPort;
@@ -18,6 +19,12 @@ final class Board
     public static function fake(): FakeBoard
     {
         return new FakeBoard(new StreamSelectLoop());
+    }
+
+    /** The host's own GPIO header (Raspberry Pi via pinctrl) — no Arduino needed. */
+    public static function linux(?Loop $loop = null): LinuxBoard
+    {
+        return new LinuxBoard(loop: $loop ?? new StreamSelectLoop());
     }
 
     /** Arduino with StandardFirmata firmware connected via USB. */
