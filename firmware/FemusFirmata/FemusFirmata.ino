@@ -8,6 +8,10 @@
 #include <DigitalInputFirmata.h>
 #include <DigitalOutputFirmata.h>
 #include <AnalogInputFirmata.h>
+#include <AnalogOutputFirmata.h>
+// NOTE: ServoFirmata is intentionally omitted — the AVR Servo library and RadioHead
+// (RadioFeature) both claim Timer1, so they cannot coexist on an ATmega328. Radio
+// wins; PWM (analogWrite) below does not need Timer1 and stays.
 #include <I2CFirmata.h>
 #include <FirmataExt.h>
 #include <FirmataReporting.h>
@@ -17,6 +21,7 @@
 DigitalInputFirmata digitalInput;
 DigitalOutputFirmata digitalOutput;
 AnalogInputFirmata analogInput;
+AnalogOutputFirmata analogOutput;
 I2CFirmata i2c;
 Hx711Feature hx711;
 RadioFeature radio;
@@ -34,6 +39,7 @@ void setup()
   firmataExt.addFeature(digitalInput);
   firmataExt.addFeature(digitalOutput);
   firmataExt.addFeature(analogInput);
+  firmataExt.addFeature(analogOutput);
   firmataExt.addFeature(i2c);
   firmataExt.addFeature(hx711);
   firmataExt.addFeature(radio);

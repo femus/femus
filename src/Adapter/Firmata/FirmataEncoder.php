@@ -19,6 +19,14 @@ final class FirmataEncoder
             . chr(($bitmask >> 7) & 0x7F);
     }
 
+    /** PWM duty for a pin (0–255), sent as a 7-bit pair. Pin must be in PWM mode. */
+    public static function analogWrite(int $pin, int $value): string
+    {
+        return chr(Firmata::ANALOG_MESSAGE | ($pin & 0x0F))
+            . chr($value & 0x7F)
+            . chr(($value >> 7) & 0x7F);
+    }
+
     public static function reportDigitalPort(int $port, bool $enable): string
     {
         return chr(Firmata::REPORT_DIGITAL | $port) . chr($enable ? 1 : 0);

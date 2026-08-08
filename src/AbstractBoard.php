@@ -16,6 +16,7 @@ use Femus\Device\LoadCell;
 use Femus\Device\MotionSensor;
 use Femus\Device\Mpu6050;
 use Femus\Device\Relay;
+use Femus\Device\RgbLed;
 use Femus\Runtime\Loop;
 
 abstract class AbstractBoard implements BoardInterface
@@ -67,6 +68,11 @@ abstract class AbstractBoard implements BoardInterface
     public function analogSensor(int $channel, float $threshold = 0.01): AnalogSensor
     {
         return new AnalogSensor($this->analogPin($channel), $this->loop, $threshold);
+    }
+
+    public function rgbLed(int $redPin, int $greenPin, int $bluePin): RgbLed
+    {
+        return new RgbLed($this->pwmPin($redPin), $this->pwmPin($greenPin), $this->pwmPin($bluePin));
     }
 
     public function lcd1602(int $address = 0x27): Lcd1602

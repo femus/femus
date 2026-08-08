@@ -24,6 +24,7 @@ final class Firmata
 
     public const MODE_INPUT = 0x00;
     public const MODE_OUTPUT = 0x01;
+    public const MODE_PWM = 0x03;
     public const MODE_PULLUP = 0x0B;
 
     public const FEMUS_HX711 = 0x0E;

@@ -11,6 +11,7 @@ use Femus\Contracts\AnalogPin;
 use Femus\Contracts\DigitalPin;
 use Femus\Contracts\I2cBus;
 use Femus\Contracts\PinMode;
+use Femus\Contracts\PwmPin;
 use Femus\Contracts\RadioLink;
 use Femus\Contracts\ScaleInput;
 use Femus\Runtime\Loop;
@@ -38,6 +39,11 @@ final class LinuxBoard extends AbstractBoard
     public function digitalPin(int $number, PinMode $mode): DigitalPin
     {
         return $this->pins[$number] ??= new LinuxDigitalPin($this->runner, $number, $mode, $this->loop);
+    }
+
+    public function pwmPin(int $pin): PwmPin
+    {
+        throw new \LogicException('PWM on LinuxBoard is not implemented yet — use Board::firmata() for PWM.');
     }
 
     public function analogPin(int $channel): AnalogPin

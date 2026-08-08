@@ -9,6 +9,7 @@ use Femus\Contracts\AnalogPin;
 use Femus\Contracts\DigitalPin;
 use Femus\Contracts\I2cBus;
 use Femus\Contracts\PinMode;
+use Femus\Contracts\PwmPin;
 use Femus\Contracts\RadioLink;
 use Femus\Contracts\ScaleInput;
 use Femus\Runtime\Loop;
@@ -26,6 +27,9 @@ final class FirmataBoard extends AbstractBoard
 
     /** @var array<int, FirmataAnalogPin> */
     private array $analogPins = [];
+
+    /** @var array<int, FirmataPwmPin> */
+    private array $pwmPins = [];
 
     private readonly FirmataParser $parser;
 
@@ -120,6 +124,11 @@ final class FirmataBoard extends AbstractBoard
         }
 
         return $this->analogPins[$channel];
+    }
+
+    public function pwmPin(int $pin): PwmPin
+    {
+        return $this->pwmPins[$pin] ??= new FirmataPwmPin($this->transport, $pin);
     }
 
     /** @internal */
