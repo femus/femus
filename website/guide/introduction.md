@@ -3,6 +3,8 @@
 femus is a hardware framework for PHP. It lets you drive physical devices — buttons,
 sensors, relays, scales, LCDs, 433 MHz radio modules, GSM modems — from ordinary PHP
 code running on your laptop or a Raspberry Pi, with an Arduino acting as the hands.
+On a Raspberry Pi you can also skip the Arduino and drive the
+[Pi's own GPIO directly](/guide/linux-board).
 
 ```php
 use Femus\Board;

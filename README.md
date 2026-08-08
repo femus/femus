@@ -33,6 +33,8 @@ $board->run();
   hardware logic in CI, no soldering required.
 - **Not just blinking LEDs.** Addressed 433 MHz packet radio, load cells, GSM/SMS,
   I2C, LCDs — enough to build a real device, not a demo.
+- **Runs on the Pi itself, too.** `Board::linux()` drives a Raspberry Pi's own GPIO
+  header directly — no Arduino needed for digital I/O. Same `led()`/`button()` code.
 - **AI-friendly (and fully optional).** `femus mcp` exposes the hardware to any
   MCP-capable agent — Claude Code, Cursor, VS Code and friends can scan ports, flash
   firmware and read pins. The docs ship as
