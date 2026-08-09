@@ -12,27 +12,42 @@ sketch. It lets you send and receive radio messages from your iPhone.
 | `ContentView.swift` | SwiftUI chat UI |
 | `FemusRadioTerminalApp.swift` | `@main` app entry point |
 
-## Setup in Xcode
+## Setup (recommended: xcodegen)
+
+The Xcode project is generated from `project.yml` (Bluetooth permission and
+settings included) — no manual project creation needed:
+
+```bash
+brew install xcodegen
+cd ios/FemusRadioTerminal
+xcodegen generate
+open FemusRadioTerminal.xcodeproj
+```
+
+Then in Xcode:
+
+1. Connect your iPhone with a USB cable and select it as the run destination.
+2. Under **Signing & Capabilities**, choose your personal Apple ID as the
+   **Team** (free personal-team signing — the app is valid for 7 days, then
+   rebuild). If the bundle id is taken, change `PRODUCT_BUNDLE_IDENTIFIER` in
+   `project.yml` and re-run `xcodegen generate`.
+3. First run on a fresh device: enable **Developer Mode** on the iPhone
+   (Settings → Privacy & Security → Developer Mode), then trust the certificate
+   under Settings → General → VPN & Device Management. (Trusting the cert needs
+   the internet once; after that the whole messenger runs fully offline.)
+4. Press **Run** (⌘R).
+
+<details>
+<summary>Manual setup (without xcodegen)</summary>
 
 1. Open Xcode and choose **File → New → Project…**
-2. Select **iOS → App**. Fill in:
-   - **Product Name**: `FemusRadioTerminal`
-   - **Interface**: SwiftUI
-   - **Language**: Swift
-3. Click **Next**, choose a location, and **Create**.
-4. In the project navigator, **delete** the generated `ContentView.swift`
-   (move to Trash when prompted).
-5. Drag the three `.swift` files from this directory into the Xcode project
-   navigator (under the `FemusRadioTerminal` group). Make sure
-   **Add to targets: FemusRadioTerminal** is checked.
-6. Open `Info.plist` (or the target's **Info** tab) and add the key:
-   - **Key**: `NSBluetoothAlwaysUsageDescription`
-   - **Value**: `Connects to the femus radio node over Bluetooth`
-7. Connect your iPhone with a USB cable.
-8. Select your iPhone as the run destination in the toolbar.
-9. Under **Signing & Capabilities**, select your personal Apple ID as the
-   team (free personal-team signing — the app will be valid for 7 days,
-   after which you need to rebuild and re-install).
+2. Select **iOS → App** with **Interface: SwiftUI**, **Language: Swift**.
+3. Delete the generated `ContentView.swift`, then drag the three `.swift` files
+   from this directory into the project (target: FemusRadioTerminal).
+4. Add `NSBluetoothAlwaysUsageDescription` to Info with value
+   `Connects to the femus radio node over Bluetooth`.
+5. Select your iPhone, set the signing Team to your Apple ID, and Run.
+</details>
 10. Press **Run** (⌘R).
 
 > **The iOS Simulator does not support Bluetooth — a real device is required.**
