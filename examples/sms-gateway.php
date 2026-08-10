@@ -5,6 +5,7 @@ declare(strict_types=1);
 require __DIR__ . '/../vendor/autoload.php';
 
 use Femus\Gsm\Gateway\AiClient;
+use Femus\Gsm\Gateway\ClaudeAiClient;
 use Femus\Gsm\Gateway\Command\HelpCommand;
 use Femus\Gsm\Gateway\Command\PingCommand;
 use Femus\Gsm\Gateway\ModemSender;
@@ -15,20 +16,21 @@ use Femus\Gsm\Sms;
 // Personal SMS↔internet gateway — the box you keep at home.
 // Text it from any phone (no data needed) and it texts an answer back.
 //
-// Usage: php examples/sms-gateway.php /dev/ttyUSB0
-//
-// This is a scaffold: the AI client below is a stub. Replace it with a real
-// Claude API client (needs an API key and the box's internet) to get answers.
+// Usage: ANTHROPIC_API_KEY=sk-... php examples/sms-gateway.php /dev/ttyUSB0
 
 $port = $argv[1] ?? null;
 
-// TODO: replace with a real Claude-backed client. Keep answers short (~1–2 SMS).
-$ai = new class implements AiClient {
-    public function ask(string $question): string
-    {
-        return "You asked: {$question}. (Connect a real AI client to answer.)";
-    }
-};
+// Claude answers plain-text questions when ANTHROPIC_API_KEY is set; otherwise a
+// stub replies so you can test the wiring without a key.
+$apiKey = getenv('ANTHROPIC_API_KEY') ?: '';
+$ai = $apiKey !== ''
+    ? new ClaudeAiClient($apiKey)
+    : new class implements AiClient {
+        public function ask(string $question): string
+        {
+            return "You asked: {$question}. (Set ANTHROPIC_API_KEY for real answers.)";
+        }
+    };
 
 $modem = GsmModem::open($port);
 $modem->init();

@@ -56,6 +56,29 @@ $modem->run();
 Text `/ping` → `pong`. Text `weather in Halifax?` → the AI agent answers.
 See `examples/sms-gateway.php`.
 
+## The AI agent (Claude over SMS)
+
+The default reply path is an AI agent: a plain-text question goes to Claude, which
+answers concisely enough to fit an SMS. `ClaudeAiClient` talks to the Claude Messages
+API over raw HTTP (femus stays dependency-free — no SDK pulled in); set
+`ANTHROPIC_API_KEY` and it works:
+
+```php
+use Femus\Gsm\Gateway\ClaudeAiClient;
+
+$ai = new ClaudeAiClient(getenv('ANTHROPIC_API_KEY')); // default model: claude-opus-4-8
+```
+
+The HTTP transport is injectable (`HttpClient`), so the client is unit-tested against a
+fake with no network. Prefer the official Anthropic SDK? Implement `AiClient` with it —
+the gateway doesn't care which you use.
+
+This is what makes "SMS internet" actually useful today: you don't tunnel raw data, you
+get an intelligent, digested answer. It's txtWeb / Google SMS, but AI-powered and
+self-hosted. Images and other media can't ride SMS — the plan is to transcode them to
+text (a marker like `[photo]`, or a one-line Claude-vision description) rather than send
+bytes.
+
 ## Whitelist first
 
 A personal box should only answer **you** (and family). Pass `allowedNumbers` — anyone
@@ -86,8 +109,10 @@ where only SMS gets through, not for browsing.
 ## What's built vs. next
 
 **Built & tested now** (against fakes, no hardware): `SmsGateway`, `SmsTransport`,
-`SmsReassembler`, `SmsCommand` + `PingCommand`/`HelpCommand`, `ModemSender`.
+`SmsReassembler`, `SmsCommand` + `PingCommand`/`HelpCommand`, `ModemSender`, and
+`ClaudeAiClient` (raw-HTTP, transport injected for tests).
 
-**Next** (needs hardware / credentials): a real Claude-backed `AiClient`
-(API key + the box's internet), a `MailService` (IMAP/SMTP), and wiring to the
-LTE modem. The gateway is ready for them — they just implement the interfaces.
+**Next** (needs the modem / live keys): confirm `ClaudeAiClient` against the real API,
+a `MailService` (IMAP/SMTP), optional Telegram relay (MTProto user-bot), image→text via
+Claude vision, and wiring to the LTE modem. The gateway is ready — they implement the
+interfaces.
