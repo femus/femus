@@ -47,6 +47,7 @@ export default defineConfig({
           { text: 'PWM — brightness & RGB', link: '/guide/pwm' },
           { text: '433 MHz Radio', link: '/guide/radio' },
           { text: 'GSM & SMS', link: '/guide/gsm' },
+          { text: 'SMS Gateway', link: '/guide/sms-gateway' },
           { text: 'Firmware & CLI', link: '/guide/firmware' },
           { text: 'AI Agents (MCP)', link: '/guide/mcp' },
         ],
