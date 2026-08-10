@@ -63,11 +63,17 @@ The divider gives ~3.33 V: `5V × 2kΩ / (1kΩ + 2kΩ) ≈ 3.33V`. Fine for 9600
 
 ---
 
+> **Different wiring?** The radio pins are `#define RADIO_RX_PIN` / `RADIO_TX_PIN` at
+> the top of `RadioBleBridge.ino` (default D11/D12). Change them to match your board
+> and re-flash — RadioHead needs the pins fixed at compile time. The antenna
+> (17.3 cm wire in each module's `ANT` hole) matters more than the exact pins: without
+> it, 433 MHz barely reaches a few centimetres.
+
 ### FS1000A Transmitter (433 MHz)
 
 | FS1000A pin | Arduino Nano pin | Notes |
 |-------------|------------------|-------|
-| DATA | D12 | ASK modulation signal |
+| DATA | D12 (default `RADIO_TX_PIN`) | ASK modulation signal |
 | VCC | 5V | Module draws ≈20 mA during TX |
 | GND | GND | Common ground |
 | ANT | - | Solder a **17.3 cm** wire for quarter-wave monopole antenna |

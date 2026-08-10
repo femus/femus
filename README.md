@@ -22,6 +22,24 @@ $button->onRelease(fn () => $led->off());
 $board->run();
 ```
 
+## The flagship: a phone ↔ computer messenger with no internet
+
+femus was built to prove a point. This repo contains a working **offline messenger**:
+type on an iPhone in **airplane mode** and the message appears on your Mac —
+carried entirely by 433 MHz radio you assembled yourself.
+
+```
+iPhone (airplane mode) → Bluetooth (HM-10) → Arduino bridge
+      → 433 MHz radio → Arduino station → USB → your PHP process
+```
+
+No Wi-Fi. No cellular. No provider. No cloud. The very first real message sent over it,
+from a phone with every network switched off, was — fittingly — **"Am I online?"**
+
+Every piece is in this repository: the two Arduino sketches (precompiled), the PHP
+radio stack (`examples/radio-chat.php`), and the [SwiftUI iPhone terminal](ios/FemusRadioTerminal/).
+Build it yourself — see the [radio guide](https://femus.github.io/femus/guide/radio).
+
 ## Why femus
 
 - **Plain PHP, real hardware.** One `Board` object, typed device drivers, an event loop

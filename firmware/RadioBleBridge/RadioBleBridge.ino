@@ -21,8 +21,13 @@
 #define DEFAULT_NODE 2
 #define DEFAULT_PEER 1
 
+// Radio pins — change these to match your wiring, then re-flash.
+// (The RadioHead ASK library needs them fixed at compile time.)
+#define RADIO_RX_PIN 11        // MX-RM-5V receiver DATA
+#define RADIO_TX_PIN 12        // FS1000A transmitter DATA
+
 SoftwareSerial ble(7, 8);      // D7 <- HM-10 TXD, D8 -> HM-10 RXD (via 1k/2k divider)
-RH_ASK radio(2000, 11, 12);    // rxPin D11 (MX-RM-5V DATA), txPin D12 (FS1000A DATA)
+RH_ASK radio(2000, RADIO_RX_PIN, RADIO_TX_PIN);
 
 byte nodeAddr;
 byte peerAddr;

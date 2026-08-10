@@ -16,7 +16,14 @@ Each node needs both modules (femus radio is bidirectional):
 | both | VCC / GND | 5V / GND |
 
 Solder a 17.3 cm wire into each module's `ANT` hole — quarter-wave for 433 MHz.
-Without antennas the range is a couple of meters; with them, tens of meters.
+
+::: warning Antennas are not optional
+Without antennas, 433 MHz barely reaches a few **centimetres**, and delivery is flaky
+even when the boards touch — packets drop, one direction works while the other doesn't.
+This looks exactly like broken hardware but isn't. The single 17.3 cm wire in each
+module turns unreliable-at-2cm into solid-across-a-room. If radio "doesn't work,"
+check antennas first.
+:::
 
 ## API
 
@@ -59,6 +66,16 @@ internet and no cellular.** A second Arduino runs the bundled `RadioBleBridge`
 firmware (BLE ⇄ radio, addresses configurable from the phone, stored in EEPROM), and
 the [SwiftUI terminal app](https://github.com/femus/femus/tree/main/ios/FemusRadioTerminal)
 connects to it over Bluetooth. Messages travel: iPhone → BLE → radio → your PHP process.
+
+The first real message sent over it, from a phone in airplane mode with every network
+off, was — fittingly — *"Am I online?"* (No. And that's the whole point.)
+
+## Half-duplex: take turns
+
+RH_ASK is half-duplex — a node can't receive while it's transmitting. If both ends
+blast packets at the same time they collide and *both* sides hear nothing, which again
+looks like broken hardware. Have the nodes **take turns** (send, then listen), the way
+`radio-chat.php` does. A one-way flood is a clean way to test each direction in isolation.
 
 ## Honest limitations
 
