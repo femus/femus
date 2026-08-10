@@ -60,10 +60,15 @@ it('serves everyone when no whitelist is configured (open mode)', function () {
     expect($sender->lastText())->toBe('hi');
 });
 
-it('sends a long AI answer as multiple SMS parts', function () {
+it('splits a long AI answer into plain phone-readable parts (no packet headers)', function () {
     $sender = new RecordingSender();
     $long = str_repeat('word ', 100); // 500 chars
     gateway($sender, new FakeAiClient($long))->handle(new Sms('+1555', 'tell me a lot'));
 
     expect(count($sender->sent))->toBeGreaterThan(1);
+    foreach ($sender->sent as $part) {
+        expect($part['text'])->not->toContain('[r:'); // no femus↔femus headers to a phone
+    }
+    // Parts rejoin to the original text
+    expect(implode('', array_column($sender->sent, 'text')))->toBe($long);
 });

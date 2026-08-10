@@ -30,7 +30,6 @@ final class SmsGateway
         private readonly AiClient $ai,
         array $commands = [],
         private readonly array $allowedNumbers = [],
-        private readonly SmsTransport $transport = new SmsTransport(),
         private readonly int $maxSmsLen = 150,
     ) {
         foreach ($commands as $command) {
@@ -46,9 +45,21 @@ final class SmsGateway
 
         $reply = $this->route(trim($message->text), $message);
 
-        foreach ($this->transport->chunk($reply, 'r', $this->maxSmsLen) as $part) {
+        // Human replies are split into plain chunks a normal phone reads in order —
+        // NOT the headered packet format (that's only for femus↔femus, via SmsTransport).
+        foreach ($this->splitForPhone($reply) as $part) {
             $this->sender->send($message->from, $part);
         }
+    }
+
+    /** @return list<string> */
+    private function splitForPhone(string $text): array
+    {
+        if (mb_strlen($text) <= $this->maxSmsLen) {
+            return [$text];
+        }
+
+        return mb_str_split($text, $this->maxSmsLen);
     }
 
     private function route(string $text, Sms $message): string
