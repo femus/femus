@@ -13,6 +13,7 @@ and full support in [`FakeBoard`](/guide/testing) for hardware-free tests.
 | `motionSensor(pin)` | PIR (HC-SR501…) | `onMotion()`, `onIdle()`, `waitForMotion()` |
 | `analogSensor(ch)` | pot, LDR, water level… | `onChange()` with normalized 0–1 values |
 | `loadCell(dout, sck)` | HX711 + strain gauges | `tare()`, `calibrate(grams)`, `grams()`, `onChange()` |
+| `pantryJar(dout, sck, ...)` | jar/container on a load cell | `contentsGrams()`, `percentFull()`, `servingsLeft()`, `isLow()` — [smart pantry guide](/guide/pantry) |
 | `lcd1602()` | 16×2 LCD via I2C backpack | `write()`, cursor control |
 | `lcd1602Parallel(...)` | 16×2 LCD on 6 GPIO | same API, no backpack needed |
 | `mpu6050()` | gyro/accelerometer (I2C) | orientation and acceleration readings |

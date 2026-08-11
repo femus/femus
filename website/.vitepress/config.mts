@@ -45,6 +45,7 @@ export default defineConfig({
         text: 'Going Further',
         items: [
           { text: 'PWM — brightness & RGB', link: '/guide/pwm' },
+          { text: 'Smart Pantry — jar levels', link: '/guide/pantry' },
           { text: '433 MHz Radio', link: '/guide/radio' },
           { text: 'GSM & SMS', link: '/guide/gsm' },
           { text: 'SMS Gateway', link: '/guide/sms-gateway' },

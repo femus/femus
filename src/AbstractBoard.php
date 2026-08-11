@@ -15,6 +15,7 @@ use Femus\Device\Led;
 use Femus\Device\LoadCell;
 use Femus\Device\MotionSensor;
 use Femus\Device\Mpu6050;
+use Femus\Device\PantryJar;
 use Femus\Device\Relay;
 use Femus\Device\RgbLed;
 use Femus\Runtime\Loop;
@@ -100,5 +101,21 @@ abstract class AbstractBoard implements BoardInterface
     public function loadCell(int $doutPin, int $sckPin, float $thresholdGrams = 1.0): LoadCell
     {
         return new LoadCell($this->scaleInput($doutPin, $sckPin), $this->loop, $thresholdGrams);
+    }
+
+    public function pantryJar(
+        int $doutPin,
+        int $sckPin,
+        float $emptyGrams = 0.0,
+        float $fullGrams = 0.0,
+        float $gramsPerServing = 0.0,
+        float $thresholdGrams = 1.0,
+    ): PantryJar {
+        return new PantryJar(
+            $this->loadCell($doutPin, $sckPin, $thresholdGrams),
+            $emptyGrams,
+            $fullGrams,
+            $gramsPerServing,
+        );
     }
 }
