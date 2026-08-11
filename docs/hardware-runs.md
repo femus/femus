@@ -163,7 +163,9 @@ Everything below is **pending live verification**.
 2. [ ] `php examples/rotary-encoder.php <port>` — volume goes up clockwise, down counter-clockwise, one step per detent, press prints "Confirmed"
 3. [ ] If direction is inverted, swap CLK/DT and note it here
 
-**Smart pantry / PantryJar** (needs FemusFirmata + HX711)
+**Smart pantry / PantryJar** (needs FemusFirmata + HX711; the LoadCell path itself
+is already hardware-verified — see Release 2026-08-04-hx711 Run 1. New here:
+gram calibration + the PantryJar layer on top)
 1. [ ] Wire HX711 per docs/devices/hx711.md, adapt pins in examples/pantry.php
 2. [ ] Tare empty, calibrate with a known weight, put a jar on — contents/percent/servings look sane
 3. [ ] Pour some contents out — onChange fires, isLow() flips near the threshold
