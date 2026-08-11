@@ -10,10 +10,12 @@ use Femus\Cli\Process\SystemCommandRunner;
 use Femus\Contracts\AnalogPin;
 use Femus\Contracts\DigitalPin;
 use Femus\Contracts\I2cBus;
+use Femus\Contracts\OneWireReader;
 use Femus\Contracts\PinMode;
 use Femus\Contracts\PwmPin;
 use Femus\Contracts\RadioLink;
 use Femus\Contracts\ScaleInput;
+use Femus\Device\Ds18b20;
 use Femus\Runtime\Loop;
 use Femus\Runtime\StreamSelectLoop;
 
@@ -32,8 +34,28 @@ final class LinuxBoard extends AbstractBoard
     public function __construct(
         private readonly CommandRunner $runner = new SystemCommandRunner(echo: false),
         ?Loop $loop = null,
+        private readonly OneWireReader $oneWire = new SysfsOneWireReader(),
     ) {
         parent::__construct($loop ?? new StreamSelectLoop());
+    }
+
+    /**
+     * A DS18B20 temperature sensor on the 1-Wire bus (needs dtoverlay=w1-gpio,
+     * sensor data on GPIO4 by default). Pass a device id, or omit it to use the
+     * first sensor found on the bus.
+     */
+    public function ds18b20(?string $deviceId = null): Ds18b20
+    {
+        $deviceId ??= $this->oneWireDevices()[0]
+            ?? throw new \RuntimeException('No DS18B20 found on the 1-Wire bus. Is dtoverlay=w1-gpio enabled?');
+
+        return new Ds18b20($this->oneWire, $deviceId);
+    }
+
+    /** @return list<string> ids of the DS18B20 sensors present on the 1-Wire bus */
+    public function oneWireDevices(): array
+    {
+        return $this->oneWire->devices();
     }
 
     public function digitalPin(int $number, PinMode $mode): DigitalPin
