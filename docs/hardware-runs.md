@@ -148,3 +148,34 @@ Node B uses DSD TECH HM-10 (BLE) + AMS1117-3.3 + BSS138 level converter (Option 
 - Node A (station) + full end-to-end (radio A↔B, iPhone app): pending.
 - Result: **Node B OK.**
 
+
+---
+
+## Release 2026-08-11-no-hardware-batch (pantry, KY-040, DS18B20, 74HC595)
+
+All four drivers were written without hardware access — fake-board tests only.
+Everything below is **pending live verification**.
+
+### Testing Checklist (Pending Human Execution)
+
+**KY-040 rotary encoder** (StandardFirmata is enough)
+1. [ ] Wire: CLK→D4, DT→D5, SW→D6, +→5V, GND→GND
+2. [ ] `php examples/rotary-encoder.php <port>` — volume goes up clockwise, down counter-clockwise, one step per detent, press prints "Confirmed"
+3. [ ] If direction is inverted, swap CLK/DT and note it here
+
+**Smart pantry / PantryJar** (needs FemusFirmata + HX711)
+1. [ ] Wire HX711 per docs/devices/hx711.md, adapt pins in examples/pantry.php
+2. [ ] Tare empty, calibrate with a known weight, put a jar on — contents/percent/servings look sane
+3. [ ] Pour some contents out — onChange fires, isLow() flips near the threshold
+
+**DS18B20** (Raspberry Pi, w1-gpio overlay)
+1. [ ] On femus-pi: enable 1-Wire (`dtoverlay=w1-gpio` + reboot), sensor on GPIO4 with 4.7k pull-up
+2. [ ] `php examples/pi-temperature.php` — plausible room °C, warms up when the probe is held
+
+**74HC595 shift register** (StandardFirmata is enough)
+1. [ ] Wire per docs/devices/74hc595.md: DS→D2, SHCP→D3, STCP→D4, MR→5V, OE→GND, 8 LEDs on Q0..Q7
+2. [ ] `php examples/shift-register.php <port>` — a single LED sweeps back and forth (Knight Rider)
+3. [ ] All LEDs dark on script start (constructor flushes zeros — no power-up garbage)
+4. [ ] If available, chain a second chip (Q7'→DS) and check `chips: 2` drives outputs 8-15
+
+**Status**: Awaiting hardware verification. Record runs below.

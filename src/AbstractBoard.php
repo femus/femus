@@ -19,6 +19,7 @@ use Femus\Device\PantryJar;
 use Femus\Device\Relay;
 use Femus\Device\RgbLed;
 use Femus\Device\RotaryEncoder;
+use Femus\Device\ShiftRegister;
 use Femus\Runtime\Loop;
 
 abstract class AbstractBoard implements BoardInterface
@@ -73,6 +74,16 @@ abstract class AbstractBoard implements BoardInterface
             $this->digitalPin($clkPin, PinMode::InputPullUp),
             $this->digitalPin($dtPin, PinMode::InputPullUp),
             $swPin === null ? null : $this->button($swPin),
+        );
+    }
+
+    public function shiftRegister(int $dataPin, int $clockPin, int $latchPin, int $chips = 1): ShiftRegister
+    {
+        return new ShiftRegister(
+            $this->digitalPin($dataPin, PinMode::Output),
+            $this->digitalPin($clockPin, PinMode::Output),
+            $this->digitalPin($latchPin, PinMode::Output),
+            $chips,
         );
     }
 

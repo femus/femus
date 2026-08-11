@@ -9,6 +9,7 @@ and full support in [`FakeBoard`](/guide/testing) for hardware-free tests.
 | `led(pin)` | any LED / digital output | `on()`, `off()`, `toggle()`, `blink(period)` |
 | `relay(pin)` | relay module | `on()`, `off()` |
 | `buzzer(pin)` | active buzzer | `beep(seconds)` |
+| `shiftRegister(data, clock, latch, chips?)` | 74HC595 — 8+ outputs from 3 pins | `set(n, on)`, `write(bits)`, `clear()`, daisy-chaining |
 | `button(pin)` | push button to GND | `onPress()`, `onRelease()`, `waitForPress()` — debounced, pull-up enabled |
 | `motionSensor(pin)` | PIR (HC-SR501…) | `onMotion()`, `onIdle()`, `waitForMotion()` |
 | `rotaryEncoder(clk, dt, sw?)` | KY-040 rotary encoder | `onTurn(±1)`, `position()`, optional push `button()` |
