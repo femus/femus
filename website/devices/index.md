@@ -11,6 +11,7 @@ and full support in [`FakeBoard`](/guide/testing) for hardware-free tests.
 | `buzzer(pin)` | active buzzer | `beep(seconds)` |
 | `button(pin)` | push button to GND | `onPress()`, `onRelease()`, `waitForPress()` — debounced, pull-up enabled |
 | `motionSensor(pin)` | PIR (HC-SR501…) | `onMotion()`, `onIdle()`, `waitForMotion()` |
+| `rotaryEncoder(clk, dt, sw?)` | KY-040 rotary encoder | `onTurn(±1)`, `position()`, optional push `button()` |
 | `analogSensor(ch)` | pot, LDR, water level… | `onChange()` with normalized 0–1 values |
 | `loadCell(dout, sck)` | HX711 + strain gauges | `tare()`, `calibrate(grams)`, `grams()`, `onChange()` |
 | `pantryJar(dout, sck, ...)` | jar/container on a load cell | `contentsGrams()`, `percentFull()`, `servingsLeft()`, `isLow()` — [smart pantry guide](/guide/pantry) |

@@ -18,6 +18,7 @@ use Femus\Device\Mpu6050;
 use Femus\Device\PantryJar;
 use Femus\Device\Relay;
 use Femus\Device\RgbLed;
+use Femus\Device\RotaryEncoder;
 use Femus\Runtime\Loop;
 
 abstract class AbstractBoard implements BoardInterface
@@ -64,6 +65,15 @@ abstract class AbstractBoard implements BoardInterface
     public function motionSensor(int $pin): MotionSensor
     {
         return new MotionSensor($this->digitalPin($pin, PinMode::Input), $this->loop);
+    }
+
+    public function rotaryEncoder(int $clkPin, int $dtPin, ?int $swPin = null): RotaryEncoder
+    {
+        return new RotaryEncoder(
+            $this->digitalPin($clkPin, PinMode::InputPullUp),
+            $this->digitalPin($dtPin, PinMode::InputPullUp),
+            $swPin === null ? null : $this->button($swPin),
+        );
     }
 
     public function analogSensor(int $channel, float $threshold = 0.01): AnalogSensor
