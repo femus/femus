@@ -37,8 +37,23 @@ export default defineConfig({
       },
       {
         text: 'Devices',
+        collapsed: false,
         items: [
           { text: 'Overview', link: '/devices/' },
+          { text: 'Wiring Basics', link: '/devices/wiring-basics' },
+          { text: 'Arduino Nano Pinout', link: '/devices/arduino-nano-pinout' },
+          { text: 'Button', link: '/devices/button' },
+          { text: 'Analog Sensors', link: '/devices/analog-sensor' },
+          { text: 'Rotary Encoder (KY-040)', link: '/devices/rotary-encoder' },
+          { text: 'Shift Register (74HC595)', link: '/devices/74hc595' },
+          { text: 'Load Cell (HX711)', link: '/devices/hx711' },
+          { text: 'LCD 16×2', link: '/devices/lcd1602' },
+          { text: 'Gyro (MPU-6050)', link: '/devices/mpu6050' },
+          { text: 'Thermometer (DS18B20)', link: '/devices/ds18b20' },
+          { text: '433 MHz Radio Modules', link: '/devices/radio-433' },
+          { text: 'BLE Radio Bridge', link: '/devices/radio-ble-bridge' },
+          { text: 'HC-05 / HM-10 Bluetooth', link: '/devices/hc05-bluetooth' },
+          { text: 'GSM Modem', link: '/devices/gsm-modem' },
         ],
       },
       {

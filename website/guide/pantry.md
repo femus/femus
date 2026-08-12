@@ -5,7 +5,7 @@ you how much is **left**, how **full** it is, how many **servings** remain, and
 (over time) how fast you're going through it: *"350 g of sugar, ~50 g/day, lasts
 about a week."*
 
-It's two small pieces on top of the [`loadCell`](/devices) driver:
+It's two small pieces on top of the [`loadCell`](/devices/) driver:
 
 - **`PantryJar`** — knows the empty container's weight, so a raw scale reading
   becomes *contents*. Reports grams left, percent full, servings, and a low-stock flag.
@@ -14,7 +14,7 @@ It's two small pieces on top of the [`loadCell`](/devices) driver:
 
 ## Wiring
 
-Same as any HX711 load cell — see the [load cell](/devices) notes. `DT → D3`,
+Same as any HX711 load cell — see the [load cell](/devices/) notes. `DT → D3`,
 `SCK → D2`, powered from 5 V, with [FemusFirmata](/guide/firmware) on the Arduino.
 
 ## Reading the jar
