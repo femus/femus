@@ -21,17 +21,19 @@ onboard regulator, so **VCC takes 5 V directly**, while the logic pins are 3.3 V
 |-----------|--------------|-------|
 | VCC | 5V | onboard regulator (Power 3.6–6V) |
 | GND | GND | common ground |
-| TXD | → level converter LV2 → D7 | 3.3 V logic |
-| RXD | ← level converter LV1 ← D8 | 3.3 V logic |
+| TXD | → D7 (direct) | 3.3 V output — the AVR input reads it fine |
+| RXD | ← level converter LV1 ← D8 | 3.3 V logic, must be shifted down |
 | STATE / BRK(EN) | — | not used |
 
-Because the logic is 3.3 V, the two UART lines (D8→RXD, D7←TXD) must be level-shifted.
-Two options — **this build uses Option A**.
+Only the board→module direction needs level shifting (D8 → RXD, 5 V down to 3.3 V).
+The module's TXD outputs 3.3 V, which is above the AVR's logic-high threshold, so
+**TXD → D7 runs direct** — verified on the bench (node B bring-up). Two options for
+the RXD line — **this build uses Option A**.
 
 #### Option A (recommended): level converter + AMS1117-3.3
 
-A bidirectional level converter (BSS138) shifts both UART lines and protects the HM-10
-input. It needs a 3.3 V reference on its LV side, supplied by an **AMS1117-3.3** regulator
+A BSS138 level converter shifts the D8→RXD line and protects the HM-10 input. It
+needs a 3.3 V reference on its LV side, supplied by an **AMS1117-3.3** regulator
 (VIN from the 5 V rail). The HM-10 itself is still powered from 5 V — the AMS1117's 3.3 V
 is used only as the converter's LV reference.
 
@@ -41,7 +43,8 @@ AMS1117-3.3:  VIN ← 5V    GND ← GND    OUT → 3.3 V rail (LV reference only
 Level converter:
   HV ← 5V          LV ← 3.3 V (AMS1117 OUT)      both GND ← GND
   HV1 ← Nano D8    LV1 → HM-10 RXD
-  HV2 ← Nano D7    LV2 → HM-10 TXD
+
+HM-10 TXD → Nano D7 direct — no channel needed (3.3 V → 5 V input is fine)
 ```
 
 Match HV1↔LV1 and HV2↔LV2 by the channel numbers printed on the converter.
@@ -95,7 +98,8 @@ The divider gives ~3.33 V: `5V × 2kΩ / (1kΩ + 2kΩ) ≈ 3.33V`. Fine for 9600
 
 > The diagram below shows **Option B (divider)**. For the build in use here
 > (**Option A: level converter + AMS1117**), see the HM-10 wiring section above —
-> D8/D7 route through the converter instead of the divider.
+> the D8→RXD line routes through the converter instead of the divider; TXD→D7 is
+> direct in both options.
 
 ```
       Arduino Nano
@@ -174,26 +178,26 @@ incoming radio messages are echoed back to the BLE UART (terminated by `\n`).
 
 ## Addressing
 
-Адреса узлов (свой и собеседника) конфигурируются динамически с телефона через BLE
-и сохраняются в EEPROM. Нет необходимости пересобирать прошивку. Используйте команды
-в разделе ниже: `/addr`, `/peer` и `/show`.
+Node addresses (this node's and the peer's) are configured dynamically from the phone over BLE
+and stored in EEPROM. No firmware rebuild is required. Use the commands described in the
+section below: `/addr`, `/peer` and `/show`.
 
 ---
 
-## Конфигурация адресов (по BLE)
+## Address Configuration (over BLE)
 
-Адреса узлов не зашиты в код — задаются с телефона и хранятся в EEPROM
-(переживают перезагрузку). Строки, начинающиеся с `/`, перехватываются мостом
-и НЕ уходят в радио:
+Node addresses are not hard-coded — they are set from the phone and stored in EEPROM
+(they survive reboots). Lines starting with `/` are intercepted by the bridge
+and are NOT sent over the radio:
 
-- `/addr N` — свой адрес узла (0–255), ответ `ok addr=N`
-- `/peer N` — адрес собеседника (0–255), ответ `ok peer=N`
-- `/show` — текущие адреса, ответ `addr=N peer=M`
-- неизвестная `/…` — ответ `err unknown`
+- `/addr N` — this node's address (0–255), replies `ok addr=N`
+- `/peer N` — the peer's address (0–255), replies `ok peer=N`
+- `/show` — current addresses, replies `addr=N peer=M`
+- unknown `/…` — replies `err unknown`
 
-При чистом EEPROM применяются дефолты node=2, peer=1 (телефонный узел
-мессенджера), поэтому незалитый настройками мост сразу работает со станцией.
-Формат EEPROM: байт 0 — маркер `0xF3`, байт 1 — node, байт 2 — peer.
+With a clean EEPROM the defaults node=2, peer=1 are applied (the messenger's phone
+node), so a bridge with no settings flashed works with the station out of the box.
+EEPROM format: byte 0 — marker `0xF3`, byte 1 — node, byte 2 — peer.
 
 ---
 

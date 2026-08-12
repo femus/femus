@@ -21,17 +21,18 @@ onboard regulator, so **VCC takes 5 V directly**, while the logic pins are 3.3 V
 |-----------|--------------|-------|
 | VCC | 5V | onboard regulator (Power 3.6–6V) |
 | GND | GND | common ground |
-| TXD | → level converter LV2 → D7 | 3.3 V logic |
-| RXD | ← level converter LV1 ← D8 | 3.3 V logic |
+| TXD | → D7 (direct) | 3.3 V output — the AVR input reads it fine |
+| RXD | ← level converter LV1 ← D8 | 3.3 V logic, must be shifted down |
 | STATE / BRK(EN) | — | not used |
 
-Because the logic is 3.3 V, the two UART lines (D8→RXD, D7←TXD) must be level-shifted.
-There are two options.
+Only the board→module direction needs level shifting (D8 → RXD, 5 V down to 3.3 V).
+The module's TXD outputs 3.3 V, which is above the AVR's logic-high threshold, so
+**TXD → D7 runs direct**. There are two options for the RXD line.
 
 #### Option A (recommended): level converter + AMS1117-3.3
 
-A bidirectional level converter (BSS138) shifts both UART lines and protects the HM-10
-input. It needs a 3.3 V reference on its LV side, supplied by an **AMS1117-3.3** regulator
+A BSS138 level converter shifts the D8→RXD line and protects the HM-10 input. It
+needs a 3.3 V reference on its LV side, supplied by an **AMS1117-3.3** regulator
 (VIN from the 5 V rail). The HM-10 itself is still powered from 5 V — the AMS1117's 3.3 V
 is used only as the converter's LV reference.
 
@@ -41,10 +42,9 @@ AMS1117-3.3:  VIN ← 5V    GND ← GND    OUT → 3.3 V rail (LV reference only
 Level converter:
   HV ← 5V          LV ← 3.3 V (AMS1117 OUT)      both GND ← GND
   HV1 ← Nano D8    LV1 → HM-10 RXD
-  HV2 ← Nano D7    LV2 → HM-10 TXD
-```
 
-Match HV1↔LV1 and HV2↔LV2 by the channel numbers printed on the converter.
+HM-10 TXD → Nano D7 direct — no channel needed (3.3 V → 5 V input is fine)
+```
 
 #### Option B (simplest, no extra modules): resistor divider
 
@@ -89,7 +89,8 @@ The divider gives ~3.33 V: `5V × 2kΩ / (1kΩ + 2kΩ) ≈ 3.33V`. Fine for 9600
 
 > The diagram below shows **Option B (divider)**. If you use
 > **Option A (level converter + AMS1117)**, see the HM-10 wiring section above —
-> D8/D7 route through the converter instead of the divider.
+> the D8→RXD line routes through the converter instead of the divider; TXD→D7 is
+> direct in both options.
 
 ```
       Arduino Nano
