@@ -50,7 +50,9 @@ Build it yourself — see the [radio guide](https://femus.github.io/femus/guide/
 - **Testable without hardware.** Every driver runs against `FakeBoard` — unit-test your
   hardware logic in CI, no soldering required.
 - **Not just blinking LEDs.** Addressed 433 MHz packet radio, load cells, GSM/SMS,
-  I2C, LCDs — enough to build a real device, not a demo.
+  I2C, LCDs — enough to build a real device, not a demo. Like a
+  [smart pantry](https://femus.github.io/femus/guide/pantry) that watches a jar on a
+  scale and tells you *"350 g left, ~50 g/day — lasts about a week."*
 - **Runs on the Pi itself, too.** `Board::linux()` drives a Raspberry Pi's own GPIO
   header directly — no Arduino needed for digital I/O. Same `led()`/`button()` code.
 - **AI-friendly (and fully optional).** `femus mcp` exposes the hardware to any
@@ -83,11 +85,16 @@ compile from source instead, `--fqbn` for non-default boards.
 | Driver | Hardware | Example |
 |---|---|---|
 | `Led`, `Relay`, `Buzzer` | any digital output | `examples/blink.php` |
+| `RgbLed` | RGB LED with PWM fades | `examples/rgb-fade.php` |
 | `Button`, `MotionSensor` | digital inputs with events | `examples/button-led.php` |
+| `RotaryEncoder` | KY-040 knob + push switch | `examples/rotary-encoder.php` |
+| `ShiftRegister` | 74HC595 — 8+ outputs from 3 pins | `examples/shift-register.php` |
 | `AnalogSensor` | potentiometers, water level, LDR… | `examples/water-level.php` |
 | `LoadCell` | HX711 + strain gauge scales | `examples/scale.php` |
+| `PantryJar` | how much is left in the jar — [smart pantry](https://femus.github.io/femus/guide/pantry) | `examples/pantry.php` |
 | `Lcd1602` / `Lcd1602Parallel` | 16×2 LCD over I2C or 6 GPIO | `examples/lcd-clock.php` |
 | `Mpu6050` | gyroscope/accelerometer (I2C) | `examples/gyro-dump.php` |
+| `Ds18b20` | 1-Wire thermometer on a Raspberry Pi | `examples/pi-temperature.php` |
 
 ### 433 MHz packet radio
 
@@ -130,7 +137,7 @@ expect($board->pin(13)->read())->toBeTrue();  // the LED turned on
 ```
 
 Simulate analog readings, scale weights, I2C replies and incoming radio messages the same
-way. The whole femus test suite (150+ Pest tests) runs like this in CI — so can yours.
+way. The whole femus test suite (230+ Pest tests) runs like this in CI — so can yours.
 
 ## Multiple boards
 
@@ -157,10 +164,11 @@ See [firmware/README.md](firmware/README.md) for wiring and details.
 
 ## Status & roadmap
 
-Under active development, pre-1.0. Working today: everything above, verified on real
-hardware (Arduino Nano). On the roadmap: Raspberry Pi adapter (FFI GPIO), `femus scan`,
-1-Wire (DS18B20), GPS (NMEA), ESP8266 as a WiFi node — see
-[docs](docs/) for device guides and hardware notes.
+Under active development, pre-1.0. Working today: everything above — the core is
+verified on real hardware (Arduino Nano, Raspberry Pi 4), the newest drivers on the
+simulated board with live runs pending (see [docs/hardware-runs.md](docs/hardware-runs.md)).
+On the roadmap: ultrasonic HC-SR04 and DHT11 (need firmware support), SPI, servos,
+GPS (NMEA), ESP8266 as a WiFi node — see [docs](docs/) for device guides and hardware notes.
 
 ## License
 
