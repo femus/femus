@@ -165,6 +165,7 @@ Node B uses DSD TECH HM-10 (BLE) + AMS1117-3.3 + BSS138 level converter (Option 
 - Note: Node B's bootloader did not sync over `A50285BI` (avrdude `sync byte 0x14 but got 0x74/0xff`
   at 115200, no response at 57600); its flash was left untouched.
 - Result: **Messenger end-to-end OK.**
+- Same evening: `examples/radio-web-chat.php` (browser chat) verified on the bench — messages both ways between the iPhone app and the page.
 
 
 ---

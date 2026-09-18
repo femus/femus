@@ -37,7 +37,7 @@ No Wi-Fi. No cellular. No provider. No cloud. The very first real message sent o
 from a phone with every network switched off, was — fittingly — **"Am I online?"**
 
 Every piece is in this repository: the two Arduino sketches (precompiled), the PHP
-radio stack (`examples/radio-chat.php`), and the [SwiftUI iPhone terminal](ios/FemusRadioTerminal/).
+radio stack (`examples/radio-chat.php`, browser chat in `examples/radio-web-chat.php`), and the [SwiftUI iPhone terminal](ios/FemusRadioTerminal/).
 Build it yourself — see the [radio guide](https://femus.github.io/femus/guide/radio).
 
 ## Why femus

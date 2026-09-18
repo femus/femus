@@ -67,6 +67,15 @@ firmware (BLE ⇄ radio, addresses configurable from the phone, stored in EEPROM
 the [SwiftUI terminal app](https://github.com/femus/femus/tree/main/ios/FemusRadioTerminal)
 connects to it over Bluetooth. Messages travel: iPhone → BLE → radio → your PHP process.
 
+For a demo, run the browser chat instead of the terminal one: `examples/radio-web-chat.php`
+serves a chat page at `http://localhost:8080` from a tiny dependency-free HTTP server
+inside the femus event loop. Messages from the phone appear in the page, what you type
+goes back out over the radio.
+
+```bash
+php examples/radio-web-chat.php /dev/cu.usbserial-XXXX 1 2   # [rx-pin] [tx-pin] [http-port] optional
+```
+
 The first real message sent over it, from a phone in airplane mode with every network
 off, was — fittingly — *"Am I online?"* (No. And that's the whole point.)
 
