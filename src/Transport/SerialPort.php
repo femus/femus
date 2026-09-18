@@ -4,58 +4,48 @@ declare(strict_types=1);
 
 namespace Femus\Transport;
 
+use Sanchescom\Serial\SerialException;
+use Sanchescom\Serial\SerialPort as Port;
+
+/**
+ * Serial transport: a thin adapter over sanchescom/php-serial, which grew out of this class.
+ * The package keeps what femus relies on: fopen before stty (macOS drops termios settings
+ * on close), a non-blocking stream, readAvailable() that never waits, cs8 -cstopb -parenb raw.
+ */
 final class SerialPort implements Transport
 {
-    /** @var resource */
-    private $stream;
+    private Port $port;
 
     public function __construct(string $device, int $baudRate = 57600)
     {
-        // Open first, configure second: on macOS termios settings applied by
-        // stty are discarded once the device is fully closed, so the port must
-        // be held open while stty runs for the settings to stick.
-        $stream = @fopen($device, 'r+b');
-        if ($stream === false) {
-            throw new TransportException("Failed to open {$device} (permissions? device connected?)");
-        }
-        stream_set_blocking($stream, false);
-        $this->stream = $stream;
-
-        $flag = PHP_OS_FAMILY === 'Darwin' ? '-f' : '-F';
-        $command = sprintf(
-            'stty %s %s %d cs8 -cstopb -parenb -echo raw',
-            $flag,
-            escapeshellarg($device),
-            $baudRate,
-        );
-        exec($command . ' 2>&1', $output, $exitCode);
-        if ($exitCode !== 0) {
-            fclose($stream);
-            throw new TransportException(
-                "Failed to configure port {$device}: " . implode("\n", $output),
-            );
+        try {
+            $this->port = new Port($device, $baudRate);
+        } catch (SerialException $e) {
+            throw new TransportException($e->getMessage(), previous: $e);
         }
     }
 
     public function write(string $bytes): void
     {
-        if (@fwrite($this->stream, $bytes) === false) {
-            throw new TransportException('Write error (device disconnected?)');
+        try {
+            $this->port->write($bytes);
+        } catch (SerialException $e) {
+            throw new TransportException($e->getMessage(), previous: $e);
         }
     }
 
     public function stream()
     {
-        return $this->stream;
+        return $this->port->stream();
     }
 
     public function readAvailable(): string
     {
-        return (string) stream_get_contents($this->stream);
+        return $this->port->readAvailable();
     }
 
     public function close(): void
     {
-        fclose($this->stream);
+        $this->port->close();
     }
 }

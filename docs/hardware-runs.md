@@ -167,6 +167,13 @@ Node B uses DSD TECH HM-10 (BLE) + AMS1117-3.3 + BSS138 level converter (Option 
 - Result: **Messenger end-to-end OK.**
 - Same evening: `examples/radio-web-chat.php` (browser chat) verified on the bench — messages both ways between the iPhone app and the page.
 
+### 2026-09-18 — serial transport moved to sanchescom/php-serial 3.0.0
+- `Femus\Transport\SerialPort` / `SerialPortLocator` are now thin adapters over the package
+  (same constructor, same `Transport` interface, `SerialException` mapped to `TransportException`).
+- Live check on Node A (Nano via YP-01, `/dev/cu.usbserial-130`): `femus scan` → Firmata board,
+  femus-ready; LED blink on D13 for 6 s through the new transport — clean run and exit.
+- 238 tests green.
+
 
 ---
 

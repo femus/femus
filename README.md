@@ -74,6 +74,9 @@ php vendor/femus/femus/examples/blink.php
 > `"repositories": [{"type": "vcs", "url": "https://github.com/femus/femus"}]`,
 > then `composer require femus/femus:dev-main`.
 
+Serial I/O comes from [sanchescom/php-serial](https://github.com/sanchescom/php-serial) — the femus
+transport, extracted into its own package (fopen-then-stty, non-blocking, macOS/Linux/Windows).
+
 The flash command installs the `arduino:avr` core if needed, autodetects the serial port
 (`--port=/dev/...` to override) and uploads the prebuilt hex as-is. Pass `--build` to
 compile from source instead, `--fqbn` for non-default boards.

@@ -4,8 +4,68 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "e7a3f0a7a558dafba9148ce3e5aab5f9",
-    "packages": [],
+    "content-hash": "652979fe7a01985f27ce34c96ce90227",
+    "packages": [
+        {
+            "name": "sanchescom/php-serial",
+            "version": "3.0.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/sanchescom/php-serial.git",
+                "reference": "3e2a51ca78137ba9d23ab6c995d55a5c6e86534d"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/sanchescom/php-serial/zipball/3e2a51ca78137ba9d23ab6c995d55a5c6e86534d",
+                "reference": "3e2a51ca78137ba9d23ab6c995d55a5c6e86534d",
+                "shasum": ""
+            },
+            "require": {
+                "php": "^8.2"
+            },
+            "require-dev": {
+                "phpstan/phpstan": "^2.1",
+                "phpunit/phpunit": "^11.5",
+                "squizlabs/php_codesniffer": "^3.11"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Sanchescom\\Serial\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Aleksandr Efimov",
+                    "email": "sanches.com@mail.ru"
+                }
+            ],
+            "description": "Serial port for PHP: open, configure, write, read with a timeout. Linux, macOS, Windows.",
+            "homepage": "https://github.com/sanchescom/php-serial",
+            "keywords": [
+                "arduino",
+                "at-commands",
+                "com-port",
+                "iot",
+                "modem",
+                "raspberry-pi",
+                "rs232",
+                "serial",
+                "serial-port",
+                "stty",
+                "tty",
+                "uart"
+            ],
+            "support": {
+                "source": "https://github.com/sanchescom/php-serial/tree/3.0.0"
+            },
+            "time": "2026-09-18T05:03:23+00:00"
+        }
+    ],
     "packages-dev": [
         {
             "name": "brianium/paratest",
