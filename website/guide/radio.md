@@ -79,7 +79,7 @@ php examples/radio-web-chat.php /dev/cu.usbserial-XXXX 1 2   # [rx-pin] [tx-pin]
 The first real message sent over it, from a phone in airplane mode with every network
 off, was — fittingly — *"Am I online?"* (No. And that's the whole point.)
 
-<video src="/femus/radio-chat-demo.mp4" controls muted loop playsinline style="width:100%;border-radius:8px"></video>
+<video src="/radio-chat-demo.mp4" controls muted loop playsinline style="width:100%;border-radius:8px"></video>
 
 *Left: the browser chat on the Mac. Right: the iPhone in airplane mode, mirrored over USB. Real time ×2.*
 
