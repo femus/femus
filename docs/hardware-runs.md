@@ -148,6 +148,24 @@ Node B uses DSD TECH HM-10 (BLE) + AMS1117-3.3 + BSS138 level converter (Option 
 - Node A (station) + full end-to-end (radio A↔B, iPhone app): pending.
 - Result: **Node B OK.**
 
+### Run 2 — full end-to-end (2026-09-17)
+- Actual bench wiring (differs from the sketch defaults): **Node A** rx **D3**, tx **D4**, address 1
+  (D11 on this Nano is dead); **Node B** rx D11, tx **D10**, address 2. Node A talks to the Mac
+  through a YP-01 USB-TTL (`/dev/cu.usbserial-130`), Node B is on `/dev/cu.usbserial-A50285BI`.
+- iPhone app: the 7-day personal-team profile had expired; rebuilt and reinstalled from the Mac with
+  `xcodebuild … -allowProvisioningUpdates` + `xcrun devicectl device install app`, then trusted the
+  developer profile on the phone (Settings → General → VPN & Device Management).
+- `/show` over BLE → `addr=2 peer=1`.
+- Mac → iPhone: 32 of 35 pings received (5 s interval). Before re-seating the antennas it was ~1 in 5.
+- iPhone → Mac: **0 packets on 16 candidate rx pins** until the owner pressed the loose antenna wires
+  and module legs back in — then 3/3 (`Hi`) and a reply mid-ping-stream. Root cause: a loose antenna /
+  breadboard contact on Node B's transmitter, not pins or firmware.
+- Lesson: when one direction dies, check the 17.3 cm antenna wires first — they slip out of the ANT
+  holes at a touch. Consider soldering them for the demo.
+- Note: Node B's bootloader did not sync over `A50285BI` (avrdude `sync byte 0x14 but got 0x74/0xff`
+  at 115200, no response at 57600); its flash was left untouched.
+- Result: **Messenger end-to-end OK.**
+
 
 ---
 
