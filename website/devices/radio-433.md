@@ -7,6 +7,10 @@ See the [radio guide](/guide/radio) for the full API walkthrough.
 
 ## Wiring to Arduino Nano
 
+![Node A as built: Nano with FS1000A and MX-RM-5V, YP-01 USB-TTL to the Mac](/radio-node-a.jpg)
+
+*The bench build of the station node. This particular Nano has a dead D11, so the receiver sits on D3 and the transmitter on D4 — pass `rxPin`/`txPin` to match your wiring.*
+
 ### FS1000A Transmitter (433 MHz)
 
 | FS1000A pin | Arduino Nano pin | Notes |

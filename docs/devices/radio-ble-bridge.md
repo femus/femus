@@ -8,6 +8,10 @@ line received from BLE is sent via radio, and each radio message is echoed to BL
 
 ## Wiring to Arduino Nano
 
+![Node B as built: Nano, HM-10 in the clear case, level converter, FS1000A and MX-RM-5V](../../website/public/radio-node-b.jpg)
+
+*The bench build of node B. Breadboards get messy; the tables below are the source of truth.*
+
 ### HM-10 (DSD TECH, Bluetooth Low Energy)
 
 **Use the HM-10 (BLE) — NOT HC-05.** iPhone connects only over Bluetooth LE; HC-05

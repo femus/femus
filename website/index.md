@@ -5,6 +5,9 @@ hero:
   name: femus
   text: Hardware for PHP developers
   tagline: Buttons, sensors, scales, radio and GSM — driven from plain PHP. No C++, no Arduino IDE.
+  image:
+    src: /radio-bench.jpg
+    alt: The femus radio messenger bench — two Arduino Nano nodes with 433 MHz radio
   actions:
     - theme: brand
       text: Quick Start

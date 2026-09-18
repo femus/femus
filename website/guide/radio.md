@@ -7,6 +7,10 @@ between two boards, with CRC and sender/recipient headers
 
 ## Hardware
 
+![The bench: node A (top, small board, YP-01 USB-TTL) and node B (bottom, HM-10 in the clear case)](/radio-bench.jpg)
+
+*The two nodes as built. On this bench the pins differ from the defaults below: node A receives on D3 and transmits on D4, node B transmits on D10.*
+
 Each node needs both modules (femus radio is bidirectional):
 
 | Module | Pin | Arduino |
