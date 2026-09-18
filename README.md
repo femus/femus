@@ -36,6 +36,10 @@ iPhone (airplane mode) → Bluetooth (HM-10) → Arduino bridge
 No Wi-Fi. No cellular. No provider. No cloud. The very first real message sent over it,
 from a phone with every network switched off, was — fittingly — **"Am I online?"**
 
+![iPhone in airplane mode chatting with a browser on the Mac over 433 MHz radio](website/public/radio-chat-demo.gif)
+
+*Left: `examples/radio-web-chat.php` in the browser. Right: the iPhone (airplane mode) mirrored over USB. Real time ×2.5.*
+
 Every piece is in this repository: the two Arduino sketches (precompiled), the PHP
 radio stack (`examples/radio-chat.php`, browser chat in `examples/radio-web-chat.php`), and the [SwiftUI iPhone terminal](ios/FemusRadioTerminal/).
 Build it yourself — see the [radio guide](https://femus.github.io/femus/guide/radio).
