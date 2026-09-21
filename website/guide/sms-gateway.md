@@ -5,10 +5,12 @@ A personal box you keep at home: a modem with a SIM, driven by femus. Text it fr
 reaches the internet for you and texts the answer back. Your home line becomes your
 family's backup internet.
 
-::: warning Status: software prototype
-The gateway logic below is built and unit-tested against fakes (no hardware, no
-network). The live pieces — a real Claude-backed `AiClient` and the LTE modem — are
-wired in when the hardware arrives. See the [roadmap note](#whats-built-vs-next).
+::: tip Status: running on real hardware
+Verified end to end on 2026-09-21 with a SIMCOM A7670G (LTE Cat-1): a question texted
+from a phone with no data came back as an answer from a live AI, and `/weather` replied
+with a real forecast. Wiring and gotchas are in
+[docs/hardware-runs.md](https://github.com/femus/femus/blob/main/docs/hardware-runs.md)
+and the [modem page](/devices/gsm-modem).
 :::
 
 ## The idea
@@ -55,6 +57,32 @@ $modem->run();
 
 Text `/ping` → `pong`. Text `weather in Halifax?` → the AI agent answers.
 See `examples/sms-gateway.php`.
+
+### Commands that know today
+
+An AI answers from memory, so it cannot tell you whether it is raining right now —
+and that is exactly what you text from a trailhead with one bar of signal and no data.
+`WeatherCommand` fetches the real forecast from Open-Meteo, which needs no API key and
+no account, so the box keeps working years later with nothing to renew:
+
+```php
+use Femus\Gsm\Gateway\Command\WeatherCommand;
+
+commands: [new PingCommand(), new WeatherCommand()],
+```
+
+```
+/weather Halifax          → Halifax: 13°C, overcast, wind 15.6 km/h. 6h: 13°. 80% precip at 05:00.
+/weather 46.81 -71.21     → 46.81,-71.21: 10°C, overcast, wind 4.3 km/h. 6h: 10°.
+```
+
+Place names are geocoded; two numbers are taken as coordinates, which is what a phone's
+GPS gives you when nothing around has a name. The reply is trimmed to what changes a
+decision — conditions now, the temperature in six hours, the worst hour for precipitation,
+and a shout if a thunderstorm is coming — because it has to fit in an SMS.
+
+Write your own the same way: implement `SmsCommand`, take an `HttpClient` in the
+constructor, and the command is unit-testable against canned JSON with no network.
 
 ## The AI agent (Claude over SMS)
 
@@ -133,11 +161,16 @@ where only SMS gets through, not for browsing.
 
 ## What's built vs. next
 
-**Built & tested now** (against fakes, no hardware): `SmsGateway`, `SmsTransport`,
-`SmsReassembler`, `SmsCommand` + `PingCommand`/`HelpCommand`, `ModemSender`, and
-`ClaudeAiClient` (raw-HTTP, transport injected for tests).
+**Working on hardware:** the whole path — modem in, whitelist, commands, AI answer,
+SMS back — with `SmsGateway`, `ModemSender`, `PingCommand`/`HelpCommand`/`WeatherCommand`,
+and `OpenAiCompatibleAiClient` against the live Gemini free tier. Non-Latin text (Cyrillic,
+emoji) travels as UCS-2 in both directions, split across messages when it exceeds 70
+characters.
 
-**Next** (needs the modem / live keys): confirm `ClaudeAiClient` against the real API,
-a `MailService` (IMAP/SMTP), optional Telegram relay (MTProto user-bot), image→text via
-Claude vision, and wiring to the LTE modem. The gateway is ready — they implement the
-interfaces.
+**Built but only tested against fakes:** `SmsTransport` / `SmsReassembler` (packet mode),
+`ClaudeAiClient` (the code path is identical to the verified Gemini one, but no live key
+was on hand).
+
+**Next:** a `MailService` (IMAP/SMTP) for mail over SMS, an optional Telegram relay
+(MTProto user-bot), image→text via a vision model, and moving the box to a Raspberry Pi,
+where the modem comes up as a USB network interface and gives the box its own internet.

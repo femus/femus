@@ -13,9 +13,22 @@ final class FakeHttpClient implements HttpClient
     public array $headers = [];
     public ?string $body = null;
 
+    /** @var list<string> URLs passed to get(), in order */
+    public array $getUrls = [];
+
+    /** @var list<array{status: int, body: string}> replies handed out by get(), in order */
+    public array $getQueue = [];
+
     /** @param array{status: int, body: string} $response */
     public function __construct(private readonly array $response)
     {
+    }
+
+    public function get(string $url): array
+    {
+        $this->getUrls[] = $url;
+
+        return array_shift($this->getQueue) ?? $this->response;
     }
 
     public function postJson(string $url, array $headers, string $body): array
