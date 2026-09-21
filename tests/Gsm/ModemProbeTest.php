@@ -100,3 +100,23 @@ it('survives a modem that answers nothing useful', function () {
     expect($report)->toContain('did not answer ATI')
         ->and($report)->toContain('PDU only');
 });
+
+it('says the tray is empty instead of blaming the modem', function () {
+    // what an A7670G really answers with no SIM in: an error, not a +CPIN line
+    $report = implode("\n", probeWith([
+        'AT+CPIN?' => [false, ['+CME ERROR: SIM not inserted']],
+        'AT+CEREG?' => [true, ['+CEREG: 0,11']],
+        'AT+CPMS?' => [false, ['+CMS ERROR: unknown error']],
+    ])->run());
+
+    expect($report)->toContain('no SIM inserted')
+        ->and($report)->toContain('nothing to register with')
+        ->and($report)->toContain('storage unreadable')
+        ->and($report)->not->toContain('state 11');
+});
+
+it('passes an unexpected SIM error through rather than swallowing it', function () {
+    $report = implode("\n", probeWith(['AT+CPIN?' => [false, ['+CME ERROR: SIM PIN required']]])->run());
+
+    expect($report)->toContain('SIM PIN required');
+});
