@@ -9,6 +9,7 @@ use Femus\Gsm\Gateway\ClaudeAiClient;
 use Femus\Gsm\Gateway\Command\HelpCommand;
 use Femus\Gsm\Gateway\Command\PingCommand;
 use Femus\Gsm\Gateway\ModemSender;
+use Femus\Gsm\Gateway\OpenAiCompatibleAiClient;
 use Femus\Gsm\Gateway\SmsGateway;
 use Femus\Gsm\GsmModem;
 use Femus\Gsm\Sms;
@@ -17,20 +18,22 @@ use Femus\Gsm\Sms;
 // Text it from any phone (no data needed) and it texts an answer back.
 //
 // Usage: ANTHROPIC_API_KEY=sk-... php examples/sms-gateway.php /dev/ttyUSB0
+//    or: GEMINI_API_KEY=AIza... php examples/sms-gateway.php /dev/ttyUSB0   (free tier)
 
 $port = $argv[1] ?? null;
 
-// Claude answers plain-text questions when ANTHROPIC_API_KEY is set; otherwise a
-// stub replies so you can test the wiring without a key.
-$apiKey = getenv('ANTHROPIC_API_KEY') ?: '';
-$ai = $apiKey !== ''
-    ? new ClaudeAiClient($apiKey)
-    : new class implements AiClient {
+// Whichever key is in the environment answers the questions; with none, a stub
+// replies so you can test the wiring without an account.
+$ai = match (true) {
+    (bool) getenv('ANTHROPIC_API_KEY') => new ClaudeAiClient((string) getenv('ANTHROPIC_API_KEY')),
+    (bool) getenv('GEMINI_API_KEY') => new OpenAiCompatibleAiClient((string) getenv('GEMINI_API_KEY')),
+    default => new class implements AiClient {
         public function ask(string $question): string
         {
-            return "You asked: {$question}. (Set ANTHROPIC_API_KEY for real answers.)";
+            return "You asked: {$question}. (Set ANTHROPIC_API_KEY or GEMINI_API_KEY for real answers.)";
         }
-    };
+    },
+};
 
 $modem = GsmModem::open($port);
 $modem->init();
@@ -43,10 +46,10 @@ $gateway = new SmsGateway(
     new ModemSender($modem),
     $ai,
     commands: $commands,
-    allowedNumbers: [
-        // Your own / family numbers. Leave empty to serve everyone (not recommended).
-        // '+15551234567',
-    ],
+    // Your own / family numbers, kept out of the repo:
+    //   SMS_ALLOWED=+15551234567,+15557654321 php examples/sms-gateway.php <port>
+    // An empty list serves everyone, which is not recommended — it is your API bill.
+    allowedNumbers: array_filter(array_map('trim', explode(',', (string) getenv('SMS_ALLOWED')))),
 );
 
 $modem->onSmsReceived(fn (Sms $sms) => $gateway->handle($sms));

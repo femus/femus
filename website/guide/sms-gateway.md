@@ -73,6 +73,31 @@ The HTTP transport is injectable (`HttpClient`), so the client is unit-tested ag
 fake with no network. Prefer the official Anthropic SDK? Implement `AiClient` with it —
 the gateway doesn't care which you use.
 
+### Any other provider, including free ones
+
+Most providers speak the OpenAI chat-completions format, so one client covers them all.
+`OpenAiCompatibleAiClient` takes the key, the model and the endpoint — Gemini's free tier
+is the default, and the box costs nothing to run:
+
+```php
+use Femus\Gsm\Gateway\OpenAiCompatibleAiClient;
+
+$ai = new OpenAiCompatibleAiClient(getenv('GEMINI_API_KEY')); // gemini-3.6-flash
+
+$ai = new OpenAiCompatibleAiClient(            // or Groq, OpenRouter, a local Ollama…
+    getenv('GROQ_API_KEY'),
+    model: 'llama-3.3-70b-versatile',
+    endpoint: 'https://api.groq.com/openai/v1/chat/completions',
+);
+```
+
+A Gemini key is free from [AI Studio](https://aistudio.google.com/apikey), no card needed.
+Keep keys and phone numbers in the environment, never in the repository:
+
+```bash
+GEMINI_API_KEY=... SMS_ALLOWED=+15551234567 php examples/sms-gateway.php /dev/ttyUSB0
+```
+
 This is what makes "SMS internet" actually useful today: you don't tunnel raw data, you
 get an intelligent, digested answer. It's txtWeb / Google SMS, but AI-powered and
 self-hosted. Images and other media can't ride SMS — the plan is to transcode them to
