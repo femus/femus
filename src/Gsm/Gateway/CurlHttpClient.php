@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Femus\Gsm\Gateway;
 
-/** HTTP POST over PHP's built-in curl. No external dependencies. */
+/** HTTP over PHP's built-in curl. No external dependencies. */
 final class CurlHttpClient implements HttpClient
 {
     public function __construct(private readonly int $timeoutSeconds = 30)
@@ -27,6 +27,26 @@ final class CurlHttpClient implements HttpClient
             CURLOPT_TIMEOUT => $this->timeoutSeconds,
         ]);
 
+        return $this->execute($ch);
+    }
+
+    public function get(string $url): array
+    {
+        $ch = curl_init($url);
+        curl_setopt_array($ch, [
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_TIMEOUT => $this->timeoutSeconds,
+        ]);
+
+        return $this->execute($ch);
+    }
+
+    /**
+     * @param \CurlHandle $ch
+     * @return array{status: int, body: string}
+     */
+    private function execute($ch): array
+    {
         $response = curl_exec($ch);
         if ($response === false) {
             $error = curl_error($ch);

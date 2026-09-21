@@ -8,6 +8,7 @@ use Femus\Gsm\Gateway\AiClient;
 use Femus\Gsm\Gateway\ClaudeAiClient;
 use Femus\Gsm\Gateway\Command\HelpCommand;
 use Femus\Gsm\Gateway\Command\PingCommand;
+use Femus\Gsm\Gateway\Command\WeatherCommand;
 use Femus\Gsm\Gateway\ModemSender;
 use Femus\Gsm\Gateway\OpenAiCompatibleAiClient;
 use Femus\Gsm\Gateway\SmsGateway;
@@ -39,7 +40,7 @@ $modem = GsmModem::open($port);
 $modem->init();
 
 $help = new HelpCommand();
-$commands = [new PingCommand(), $help];
+$commands = [new PingCommand(), new WeatherCommand(), $help];
 $help->withCommands($commands);
 
 $gateway = new SmsGateway(
