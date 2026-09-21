@@ -37,10 +37,47 @@ it('parses signal quality and maps 99 to null', function () {
 
 it('sends an sms through the prompt flow', function () {
     [$modem, $transport, $loop] = gsmModem();
-    $loop->addTimer(0.01, fn () => $transport->feed("\r\n> "));
-    $loop->addTimer(0.03, fn () => $transport->feed("+CMGS: 4\r\nOK\r\n"));
+    $loop->addTimer(0.01, fn () => $transport->feed("OK\r\n"));   // +CSMP
+    $loop->addTimer(0.03, fn () => $transport->feed("\r\n> "));
+    $loop->addTimer(0.05, fn () => $transport->feed("+CMGS: 4\r\nOK\r\n"));
     $modem->sendSms('+79161234567', 'Hello');
-    expect($transport->written)->toBe("AT+CMGS=\"+79161234567\"\rHello\x1A");
+    expect($transport->written)->toBe("AT+CSMP=17,167,0,0\rAT+CMGS=\"+79161234567\"\rHello\x1A");
+});
+
+it('sends non-ASCII text as UCS-2, number included', function () {
+    [$modem, $transport, $loop] = gsmModem();
+    $loop->addTimer(0.01, fn () => $transport->feed("OK\r\n"));   // +CSCS="UCS2"
+    $loop->addTimer(0.03, fn () => $transport->feed("OK\r\n"));   // +CSMP
+    $loop->addTimer(0.05, fn () => $transport->feed("\r\n> "));
+    $loop->addTimer(0.07, fn () => $transport->feed("+CMGS: 4\r\nOK\r\n"));
+    $loop->addTimer(0.09, fn () => $transport->feed("OK\r\n"));   // +CSCS="GSM"
+    $modem->sendSms('+79161234567', 'Привет');
+
+    // the modem rejects a UCS-2 body unless its charset is switched, and then the
+    // number is hex too — otherwise the phone shows mojibake
+    expect($transport->written)->toBe(
+        "AT+CSCS=\"UCS2\"\rAT+CSMP=17,167,0,8\r"
+        . "AT+CMGS=\"002B00370039003100360031003200330034003500360037\"\r"
+        . "041F04400438043204350442\x1A"
+        . "AT+CSCS=\"GSM\"\r",
+    );
+});
+
+it('splits long UCS-2 text into several messages', function () {
+    [$modem, $transport, $loop] = gsmModem();
+    $loop->addTimer(0.01, fn () => $transport->feed("OK\r\n"));   // +CSCS="UCS2"
+    $loop->addTimer(0.03, fn () => $transport->feed("OK\r\n"));   // +CSMP
+    $loop->addTimer(0.05, fn () => $transport->feed("\r\n> "));
+    $loop->addTimer(0.07, fn () => $transport->feed("+CMGS: 4\r\nOK\r\n"));
+    $loop->addTimer(0.09, fn () => $transport->feed("\r\n> "));
+    $loop->addTimer(0.11, fn () => $transport->feed("+CMGS: 5\r\nOK\r\n"));
+    $loop->addTimer(0.13, fn () => $transport->feed("OK\r\n"));   // +CSCS="GSM"
+
+    $modem->sendSms('+79161234567', str_repeat('я', 100));   // 70 + 30
+
+    // "SMS size more than expected" past 70 UCS-2 characters, hence two prompts
+    expect(substr_count($transport->written, 'AT+CMGS='))->toBe(2)
+        ->and(substr_count($transport->written, "\x1A"))->toBe(2);
 });
 
 it('reads a multiline sms', function () {
