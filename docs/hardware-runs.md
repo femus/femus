@@ -79,9 +79,29 @@ Manual hardware verification with live Arduino is pending. When executed, verify
 4. Record results below
 
 ### Run 1
-- Date: (pending)
-- Modem: (pending)
-- Result: (pending)
+- Date: 2026-09-19
+- Modem: SIMCOM A7670G-LABE (CAT1_A767x board), firmware V1.11.2, LTE Cat-1
+- Power: the modem's own micro-USB (5 V, 2 A capable). The 5-12V / PWR-K / SLEEP pins stay empty;
+  a USB-TTL adapter cannot power it — peaks reach 2 A.
+- Wiring: YP-01 (PL2303) ↔ 2-channel level converter ↔ modem header. The modem UART is **1.8 V**,
+  so the converter is mandatory; its LV pin is fed from a 3V3 → 1 kΩ → 1 kΩ → GND divider (≈1.65 V).
+  Crossed signals: YP-01 TXD → converter → modem URX, modem UTX → converter → YP-01 RXD.
+  Common GND on all three boards.
+- Result: ✅ `AT` → `OK` at 115200. `ATI` reports A7670G-LABE.
+  `+CPIN: READY`, `+CSQ: 24`, `+CREG: 0,1`, `+CEREG: 0,1`, `+COPS: 0,2,"302610",7` (LTE).
+  `php examples/sms-send.php /dev/cu.usbserial-130 +1XXXXXXXXXX "Hello from femus"` → `SMS sent.`,
+  delivered to the phone. `AT+CCID` returns ERROR on this firmware — use `AT+CICCID` for the ICCID.
+- Data over LTE: the SIM's default bearer is `ota.bell.ca`, a carrier service APN with no internet —
+  ping and the modem's own HTTP stack fail there (`+HTTPACTION: 0,706,0`). A second context with the
+  consumer APN attaches and resolves DNS (`AT+CGDCONT=2,"IP","pda.bell.ca"` → `AT+CGACT=1,2` →
+  `AT+CDNSGIP` returns real addresses), but this firmware rejects `AT+HTTPPARA="CID",2`, so the
+  built-in HTTP client cannot be pointed at it. Do not chase this: on the Pi the modem is meant to
+  come up as a USB network interface, and normal sockets replace the AT HTTP stack. Changing the
+  **default** context APN gets registration denied — recover with `AT+CGDCONT=1,"IPV4V6",""` + `AT+CRESET`.
+- Bring-up gotchas (all three cost an evening): GND of the USB-TTL adapter not connected at all;
+  both divider resistors tied to GND, leaving LV at 0 V so the converter passed nothing;
+  UTX/URX swapped. Symptom of every one of them is identical — not a single byte at any baud rate.
+  If the port stays silent on all bauds, the fault is wiring, not the baud rate.
 
 ---
 

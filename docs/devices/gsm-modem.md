@@ -6,8 +6,34 @@ This guide covers any AT-compatible GSM/GPRS modem: SIM800L, SIM5216E, Cinterion
 
 - **SIM800L** (very common, cheap, 2G-only — auto-baud, minimal power)
 - **SIM5216E** (smaller footprint variant of SIM800)
+- **SIMCOM A7670G** (LTE Cat-1, verified — see the section below; wiring differs from the SIM800L)
 - **Cinterion EHS5-E** (industrial, 3G, higher quality)
 - Others with standard AT command set
+
+## SIMCOM A7670G (LTE Cat-1) — verified 2026-09-19
+
+The wiring below is **not** the SIM800L one. Two differences matter:
+
+- **Power comes from the board's own micro-USB**, not from a pin. Leave `5-12V`, `PWR-K` and
+  `SLEEP` empty. A USB-TTL adapter cannot feed it: peaks reach 2 A. Plugging that micro-USB into
+  a computer also exposes the modem's own AT ports, which makes the UART path optional.
+- **The UART is 1.8 V** (marked `1V8` on the header). A 5 V or 3.3 V adapter must not drive `URX`
+  directly — use a level converter whose LV side sits at ~1.8 V. A 3V3 → 1 kΩ → 1 kΩ → GND divider
+  feeding the converter's LV pin gives ≈1.65 V, which the modem accepts.
+
+| USB-TTL pin | Goes to | Modem pin |
+|---|---|---|
+| TXD | level converter (HV → LV) | URX |
+| RXD | level converter (LV → HV) | UTX |
+| GND | common rail | GND |
+| 3V3 | converter HV + top of the divider | — |
+
+Baud rate is **115200**. `AT+CCID` returns `ERROR` on firmware V1.11.2 — use `AT+CICCID`.
+On LTE, check registration with `AT+CEREG?`, not only `AT+CREG?`.
+
+**Silence on every baud rate means a wiring fault, not a baud mismatch.** A wrong baud still
+returns garbage bytes; zero bytes means the link is broken. Check, in this order: GND common to
+all three boards, the voltage on the converter's LV pin (1.5–1.9 V), and UTX/RXD not swapped.
 
 ## Power Supply (⚠️ Critical)
 
