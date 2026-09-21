@@ -10,6 +10,7 @@ use Femus\Board;
 use Femus\Cli\Arduino\ArduinoCli;
 use Femus\Cli\Command\FlashFirmware;
 use Femus\Cli\Command\FlashOptions;
+use Femus\Cli\Command\ProbeModem;
 use Femus\Cli\Command\ScanPorts;
 use Femus\Cli\Process\SystemCommandRunner;
 use Femus\Mcp\McpServer;
@@ -51,6 +52,19 @@ final class Application
             return $scan->run($out);
         }
 
+        if ($command === 'modem:probe') {
+            $port = null;
+            foreach (array_slice($argv, 2) as $argument) {
+                if (str_starts_with($argument, '--port=')) {
+                    $port = substr($argument, 7);
+                } elseif (!str_starts_with($argument, '-')) {
+                    $port = $argument;
+                }
+            }
+
+            return (new ProbeModem(new SerialPortLocator()))->run($port, $out);
+        }
+
         if ($command === 'mcp') {
             $locator = new SerialPortLocator();
             $registry = new ToolRegistry();
@@ -68,6 +82,7 @@ final class Application
         $out('femus — PHP hardware framework CLI');
         $out('usage: femus scan   (list serial ports and detect Firmata boards)');
         $out('       femus firmware:flash <femus|radio-bridge> [--port=auto] [--fqbn=...] [--build]');
+        $out('       femus modem:probe [port]   (identify a GSM modem: baud, SIM, network, quirks)');
         $out('       femus mcp   (MCP server over stdio — hardware tools for AI agents)');
 
         return $command === null ? 0 : 2;
