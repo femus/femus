@@ -52,7 +52,11 @@ $gateway = new SmsGateway(
     allowedNumbers: array_filter(array_map('trim', explode(',', (string) getenv('SMS_ALLOWED')))),
 );
 
-$modem->onSmsReceived(fn (Sms $sms) => $gateway->handle($sms));
+$modem->onSmsReceived(function (Sms $sms) use ($gateway): void {
+    fwrite(STDOUT, sprintf("[%s] SMS from %s: %s\n", date('H:i:s'), $sms->from, $sms->text));
+    $gateway->handle($sms);
+    fwrite(STDOUT, sprintf("[%s] answered %s\n", date('H:i:s'), $sms->from));
+});
 
 fwrite(STDOUT, "SMS gateway running. Text the SIM's number from any phone. Ctrl+C to quit.\n");
 $modem->run();

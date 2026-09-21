@@ -55,9 +55,37 @@ final class GsmModem
             throw new \InvalidArgumentException("Invalid phone number '{$number}' — expected digits with an optional leading +");
         }
 
-        $response = $this->channel->sendExpectingPrompt(sprintf('AT+CMGS="%s"', $number), $text);
-        if (!$response->ok) {
-            throw new AtException("Modem failed to send the SMS to {$number}");
+        // Non-ASCII (Cyrillic, emoji…) only fits an SMS as UCS-2. The modem rejects a
+        // UCS-2 body with "Invalid text mode parameter" unless its own character set is
+        // switched too — and in that mode the *number* is hex as well. Verified on an
+        // A7670G: CSCS=GSM + DCS 8 fails, this sequence sends.
+        $ucs2 = Ucs2::isNeeded($text);
+        $recipient = $number;
+
+        if ($ucs2) {
+            $this->channel->send('AT+CSCS="UCS2"');
+            $this->channel->send('AT+CSMP=17,167,0,8');
+            $recipient = Ucs2::encode($number);
+        } else {
+            $this->channel->send('AT+CSMP=17,167,0,0');
+        }
+
+        // One message holds 160 GSM characters, or only 70 as UCS-2 — past that the
+        // modem answers "SMS size more than expected", so long text goes as several.
+        $chunks = $ucs2 ? mb_str_split($text, 70) : str_split($text, 160);
+
+        try {
+            foreach ($chunks as $chunk) {
+                $body = $ucs2 ? Ucs2::encode($chunk) : $chunk;
+                if (!$this->channel->sendExpectingPrompt(sprintf('AT+CMGS="%s"', $recipient), $body)->ok) {
+                    throw new AtException("Modem failed to send the SMS to {$number}");
+                }
+            }
+        } finally {
+            if ($ucs2) {
+                // back to the character set the read path expects
+                $this->channel->send('AT+CSCS="GSM"');
+            }
         }
     }
 
@@ -71,7 +99,9 @@ final class GsmModem
         }
 
         // only body lines reach pendingLines — OK/ERROR terminals are consumed by the channel
-        return new Sms($m[1], implode("\n", array_slice($response->lines, 1)));
+        $body = implode("\n", array_slice($response->lines, 1));
+
+        return new Sms(Ucs2::decode($m[1]), Ucs2::decode($body));
     }
 
     public function deleteSms(int $index): void
