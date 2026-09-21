@@ -71,6 +71,7 @@ Build it yourself — see the [radio guide](https://femus.github.io/femus/guide/
 composer require femus/femus            # not on Packagist yet — see note below
 vendor/bin/femus scan                   # find your board and check it's femus-ready
 vendor/bin/femus firmware:flash femus   # flashes the bundled firmware to your Arduino
+vendor/bin/femus modem:probe            # meeting a GSM modem? it reports baud, SIM, network
 php vendor/femus/femus/examples/blink.php
 ```
 

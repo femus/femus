@@ -38,6 +38,20 @@ On LTE, check registration with `AT+CEREG?`, not only `AT+CREG?`.
 returns garbage bytes; zero bytes means the link is broken. Check, in this order: GND common to
 all three boards, the voltage on the converter's LV pin (1.5–1.9 V), and UTX/RXD not swapped.
 
+## Meeting a new module
+
+Before wiring anything into an application, ask the module what it is:
+
+```bash
+vendor/bin/femus modem:probe /dev/cu.usbserial-130
+```
+
+It walks the common baud rates, stops at the one that answers, and prints identity,
+SIM state, registration, signal in dBm, SMS capabilities and the firmware's quirks as a
+block for `docs/hardware-runs.md`. Silence at every baud rate means broken wiring rather
+than a wrong baud (a wrong baud still returns garbage), and the command says what to
+check first.
+
 ## Power Supply (⚠️ Critical)
 
 ### SIM800L (most common)
@@ -168,7 +182,8 @@ $modem->sendSms(string $number, string $text): void
 ```
 
 - `$number`: Phone number as string — must match `/^\+?\d{3,15}$/` (digits, optional leading +, 3–15 digits total).
-- `$text`: Message body (ASCII or Unicode, up to 160 characters).
+- `$text`: Message body. Longer text is split automatically — one SMS holds 160 GSM
+  characters, or 70 when the text is non-Latin (Cyrillic, emoji), which travels as UCS-2.
 - Throws `InvalidArgumentException` if phone number format is invalid.
 - Throws `AtException` if the modem rejects the send command.
 

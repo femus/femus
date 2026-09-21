@@ -29,6 +29,11 @@ final class ModemProbe
         3 => 'registration DENIED',
         4 => 'unknown',
         5 => 'registered (roaming)',
+        6 => 'registered for SMS only (home)',
+        7 => 'registered for SMS only (roaming)',
+        8 => 'emergency calls only',
+        // seen on an A7670G with the SIM tray empty
+        11 => 'emergency services only — no usable SIM',
     ];
 
     /** @param callable(string): AtResponse $send */
@@ -43,8 +48,10 @@ final class ModemProbe
         $quirks = [];
 
         $report[] = 'Modem:    ' . $this->identity();
-        $report[] = 'SIM:      ' . $this->sim();
-        $report[] = 'Network:  ' . $this->network();
+
+        $sim = $this->sim();
+        $report[] = 'SIM:      ' . $sim;
+        $report[] = 'Network:  ' . $this->network(str_contains($sim, 'no SIM'));
         $report[] = 'Signal:   ' . $this->signal();
         $report[] = 'SMS:      ' . $this->sms($quirks);
 
@@ -87,8 +94,17 @@ final class ModemProbe
 
     private function sim(): string
     {
-        $pin = $this->ask('AT+CPIN?')->firstLine() ?? '';
-        $state = preg_match('/\+CPIN:\s*(.+)$/', trim($pin), $m) === 1 ? trim($m[1]) : 'no answer';
+        $response = $this->ask('AT+CPIN?');
+        $first = trim($response->firstLine() ?? '');
+
+        if (!$response->ok) {
+            // "+CME ERROR: SIM not inserted" — an empty tray, not a broken modem
+            return stripos($first, 'not inserted') !== false || stripos($first, 'not present') !== false
+                ? 'no SIM inserted'
+                : ($first === '' ? 'no answer' : $first);
+        }
+
+        $state = preg_match('/\+CPIN:\s*(.+)$/', $first, $m) === 1 ? trim($m[1]) : 'no answer';
 
         $number = $this->ask('AT+CNUM')->firstLine() ?? '';
         if (preg_match('/"(\+?\d{6,15})"/', $number, $m) === 1) {
@@ -98,8 +114,12 @@ final class ModemProbe
         return $state;
     }
 
-    private function network(): string
+    private function network(bool $simMissing = false): string
     {
+        if ($simMissing) {
+            return 'nothing to register with until a SIM is in';
+        }
+
         // LTE registration lives in +CEREG; +CREG alone can read 0 on a perfectly attached modem
         $state = null;
         foreach (['AT+CEREG?', 'AT+CREG?'] as $command) {
@@ -155,7 +175,11 @@ final class ModemProbe
             }
         }
 
-        $storage = $this->ask('AT+CPMS?')->firstLine() ?? '';
+        $storageResponse = $this->ask('AT+CPMS?');
+        $storage = $storageResponse->firstLine() ?? '';
+        if (!$storageResponse->ok) {
+            $parts[] = 'storage unreadable (no SIM?)';
+        }
         if (preg_match('/\+CPMS:\s*"(\w+)",(\d+),(\d+)/', $storage, $m) === 1) {
             $parts[] = sprintf('storage %s %d/%d', $m[1], (int) $m[2], (int) $m[3]);
             if ((int) $m[3] > 0 && (int) $m[2] >= (int) $m[3] - 2) {

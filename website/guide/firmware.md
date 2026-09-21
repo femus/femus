@@ -21,6 +21,43 @@ It lists every serial port and tells you, in plain language, what each one is:
 | `· … no response` | a port opened but nothing answered — flash it (`femus firmware:flash femus`) |
 | `· … in use` | the port is held by another program — close the Arduino IDE / serial monitor |
 
+## femus modem:probe
+
+For a GSM modem there is no firmware to flash — the questions are different: what baud
+rate does it speak, is the SIM readable, is it on a network, which commands does this
+firmware actually support.
+
+```bash
+vendor/bin/femus modem:probe                          # first serial port found
+vendor/bin/femus modem:probe /dev/cu.usbserial-130    # or name it
+```
+
+```
+Port:     /dev/cu.usbserial-130 @ 115200 baud
+Modem:    SIMCOM INCORPORATED, A7670G-LABE, V1.11.2, IMEI …0123
+SIM:      no SIM inserted
+Network:  nothing to register with until a SIM is in
+Signal:   21/31 (-71 dBm)
+SMS:      text mode, charsets IRA,UCS2,HEX,GSM, storage unreadable (no SIM?)
+```
+
+The block is meant to be pasted into `docs/hardware-runs.md`. IMEI, ICCID and the SIM's
+own number come out cut to their last digits, because that file is public.
+
+| Line you get | What it means |
+|---|---|
+| `Quirk: AT+CCID not supported` | this firmware hides the ICCID behind `AT+CICCID` |
+| `Quirk: no UCS2 charset` | the module cannot carry Cyrillic or emoji in an SMS |
+| `Quirk: SMS storage nearly full` | incoming messages are about to be dropped — `AT+CMGD=1,4` |
+| `no such port` | the USB adapter is unplugged; `femus scan` lists what is there |
+| `silence at every baud rate` | the link is broken, not mistuned — see below |
+
+Silence deserves the last word. A **wrong** baud rate still returns garbage bytes, so
+getting nothing at all means the wiring is at fault, and the command prints the checklist
+in the order worth walking: power (a USB-TTL adapter cannot feed a modem's 2 A peaks),
+shared GND, the level converter's LV pin, then TX/RX crossed. Every one of those has
+cost this project an evening.
+
 ## The firmware model
 
 You never write or edit Arduino code with femus. Two sketches ship **precompiled**
