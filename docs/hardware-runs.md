@@ -71,7 +71,7 @@ Manual hardware verification with live Arduino is pending. When executed, verify
 
 ## Release 2026-08-04-gsm-at
 
-### Testing Checklist (Pending Human Execution)
+### Testing Checklist (done — Runs 1–2)
 
 1. Power the modem correctly (SIM800L: external 3.4–4.2 V source, common GND — see docs/devices/gsm-modem.md)
 2. Insert a SIM (PIN disabled), connect via USB-TTL, `php examples/sms-send.php <port> <your number> "test"`
@@ -102,6 +102,25 @@ Manual hardware verification with live Arduino is pending. When executed, verify
   both divider resistors tied to GND, leaving LV at 0 V so the converter passed nothing;
   UTX/URX swapped. Symptom of every one of them is identical — not a single byte at any baud rate.
   If the port stays silent on all bauds, the fault is wiring, not the baud rate.
+
+### Run 2 — SMS gateway end to end
+- Date: 2026-09-21
+- Setup: same bench as Run 1 (A7670G over YP-01 + level converter, `/dev/cu.usbserial-130`).
+  `GEMINI_API_KEY=... SMS_ALLOWED=+1... php examples/sms-gateway.php /dev/cu.usbserial-130`
+- Result: ✅ a phone with mobile data and Wi-Fi off texts the SIM, `SmsGateway` routes the message,
+  and the reply arrives as SMS: `/ping` → `pong`, `/weather Halifax` → live Open-Meteo forecast,
+  a free-form question → answer from the live Gemini free tier via `OpenAiCompatibleAiClient`.
+  Cyrillic works in both directions.
+- Gotchas found (all fixed in code):
+  - Non-Latin incoming text arrives as UCS-2 hex (`0421…`) — decoded by `Femus\Gsm\Ucs2`.
+  - The modem rejects a UCS-2 body (`Invalid text mode parameter`) until `AT+CSCS="UCS2"`, and in
+    that mode the **recipient number must be hex-encoded too**.
+  - A UCS-2 SMS holds 70 characters, not 160 (`SMS size more than expected`) — long replies are split.
+- SIM storage fills up (`+SMS FULL`, 20/20) within about a day of testing. New messages then wait
+  at the carrier and arrive in a burst after `AT+CMGD=1,4`. Clear it before a demo;
+  `femus modem:probe` warns when storage is nearly full.
+- `femus modem:probe` also run on the bench with the SIM tray empty; it now reports that case
+  instead of failing.
 
 ---
 
