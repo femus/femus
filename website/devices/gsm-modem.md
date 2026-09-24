@@ -210,6 +210,7 @@ Register a callback. When an SMS arrives, the modem sends an unsolicited `+CMTI`
 | "Not registered on the network yet" | SIM not detected or network unavailable | Check SIM physically, try another location, verify antenna |
 | SMS sends but never arrives | Wrong number format or low signal | Check phone format matches +XXXX convention; verify signal quality |
 | Modem resets during send | Insufficient power | Increase power supply capacity (2 A+ buck converter or LiPo); reduce TX power if modem supports it |
+| Incoming SMS stop arriving, then come in a burst later | SIM message storage full (`+SMS FULL`, e.g. 20/20) | `AT+CMGD=1,4` deletes all stored messages; `femus modem:probe` warns before it fills |
 | USB adapter not visible on macOS | Driver missing (CH340/CP2102 etc.) | Install the vendor driver for your chip (CH340: WCH website; CP2102: Silicon Labs) |
 
 ## Testing Checklist
