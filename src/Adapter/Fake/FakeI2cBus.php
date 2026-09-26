@@ -31,6 +31,11 @@ final class FakeI2cBus implements I2cBus
         return array_shift($this->readQueue);
     }
 
+    public function read(int $address, int $length): string
+    {
+        return $this->readRegister($address, 0, $length);
+    }
+
     public function queueRead(string $bytes): void
     {
         $this->readQueue[] = $bytes;

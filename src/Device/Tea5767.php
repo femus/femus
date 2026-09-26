@@ -1,0 +1,114 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Femus\Device;
+
+use Femus\Contracts\I2cBus;
+
+/**
+ * TEA5767 FM receiver (the blue module with headphone and antenna jacks).
+ *
+ * The chip has no registers: every write is the full 5-byte state, every read returns
+ * 5 status bytes. Any byte written, even a register address, retunes it — so reads go
+ * through I2cBus::read(), never readRegister().
+ */
+final class Tea5767
+{
+    public const MIN_MHZ = 87.5;
+    public const MAX_MHZ = 108.0;
+
+    /** High-side injection: the PLL sits 225 kHz above the station. */
+    private const IF_HZ = 225_000;
+    private const XTAL_HZ = 32_768;
+
+    /**
+     * @param bool $deEmphasis75us true in the Americas, false (50 µs) in Europe and most of the world
+     */
+    public function __construct(
+        private readonly I2cBus $bus,
+        private readonly bool $deEmphasis75us = true,
+        private readonly int $address = 0x60,
+    ) {
+    }
+
+    public function tune(float $mhz, bool $mute = false): void
+    {
+        if ($mhz < self::MIN_MHZ || $mhz > self::MAX_MHZ) {
+            throw new \InvalidArgumentException(
+                sprintf('%.1f MHz is outside the FM band (%.1f–%.1f).', $mhz, self::MIN_MHZ, self::MAX_MHZ),
+            );
+        }
+
+        $pll = (int) round(4 * ($mhz * 1_000_000 + self::IF_HZ) / self::XTAL_HZ);
+
+        $this->bus->write($this->address, pack(
+            'C5',
+            ($mute ? 0x80 : 0) | (($pll >> 8) & 0x3F),
+            $pll & 0xFF,
+            0x10,                               // HLSI: high-side injection, stereo allowed
+            0x12,                               // XTAL 32.768 kHz, stereo noise cancelling
+            $this->deEmphasis75us ? 0x40 : 0x00,
+        ));
+    }
+
+    /**
+     * @return array{frequency: float, level: int, stereo: bool} level is the chip's 0–15 ADC
+     */
+    public function status(): array
+    {
+        $raw = $this->bus->read($this->address, 5);
+        $pll = ((ord($raw[0]) & 0x3F) << 8) | ord($raw[1]);
+
+        return [
+            'frequency' => round(($pll * self::XTAL_HZ / 4 - self::IF_HZ) / 1_000_000, 1),
+            'level' => ord($raw[3]) >> 4,
+            'stereo' => (ord($raw[2]) & 0x80) !== 0,
+        ];
+    }
+
+    /**
+     * Steps across the band and reads the signal at every point. Muted while it runs.
+     *
+     * @param float $settle seconds to wait after tuning before the level is valid
+     * @return list<array{frequency: float, level: int, stereo: bool}>
+     */
+    public function scan(
+        float $from = self::MIN_MHZ,
+        float $to = self::MAX_MHZ,
+        float $step = 0.1,
+        float $settle = 0.05,
+    ): array {
+        $points = [];
+        $steps = (int) round(($to - $from) / $step);
+        for ($i = 0; $i <= $steps; $i++) {
+            $this->tune(round($from + $i * $step, 1), mute: true);
+            usleep((int) ($settle * 1_000_000));
+            $points[] = $this->status();
+        }
+
+        return $points;
+    }
+
+    /**
+     * Picks stations out of a scan: a station bleeds into its neighbours, so only the
+     * peak of each hump counts.
+     *
+     * @param list<array{frequency: float, level: int, stereo: bool}> $points
+     * @return list<array{frequency: float, level: int, stereo: bool}>
+     */
+    public static function stations(array $points, int $minLevel = 7): array
+    {
+        $stations = [];
+        foreach ($points as $i => $point) {
+            $left = $points[$i - 1]['level'] ?? -1;
+            $right = $points[$i + 1]['level'] ?? -1;
+            // strict on the left, loose on the right: a flat top counts once, at its first point
+            if ($point['level'] >= $minLevel && $point['level'] > $left && $point['level'] >= $right) {
+                $stations[] = $point;
+            }
+        }
+
+        return $stations;
+    }
+}

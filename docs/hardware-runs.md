@@ -246,3 +246,21 @@ gram calibration + the PantryJar layer on top)
 4. [ ] If available, chain a second chip (Q7'→DS) and check `chips: 2` drives outputs 8-15
 
 **Status**: Awaiting hardware verification. Record runs below.
+
+---
+
+## Release 2026-09-25-tea5767
+
+Written without hardware; tests run against a fake I2C bus.
+
+### Testing Checklist (Pending Human Execution)
+
+1. Wire the module per docs/devices/tea5767.md (5V, GND, SDA→A4, SCL→A5), antenna wire in ANT, headphones in.
+2. `vendor/bin/femus fm:scan` — the table lists the local stations; the strongest one plays in the headphones.
+3. `vendor/bin/femus fm:tune <MHz>` on another listed station — it switches, the reported level is close to the scan's.
+4. If every level reads the same, raise the settle time (`FmRadio` / `scan(settle:)`) — 50 ms is a guess.
+5. Record results below.
+
+### Run 1
+- Date: (pending)
+- Result: (pending)

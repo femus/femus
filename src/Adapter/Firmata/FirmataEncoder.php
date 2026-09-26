@@ -61,6 +61,15 @@ final class FirmataEncoder
             . chr(Firmata::SYSEX_END);
     }
 
+    /** Read with no register: the firmware skips the register write and replies with register 0. */
+    public static function i2cRead(int $address, int $length): string
+    {
+        return chr(Firmata::SYSEX_START) . chr(Firmata::I2C_REQUEST)
+            . chr($address) . chr(Firmata::I2C_MODE_READ_ONCE)
+            . chr($length & 0x7F) . chr(($length >> 7) & 0x7F)
+            . chr(Firmata::SYSEX_END);
+    }
+
     public static function hx711Attach(int $doutPin, int $sckPin): string
     {
         return chr(Firmata::SYSEX_START) . chr(Firmata::FEMUS_HX711) . chr(Firmata::HX711_ATTACH)

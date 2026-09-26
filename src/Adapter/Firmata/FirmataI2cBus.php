@@ -35,8 +35,29 @@ final class FirmataI2cBus implements I2cBus
 
     public function readRegister(int $address, int $register, int $length): string
     {
+        return $this->request(
+            FirmataEncoder::i2cReadRegister($address, $register, $length),
+            $address,
+            $register,
+            sprintf('I2C device 0x%02X did not reply for register 0x%02X (is it connected? correct address?)', $address, $register),
+        );
+    }
+
+    public function read(int $address, int $length): string
+    {
+        // the firmware answers a register-less read with register 0
+        return $this->request(
+            FirmataEncoder::i2cRead($address, $length),
+            $address,
+            0,
+            sprintf('I2C device 0x%02X did not reply (is it connected? correct address?)', $address),
+        );
+    }
+
+    private function request(string $frame, int $address, int $register, string $timeoutMessage): string
+    {
         $this->pendingReply = null;
-        $this->transport->write(FirmataEncoder::i2cReadRegister($address, $register, $length));
+        $this->transport->write($frame);
 
         $deadline = hrtime(true) / 1e9 + $this->timeout;
         while (true) {
@@ -46,13 +67,7 @@ final class FirmataI2cBus implements I2cBus
             }
             $remaining = $deadline - hrtime(true) / 1e9;
             if ($remaining <= 0) {
-                throw new I2cException(
-                    sprintf(
-                        'I2C device 0x%02X did not reply for register 0x%02X (is it connected? correct address?)',
-                        $address,
-                        $register,
-                    ),
-                );
+                throw new I2cException($timeoutMessage);
             }
             $this->loop->tick(min(0.05, $remaining));
         }

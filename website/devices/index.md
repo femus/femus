@@ -19,6 +19,7 @@ and full support in [`FakeBoard`](/guide/testing) for hardware-free tests.
 | `lcd1602()` | [16×2 LCD](/devices/lcd1602) via I2C backpack | `write()`, cursor control |
 | `lcd1602Parallel(...)` | [16×2 LCD](/devices/lcd1602) on 6 GPIO | same API, no backpack needed |
 | `mpu6050()` | [gyro/accelerometer](/devices/mpu6050) (I2C) | orientation and acceleration readings |
+| `tea5767()` | [FM receiver](/devices/tea5767) (I2C) | `tune(mhz)`, `status()` level/stereo, `scan()` the band |
 | `ds18b20(id?)` | [1-Wire thermometer](/devices/ds18b20) on a Raspberry Pi | `celsius()`, `fahrenheit()`, CRC-checked reads |
 | `radioLink(addr)` | [433 MHz TX+RX pair](/devices/radio-433) | [full guide](/guide/radio) |
 

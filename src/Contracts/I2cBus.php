@@ -14,4 +14,12 @@ interface I2cBus
      * @throws I2cException on timeout
      */
     public function readRegister(int $address, int $register, int $length): string;
+
+    /**
+     * Blocking read of $length bytes with no register write first — for chips like the
+     * TEA5767 that treat any written byte as a command.
+     *
+     * @throws I2cException on timeout
+     */
+    public function read(int $address, int $length): string;
 }

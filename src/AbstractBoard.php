@@ -20,6 +20,7 @@ use Femus\Device\Relay;
 use Femus\Device\RgbLed;
 use Femus\Device\RotaryEncoder;
 use Femus\Device\ShiftRegister;
+use Femus\Device\Tea5767;
 use Femus\Runtime\Loop;
 
 abstract class AbstractBoard implements BoardInterface
@@ -117,6 +118,12 @@ abstract class AbstractBoard implements BoardInterface
     public function mpu6050(int $address = 0x68): Mpu6050
     {
         return new Mpu6050($this->i2c(), $address);
+    }
+
+    /** @param bool $deEmphasis75us true in the Americas, false in Europe and most of the world */
+    public function tea5767(bool $deEmphasis75us = true, int $address = 0x60): Tea5767
+    {
+        return new Tea5767($this->i2c(), $deEmphasis75us, $address);
     }
 
     public function loadCell(int $doutPin, int $sckPin, float $thresholdGrams = 1.0): LoadCell

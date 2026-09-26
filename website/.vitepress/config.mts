@@ -50,6 +50,7 @@ export default defineConfig({
           { text: 'LCD 16×2', link: '/devices/lcd1602' },
           { text: 'Gyro (MPU-6050)', link: '/devices/mpu6050' },
           { text: 'Thermometer (DS18B20)', link: '/devices/ds18b20' },
+          { text: 'FM Receiver (TEA5767)', link: '/devices/tea5767' },
           { text: '433 MHz Radio Modules', link: '/devices/radio-433' },
           { text: 'BLE Radio Bridge', link: '/devices/radio-ble-bridge' },
           { text: 'HC-05 / HM-10 Bluetooth', link: '/devices/hc05-bluetooth' },
