@@ -76,6 +76,7 @@ $handle = function (string $method, string $path, string $body) use (
             'floor' => $points === [] ? null : Tea5767::noiseFloor($points),
             'stations' => array_column($sweeps > 0 ? Tea5767::stations($points) : [], 'frequency'),
             'listening' => $now,
+            'muted' => $radio->isMuted(),
         ]));
     }
     if ($method === 'POST' && $path === '/listen') {
@@ -85,6 +86,11 @@ $handle = function (string $method, string $path, string $body) use (
             $radio->tune($mhz);
             printf("[%s] listening to %.1f MHz\n", date('H:i:s'), $mhz);
         }
+
+        return $respond(200, 'text/plain', 'ok');
+    }
+    if ($method === 'POST' && $path === '/mute') {
+        $radio->mute($body === '1');
 
         return $respond(200, 'text/plain', 'ok');
     }

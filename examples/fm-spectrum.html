@@ -16,7 +16,9 @@
   #state { color: var(--muted); font-variant-numeric: tabular-nums; }
   #state strong { color: var(--hot); font-weight: 600; }
   button { font: inherit; padding: 8px 14px; border-radius: 10px; border: 1px solid #2d4a33; background: var(--panel);
-           color: var(--ink); cursor: pointer; margin-left: auto; }
+           color: var(--ink); cursor: pointer; }
+  #mute { margin-left: auto; }
+  #mute[aria-pressed="true"] { border-color: var(--hot); color: var(--hot); }
   button:hover { border-color: var(--bar); }
   main { flex: 1; padding: 16px 20px 20px; display: flex; flex-direction: column; gap: 12px; }
   /* a fixed CSS height: sizing the bitmap for the pixel ratio must not feed back into the layout */
@@ -30,7 +32,7 @@
 </style>
 </head>
 <body>
-<header><span class="dot"></span><b>femus FM spectrum</b><span id="state">connecting…</span><button id="sweep" hidden>Resume sweep</button></header>
+<header><span class="dot"></span><b>femus FM spectrum</b><span id="state">connecting…</span><button id="mute" hidden>Mute</button><button id="sweep" hidden>Resume sweep</button></header>
 <main>
   <canvas id="c"></canvas>
   <div id="stations"></div>
@@ -38,7 +40,7 @@
 </main>
 <script>
   const canvas = document.getElementById('c'), ctx = canvas.getContext('2d');
-  const state = document.getElementById('state'), sweepButton = document.getElementById('sweep'), list = document.getElementById('stations');
+  const state = document.getElementById('state'), sweepButton = document.getElementById('sweep'), muteButton = document.getElementById('mute'), list = document.getElementById('stations');
   const css = name => getComputedStyle(document.documentElement).getPropertyValue(name).trim();
   let data = null;
   const pad = { left: 36, right: 12, top: 28, bottom: 30 };
@@ -87,12 +89,15 @@
 
   function render() {
     if (data.listening) {
-      state.innerHTML = `listening <strong>${data.listening.frequency.toFixed(1)} MHz</strong> · level ${data.listening.level}/15`;
+      state.innerHTML = `${data.muted ? 'muted' : 'listening'} <strong>${data.listening.frequency.toFixed(1)} MHz</strong> · level ${data.listening.level}/15`;
     } else {
       const f = data.frequencies[data.cursor];
       state.textContent = `sweeping · ${f.toFixed(1)} MHz · sweep ${data.sweeps + 1}` + (data.floor !== null ? ` · noise floor ${data.floor}` : '');
     }
     sweepButton.hidden = !data.listening;
+    muteButton.hidden = !data.listening;               // the sweep is silent anyway
+    muteButton.textContent = data.muted ? 'Unmute' : 'Mute';
+    muteButton.setAttribute('aria-pressed', data.muted);
     list.replaceChildren(...data.stations.map(f => {
       const el = document.createElement('span');
       el.textContent = f.toFixed(1) + ' MHz';
@@ -119,6 +124,7 @@
     listen(near ?? f);
   });
   sweepButton.onclick = () => fetch('/sweep', { method: 'POST' });
+  muteButton.onclick = () => fetch('/mute', { method: 'POST', body: data.muted ? '0' : '1' });
   window.addEventListener('resize', draw);
   poll();
 </script>
