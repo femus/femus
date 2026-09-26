@@ -11,7 +11,13 @@ use Femus\Transport\Transport;
 
 final class FirmataI2cBus implements I2cBus
 {
-    private ?I2cReply $pendingReply = null;
+    /**
+     * Replies in arrival order. A list, not one slot: a request that waits spins the loop,
+     * and a second request started from inside that spin must not wipe out the first's reply.
+     *
+     * @var list<I2cReply>
+     */
+    private array $replies = [];
 
     public function __construct(
         private readonly Transport $transport,
@@ -22,7 +28,7 @@ final class FirmataI2cBus implements I2cBus
         $parser->onSysex(function (string $payload): void {
             $reply = I2cReply::fromSysexPayload($payload);
             if ($reply !== null) {
-                $this->pendingReply = $reply;
+                $this->replies[] = $reply;
             }
         });
         $transport->write(FirmataEncoder::i2cConfig());
@@ -56,14 +62,18 @@ final class FirmataI2cBus implements I2cBus
 
     private function request(string $frame, int $address, int $register, string $timeoutMessage): string
     {
-        $this->pendingReply = null;
         $this->transport->write($frame);
 
         $deadline = hrtime(true) / 1e9 + $this->timeout;
         while (true) {
-            $reply = $this->pendingReply;
-            if ($reply !== null && $reply->address === $address && $reply->register === $register) {
-                return $reply->data;
+            // ponytail: a reply that outlived its timed-out request answers the next one to the
+            // same device and register; stale by one read, never another device's data
+            foreach ($this->replies as $i => $reply) {
+                if ($reply->address === $address && $reply->register === $register) {
+                    array_splice($this->replies, $i, 1);
+
+                    return $reply->data;
+                }
             }
             $remaining = $deadline - hrtime(true) / 1e9;
             if ($remaining <= 0) {

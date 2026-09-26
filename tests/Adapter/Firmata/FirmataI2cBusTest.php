@@ -71,3 +71,22 @@ it('read sends a register-less request and takes the register-0 reply', function
     expect($bus->read(0x60, 2))->toBe("\x30\x69")
         ->and($transport->written)->toBe("\xF0\x76\x60\x08\x02\x00\xF7");
 });
+
+it('a read started while another read waits does not steal its reply', function () {
+    // the spectrum page polls while a read is in flight: two requests to 0x60 overlap
+    $transport = new InMemoryTransport();
+    $board = readyI2cBoard($transport);
+    $bus = $board->i2c();
+    $reply = fn (int $byte) => "\xF0\x77\x60\x00\x00\x00" . chr($byte) . "\x00\xF7";
+
+    $inner = null;
+    $board->loop()->addTimer(0.01, function () use ($bus, $transport, $board, $reply, &$inner) {
+        $transport->feed($reply(0x11));                       // the outer read's answer lands first
+        $board->loop()->addTimer(0.01, fn () => $transport->feed($reply(0x22)));
+        $inner = $bus->read(0x60, 1);                         // a second read from inside the wait
+    });
+
+    $outer = $bus->read(0x60, 1);
+
+    expect([$outer, $inner])->toEqualCanonicalizing(["\x11", "\x22"]);
+});

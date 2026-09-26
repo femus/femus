@@ -288,3 +288,7 @@ Written without hardware; tests run against a fake I2C bus.
 - After that crash the TEA5767 held the I2C bus: Firmata answered, the module did not. A board reset
   does not clear it — unplugging the Nano's USB (power-cycling the module) does.
 - Right after power-up `fm:tune` reported level 1 — the same junk first reading; it is dropped now.
+- Second live crash, while listening: the page polls the level 4× a second, a poll arrived while
+  another read was still waiting, and the second request wiped the first one's reply slot — the
+  first timed out. `FirmataI2cBus` now keeps replies in a queue; a minute of listening with the page
+  polling ran clean after the fix.
