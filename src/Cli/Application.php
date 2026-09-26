@@ -60,7 +60,7 @@ final class Application
         if ($command === 'fm:scan' || $command === 'fm:tune') {
             $radio = new FmRadio(static fn (?string $port) => Board::firmata($port)->tea5767());
             if ($command === 'fm:scan') {
-                $minLevel = 7;
+                $minLevel = null;
                 foreach ($argv as $argument) {
                     if (str_starts_with($argument, '--min-level=')) {
                         $minLevel = (int) substr($argument, 12);
@@ -98,7 +98,7 @@ final class Application
         $out('usage: femus scan   (list serial ports and detect Firmata boards)');
         $out('       femus firmware:flash <femus|radio-bridge> [--port=auto] [--fqbn=...] [--build]');
         $out('       femus modem:probe [port]   (identify a GSM modem: baud, SIM, network, quirks)');
-        $out('       femus fm:scan [port] [--min-level=7]   (TEA5767: list FM stations, tune to the strongest)');
+        $out('       femus fm:scan [port] [--min-level=N]   (TEA5767: list FM stations, tune to the strongest)');
         $out('       femus fm:tune <MHz> [port]');
         $out('       femus mcp   (MCP server over stdio — hardware tools for AI agents)');
 

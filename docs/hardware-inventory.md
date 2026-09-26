@@ -8,7 +8,6 @@ every module is a future driver and an item on the hardware checklist.
 | Board | Chip | Connection | Role |
 |---|---|---|---|
 | Arduino Nano V3 ("LISA 2011") | ATmega328P | mini-USB (CH340) | **primary Firmata adapter board**; in the Arduino IDE select Processor: "ATmega328P (Old Bootloader)" |
-| Arduino Pro Mini | ATmega328P | via USB-TTL | spare; YP-01 has no DTR → flashing requires a manual reset |
 | Raspberry Pi 4 Model B | BCM2711 | standalone | Linux adapter (plan 2) |
 | ESP-01S | ESP8266EX | UART | future: Firmata-over-WiFi / standalone node |
 | Digispark | ATtiny85 | micro-USB (V-USB) | out of scope (8 KB, Firmata doesn't fit) |
@@ -25,7 +24,7 @@ every module is a future driver and an item on the hardware checklist.
 - **HC-05/06** — Bluetooth-UART bridge (logic 3.3V, power 3.6–6 V).
   Idea: wireless Firmata (Arduino ↔ PHP without a cable).
 - **YP-01 USB-TTL** — adapter for connecting UART modules directly to a computer
-  (no DTR — inconvenient for flashing the Pro Mini).
+  (no DTR — flashing through it needs a manual reset).
 
 ### I2C (plan 3)
 - **TEA5767** (blue board) — FM receiver, pins +5V/SDA/SLC/GND.
