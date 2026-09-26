@@ -1,0 +1,126 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>femus FM spectrum</title>
+<style>
+  :root { color-scheme: dark; --bg: #0b0f0c; --panel: #111812; --grid: #1c2a1f; --ink: #d8e6da; --muted: #7d9483;
+          --bar: #3fb950; --hot: #f2cc60; --floor: #58705e; }
+  * { box-sizing: border-box; }
+  body { margin: 0; min-height: 100vh; display: flex; flex-direction: column; background: var(--bg); color: var(--ink);
+         font: 15px/1.4 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+  header { padding: 14px 20px; border-bottom: 1px solid var(--grid); display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
+  header b { font-size: 18px; letter-spacing: .02em; }
+  header .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--bar); box-shadow: 0 0 8px var(--bar); }
+  #state { color: var(--muted); font-variant-numeric: tabular-nums; }
+  #state strong { color: var(--hot); font-weight: 600; }
+  button { font: inherit; padding: 8px 14px; border-radius: 10px; border: 1px solid #2d4a33; background: var(--panel);
+           color: var(--ink); cursor: pointer; margin-left: auto; }
+  button:hover { border-color: var(--bar); }
+  main { flex: 1; padding: 16px 20px 20px; display: flex; flex-direction: column; gap: 12px; }
+  /* a fixed CSS height: sizing the bitmap for the pixel ratio must not feed back into the layout */
+  canvas { width: 100%; height: min(60vh, 520px); min-height: 280px; background: var(--panel); border: 1px solid var(--grid);
+           border-radius: 12px; cursor: crosshair; }
+  #stations { display: flex; flex-wrap: wrap; gap: 8px; }
+  #stations span { padding: 6px 10px; border-radius: 8px; background: var(--panel); border: 1px solid var(--grid);
+                   cursor: pointer; font-variant-numeric: tabular-nums; }
+  #stations span:hover, #stations span.on { border-color: var(--hot); color: var(--hot); }
+  footer { color: var(--muted); font-size: 13px; }
+</style>
+</head>
+<body>
+<header><span class="dot"></span><b>femus FM spectrum</b><span id="state">connecting…</span><button id="sweep" hidden>Resume sweep</button></header>
+<main>
+  <canvas id="c"></canvas>
+  <div id="stations"></div>
+  <footer>TEA5767 · level is the chip's own 0–15 meter · click a peak or a station to listen, the sweep pauses while it plays</footer>
+</main>
+<script>
+  const canvas = document.getElementById('c'), ctx = canvas.getContext('2d');
+  const state = document.getElementById('state'), sweepButton = document.getElementById('sweep'), list = document.getElementById('stations');
+  const css = name => getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+  let data = null;
+  const pad = { left: 36, right: 12, top: 28, bottom: 30 };
+
+  function x(i, w) { return pad.left + (i + 0.5) * (w - pad.left - pad.right) / data.frequencies.length; }
+  function y(level, h) { return h - pad.bottom - level * (h - pad.top - pad.bottom) / 15; }
+
+  function draw() {
+    const dpr = window.devicePixelRatio || 1, w = canvas.clientWidth, h = canvas.clientHeight;
+    canvas.width = w * dpr; canvas.height = h * dpr; ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    ctx.clearRect(0, 0, w, h);
+    if (!data) return;
+    const n = data.frequencies.length, barW = Math.max(1, (w - pad.left - pad.right) / n - 1);
+    ctx.font = '11px -apple-system, sans-serif';
+
+    ctx.strokeStyle = css('--grid'); ctx.fillStyle = css('--muted'); ctx.lineWidth = 1;
+    for (let level = 0; level <= 15; level += 5) {
+      ctx.beginPath(); ctx.moveTo(pad.left, y(level, h)); ctx.lineTo(w - pad.right, y(level, h)); ctx.stroke();
+      ctx.textAlign = 'right'; ctx.fillText(level, pad.left - 8, y(level, h) + 4);
+    }
+    ctx.textAlign = 'center';
+    data.frequencies.forEach((f, i) => { if (Math.abs(f % 2) < 0.05) ctx.fillText(f.toFixed(0), x(i, w), h - 10); });
+
+    const hot = new Set(data.stations), playing = data.listening ? data.listening.frequency : null;
+    data.levels.forEach((level, i) => {
+      if (level === null) return;
+      const f = data.frequencies[i], isStation = hot.has(f);
+      ctx.fillStyle = f === playing ? css('--hot') : css('--bar');
+      ctx.globalAlpha = isStation || f === playing ? 1 : 0.45;
+      ctx.fillRect(x(i, w) - barW / 2, y(level, h), barW, y(0, h) - y(level, h));
+      ctx.globalAlpha = 1;
+      if (isStation) { ctx.fillStyle = css('--ink'); ctx.fillText(f.toFixed(1), x(i, w), y(level, h) - 6); }
+    });
+
+    if (data.floor !== null) {
+      ctx.strokeStyle = css('--floor'); ctx.setLineDash([4, 4]);
+      ctx.beginPath(); ctx.moveTo(pad.left, y(data.floor, h)); ctx.lineTo(w - pad.right, y(data.floor, h)); ctx.stroke();
+      ctx.setLineDash([]);
+    }
+    if (!data.listening) {
+      ctx.strokeStyle = css('--hot'); ctx.globalAlpha = 0.7;
+      ctx.beginPath(); ctx.moveTo(x(data.cursor, w), pad.top - 10); ctx.lineTo(x(data.cursor, w), y(0, h)); ctx.stroke();
+      ctx.globalAlpha = 1;
+    }
+  }
+
+  function render() {
+    if (data.listening) {
+      state.innerHTML = `listening <strong>${data.listening.frequency.toFixed(1)} MHz</strong> · level ${data.listening.level}/15`;
+    } else {
+      const f = data.frequencies[data.cursor];
+      state.textContent = `sweeping · ${f.toFixed(1)} MHz · sweep ${data.sweeps + 1}` + (data.floor !== null ? ` · noise floor ${data.floor}` : '');
+    }
+    sweepButton.hidden = !data.listening;
+    list.replaceChildren(...data.stations.map(f => {
+      const el = document.createElement('span');
+      el.textContent = f.toFixed(1) + ' MHz';
+      el.className = data.listening && data.listening.frequency === f ? 'on' : '';
+      el.onclick = () => listen(f);
+      return el;
+    }));
+    draw();
+  }
+
+  async function poll() {
+    try { data = await (await fetch('/spectrum')).json(); render(); } catch (e) { state.textContent = 'no connection to femus'; }
+    setTimeout(poll, 250);
+  }
+  async function listen(f) { await fetch('/listen', { method: 'POST', body: String(f) }); }
+
+  canvas.addEventListener('click', e => {
+    if (!data) return;
+    const r = canvas.getBoundingClientRect(), n = data.frequencies.length;
+    const i = Math.round((e.clientX - r.left - pad.left) / ((r.width - pad.left - pad.right) / n) - 0.5);
+    // snap to a nearby station if there is one, otherwise take the frequency under the cursor
+    const f = data.frequencies[Math.max(0, Math.min(n - 1, i))];
+    const near = data.stations.find(s => Math.abs(s - f) <= 0.15);
+    listen(near ?? f);
+  });
+  sweepButton.onclick = () => fetch('/sweep', { method: 'POST' });
+  window.addEventListener('resize', draw);
+  poll();
+</script>
+</body>
+</html>

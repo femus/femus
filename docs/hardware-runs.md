@@ -278,3 +278,5 @@ Written without hardware; tests run against a fake I2C bus.
   - Settle time 50 ms and 200 ms give identical readings; 50 ms stays. A full scan takes ~17 s,
     the I2C round trip over Firmata dominates.
 - Open: the stereo flag never came up, even at level 13 — antenna or signal strength, not checked yet.
+- Pending: `php examples/fm-spectrum.php <port>` on the live module — the sweep fills the chart,
+  clicking a station plays it, Resume sweep carries on. Checked so far against a simulated chip only.
