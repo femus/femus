@@ -103,7 +103,7 @@ compile from source instead, `--fqbn` for non-default boards.
 | `PantryJar` | how much is left in the jar — [smart pantry](https://femus.github.io/femus/guide/pantry) | `examples/pantry.php` |
 | `Lcd1602` / `Lcd1602Parallel` | 16×2 LCD over I2C or 6 GPIO | `examples/lcd-clock.php` |
 | `Mpu6050` | gyroscope/accelerometer (I2C) | `examples/gyro-dump.php` |
-| `Tea5767` | FM receiver (I2C) — tune, signal level, band scan | `femus fm:scan` |
+| `Tea5767` | FM receiver (I2C) — tune, signal level, band scan | `femus fm:scan`, `examples/fm-spectrum.php` |
 | `Ds18b20` | 1-Wire thermometer on a Raspberry Pi | `examples/pi-temperature.php` |
 
 ### 433 MHz packet radio
