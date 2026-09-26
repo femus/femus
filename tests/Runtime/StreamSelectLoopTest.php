@@ -56,3 +56,20 @@ it('fires a timer with timeout > 1s correctly', function () {
     expect($fired)->toBeTrue();
     expect($elapsed)->toBeLessThan(1.0);
 });
+
+it('a callback that ticks the loop itself does not fire its own timer again', function () {
+    // the shape of a blocking I2C read inside a timer: the read spins the loop until the reply
+    $loop = new StreamSelectLoop();
+    $calls = 0;
+    $loop->addTimer(0, function () use ($loop, &$calls) {
+        $calls++;
+        if ($calls < 5) {
+            $loop->tick(0);
+        }
+        $loop->stop();
+    });
+
+    $loop->run();
+
+    expect($calls)->toBe(1);
+});
