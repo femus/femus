@@ -57,3 +57,17 @@ it('readRegister throws on timeout', function () {
     $board = readyI2cBoard($transport);
     $board->i2c()->readRegister(0x68, 0x3B, 2);
 })->throws(I2cException::class);
+
+it('read sends a register-less request and takes the register-0 reply', function () {
+    $transport = new InMemoryTransport();
+    $board = readyI2cBoard($transport);
+    $bus = $board->i2c();
+    $transport->written = '';
+
+    $board->loop()->addTimer(0.01, function () use ($transport) {
+        $transport->feed("\xF0\x77\x60\x00\x00\x00\x30\x00\x69\x00\xF7");
+    });
+
+    expect($bus->read(0x60, 2))->toBe("\x30\x69")
+        ->and($transport->written)->toBe("\xF0\x76\x60\x08\x02\x00\xF7");
+});

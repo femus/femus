@@ -10,6 +10,7 @@ use Femus\Board;
 use Femus\Cli\Arduino\ArduinoCli;
 use Femus\Cli\Command\FlashFirmware;
 use Femus\Cli\Command\FlashOptions;
+use Femus\Cli\Command\FmRadio;
 use Femus\Cli\Command\ProbeModem;
 use Femus\Cli\Command\ScanPorts;
 use Femus\Cli\Process\SystemCommandRunner;
@@ -53,16 +54,30 @@ final class Application
         }
 
         if ($command === 'modem:probe') {
-            $port = null;
-            foreach (array_slice($argv, 2) as $argument) {
-                if (str_starts_with($argument, '--port=')) {
-                    $port = substr($argument, 7);
-                } elseif (!str_starts_with($argument, '-')) {
-                    $port = $argument;
+            return (new ProbeModem(new SerialPortLocator()))->run(self::portArgument(array_slice($argv, 2)), $out);
+        }
+
+        if ($command === 'fm:scan' || $command === 'fm:tune') {
+            $radio = new FmRadio(static fn (?string $port) => Board::firmata($port)->tea5767());
+            if ($command === 'fm:scan') {
+                $minLevel = 7;
+                foreach ($argv as $argument) {
+                    if (str_starts_with($argument, '--min-level=')) {
+                        $minLevel = (int) substr($argument, 12);
+                    }
                 }
+
+                return $radio->scan(self::portArgument(array_slice($argv, 2)), $minLevel, $out);
             }
 
-            return (new ProbeModem(new SerialPortLocator()))->run($port, $out);
+            $mhz = $argv[2] ?? '';
+            if (!is_numeric($mhz)) {
+                $out('usage: femus fm:tune <MHz> [port]   e.g. femus fm:tune 101.5');
+
+                return 2;
+            }
+
+            return $radio->tune(self::portArgument(array_slice($argv, 3)), (float) $mhz, $out);
         }
 
         if ($command === 'mcp') {
@@ -83,9 +98,30 @@ final class Application
         $out('usage: femus scan   (list serial ports and detect Firmata boards)');
         $out('       femus firmware:flash <femus|radio-bridge> [--port=auto] [--fqbn=...] [--build]');
         $out('       femus modem:probe [port]   (identify a GSM modem: baud, SIM, network, quirks)');
+        $out('       femus fm:scan [port] [--min-level=7]   (TEA5767: list FM stations, tune to the strongest)');
+        $out('       femus fm:tune <MHz> [port]');
         $out('       femus mcp   (MCP server over stdio — hardware tools for AI agents)');
 
         return $command === null ? 0 : 2;
+    }
+
+    /**
+     * The port from the command's arguments ("port" or "--port=..."), null to auto-detect.
+     *
+     * @param list<string> $arguments
+     */
+    private static function portArgument(array $arguments): ?string
+    {
+        $port = null;
+        foreach ($arguments as $argument) {
+            if (str_starts_with($argument, '--port=')) {
+                $port = substr($argument, 7);
+            } elseif (!str_starts_with($argument, '-')) {
+                $port = $argument;
+            }
+        }
+
+        return $port;
     }
 
     /** Probe a port: firmata (responds), silent (opens, no Firmata), busy (cannot open). */
