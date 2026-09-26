@@ -115,19 +115,20 @@ final class StreamSelectLoop implements Loop
     private function fireDueTimers(): void
     {
         $now = $this->now();
-        foreach ($this->timers as $id => $timer) {
-            if ($timer['at'] > $now) {
+        foreach (array_keys($this->timers) as $id) {
+            // re-read every time: a callback that blocks (an I2C read) ticks the loop itself,
+            // and that nested tick may already have fired or cancelled this timer
+            $timer = $this->timers[$id] ?? null;
+            if ($timer === null || $timer['at'] > $now) {
                 continue;
             }
-            ($timer['cb'])();
-            if (!isset($this->timers[$id])) {
-                continue; // cancelled inside the callback
-            }
+            // retire or reschedule before the callback, so a nested tick does not fire it again
             if ($timer['interval'] === null) {
                 unset($this->timers[$id]);
             } else {
                 $this->timers[$id]['at'] = $now + $timer['interval'];
             }
+            ($timer['cb'])();
         }
     }
 }

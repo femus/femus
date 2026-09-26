@@ -278,5 +278,13 @@ Written without hardware; tests run against a fake I2C bus.
   - Settle time 50 ms and 200 ms give identical readings; 50 ms stays. A full scan takes ~17 s,
     the I2C round trip over Firmata dominates.
 - Open: the stereo flag never came up, even at level 13 — antenna or signal strength, not checked yet.
-- Pending: `php examples/fm-spectrum.php <port>` on the live module — the sweep fills the chart,
-  clicking a station plays it, Resume sweep carries on. Checked so far against a simulated chip only.
+- ✅ `php examples/fm-spectrum.php <port>`: the sweep fills the chart in ~14 s, 13 stations rise
+  above the noise floor (101.9 and 102.7 among them, which the fixed threshold used to miss);
+  clicking a station plays it (102.7, 101.3 at level 13), Resume sweep carries on.
+- First live start crashed with `Write stalled`: a one-shot timer stayed registered while its
+  callback ran, the blocking I2C read inside it ticked the loop, and the loop fired the same timer
+  again — recursion until the serial buffer choked. Fixed in `StreamSelectLoop::fireDueTimers()`
+  (retire before calling), with a test.
+- After that crash the TEA5767 held the I2C bus: Firmata answered, the module did not. A board reset
+  does not clear it — unplugging the Nano's USB (power-cycling the module) does.
+- Right after power-up `fm:tune` reported level 1 — the same junk first reading; it is dropped now.

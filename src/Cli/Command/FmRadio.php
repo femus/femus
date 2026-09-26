@@ -72,6 +72,7 @@ final class FmRadio
         return $this->withRadio($port, $out, function (Tea5767 $radio) use ($mhz, $out): int {
             $radio->tune($mhz);
             usleep(100_000);
+            $radio->status();               // right after power-up the first reading is junk
             $status = $radio->status();
             $out(sprintf(
                 'Tuned to %.1f MHz: level %d/15, %s.',

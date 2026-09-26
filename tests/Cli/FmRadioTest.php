@@ -67,6 +67,7 @@ it('no board at all says so', function () {
 
 it('tune reports what the chip locked onto', function () {
     $board = new FakeBoard(new StreamSelectLoop());
+    $board->fakeI2c()->queueRead(teaStatus(101.3, 1));                 // junk, dropped
     $board->fakeI2c()->queueRead(teaStatus(101.3, 12, stereo: true));
 
     [$code, $output] = fmRun(fn ($out) => (new FmRadio(fn () => $board->tea5767()))->tune(null, 101.3, $out));
