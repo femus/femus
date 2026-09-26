@@ -67,3 +67,30 @@ it('by default stations stand 3 above the noise floor', function () {
     expect(Tea5767::noiseFloor($scan))->toBe(8)
         ->and(array_column(Tea5767::stations($scan), 'frequency'))->toBe([90.5, 101.3]);
 });
+
+it('mute, mono and soft mute rewrite the state at the current frequency', function () {
+    $board = new FakeBoard(new StreamSelectLoop());
+    $radio = $board->tea5767();
+    $radio->mono();                                   // before tune: nothing to rewrite yet
+    $radio->tune(101.3);
+    $radio->mute();
+    $radio->softMute();
+    $radio->mute(false);
+
+    expect(array_column($board->fakeI2c()->writes, 1))->toBe([
+        "\x30\x69\x18\x12\x40",                      // mono set before tuning is applied
+        "\xB0\x69\x18\x12\x40",                      // muted
+        "\xB0\x69\x18\x1A\x40",                      // + soft mute
+        "\x30\x69\x18\x1A\x40",                      // unmuted, the rest kept
+    ])->and($radio->isMuted())->toBeFalse();
+});
+
+it('a one-off muted tune does not change the mute setting', function () {
+    $board = new FakeBoard(new StreamSelectLoop());
+    $radio = $board->tea5767();
+    $radio->tune(101.3, mute: true);
+    $radio->tune(101.3);
+
+    expect(ord($board->fakeI2c()->writes[1][1][0]) & 0x80)->toBe(0)
+        ->and($radio->isMuted())->toBeFalse();
+});

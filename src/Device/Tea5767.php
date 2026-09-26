@@ -11,7 +11,10 @@ use Femus\Contracts\I2cBus;
  *
  * The chip has no registers: every write is the full 5-byte state, every read returns
  * 5 status bytes. Any byte written, even a register address, retunes it — so reads go
- * through I2cBus::read(), never readRegister().
+ * through I2cBus::read(), never readRegister(). The driver keeps that state, so mute(),
+ * mono() and softMute() rewrite it at the current frequency.
+ *
+ * There is no volume control on this chip: it outputs a fixed level.
  */
 final class Tea5767
 {
@@ -21,6 +24,11 @@ final class Tea5767
     /** High-side injection: the PLL sits 225 kHz above the station. */
     private const IF_HZ = 225_000;
     private const XTAL_HZ = 32_768;
+
+    private ?float $frequency = null;
+    private bool $muted = false;
+    private bool $mono = false;
+    private bool $softMute = false;
 
     /**
      * @param bool $deEmphasis75us true in the Americas, false (50 µs) in Europe and most of the world
@@ -32,7 +40,10 @@ final class Tea5767
     ) {
     }
 
-    public function tune(float $mhz, bool $mute = false): void
+    /**
+     * @param ?bool $mute a one-off override for this write (a sweep tunes muted); null keeps mute()
+     */
+    public function tune(float $mhz, ?bool $mute = null): void
     {
         if ($mhz < self::MIN_MHZ || $mhz > self::MAX_MHZ) {
             throw new \InvalidArgumentException(
@@ -40,14 +51,54 @@ final class Tea5767
             );
         }
 
-        $pll = (int) round(4 * ($mhz * 1_000_000 + self::IF_HZ) / self::XTAL_HZ);
+        $this->frequency = $mhz;
+        $this->write($mute ?? $this->muted);
+    }
+
+    /** Silences the output; the chip stays tuned and keeps reporting the signal. */
+    public function mute(bool $on = true): void
+    {
+        $this->muted = $on;
+        $this->rewrite();
+    }
+
+    /** Forces mono: less hiss on a weak station, at the cost of the stereo image. */
+    public function mono(bool $on = true): void
+    {
+        $this->mono = $on;
+        $this->rewrite();
+    }
+
+    /** Lets the chip turn the volume down by itself while the signal is weak and noisy. */
+    public function softMute(bool $on = true): void
+    {
+        $this->softMute = $on;
+        $this->rewrite();
+    }
+
+    public function isMuted(): bool
+    {
+        return $this->muted;
+    }
+
+    /** Settings changed before the first tune() apply when it comes. */
+    private function rewrite(): void
+    {
+        if ($this->frequency !== null) {
+            $this->write($this->muted);
+        }
+    }
+
+    private function write(bool $mute): void
+    {
+        $pll = (int) round(4 * ((float) $this->frequency * 1_000_000 + self::IF_HZ) / self::XTAL_HZ);
 
         $this->bus->write($this->address, pack(
             'C5',
             ($mute ? 0x80 : 0) | (($pll >> 8) & 0x3F),
             $pll & 0xFF,
-            0x10,                               // HLSI: high-side injection, stereo allowed
-            0x12,                               // XTAL 32.768 kHz, stereo noise cancelling
+            0x10 | ($this->mono ? 0x08 : 0),                // HLSI: high-side injection; MS: force mono
+            0x12 | ($this->softMute ? 0x08 : 0),            // XTAL 32.768 kHz, stereo noise cancelling; SMUTE
             $this->deEmphasis75us ? 0x40 : 0x00,
         ));
     }
