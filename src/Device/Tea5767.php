@@ -79,6 +79,11 @@ final class Tea5767
         float $step = 0.1,
         float $settle = 0.05,
     ): array {
+        // the first reading after power-up or a long jump is junk — take it and drop it
+        $this->tune($from, mute: true);
+        usleep((int) ($settle * 1_000_000));
+        $this->status();
+
         $points = [];
         $steps = (int) round(($to - $from) / $step);
         for ($i = 0; $i <= $steps; $i++) {
@@ -94,11 +99,15 @@ final class Tea5767
      * Picks stations out of a scan: a station bleeds into its neighbours, so only the
      * peak of each hump counts.
      *
+     * Empty air still reads 6–9 on the chip's meter, and how high depends on the antenna,
+     * so by default the bar is the band's own noise floor (the median level) plus 3.
+     *
      * @param list<array{frequency: float, level: int, stereo: bool}> $points
      * @return list<array{frequency: float, level: int, stereo: bool}>
      */
-    public static function stations(array $points, int $minLevel = 7): array
+    public static function stations(array $points, ?int $minLevel = null): array
     {
+        $minLevel ??= self::noiseFloor($points) + 3;
         $stations = [];
         foreach ($points as $i => $point) {
             $left = $points[$i - 1]['level'] ?? -1;
@@ -110,5 +119,14 @@ final class Tea5767
         }
 
         return $stations;
+    }
+
+    /** @param list<array{level: int}> $points */
+    public static function noiseFloor(array $points): int
+    {
+        $levels = array_column($points, 'level');
+        sort($levels);
+
+        return $levels[intdiv(count($levels), 2)] ?? 0;
     }
 }

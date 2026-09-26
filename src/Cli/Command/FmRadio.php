@@ -26,15 +26,18 @@ final class FmRadio
     }
 
     /** @param callable(string): void $out */
-    public function scan(?string $port, int $minLevel, callable $out): int
+    public function scan(?string $port, ?int $minLevel, callable $out): int
     {
         return $this->withRadio($port, $out, function (Tea5767 $radio) use ($minLevel, $out): int {
             $out(sprintf('Scanning %.1f–%.1f MHz…', Tea5767::MIN_MHZ, Tea5767::MAX_MHZ));
-            $stations = Tea5767::stations($radio->scan(settle: $this->settle), $minLevel);
+            $points = $radio->scan(settle: $this->settle);
+            $minLevel ??= Tea5767::noiseFloor($points) + 3;
+            $stations = Tea5767::stations($points, $minLevel);
+            $out(sprintf('Noise floor %d/15, counting stations from %d.', Tea5767::noiseFloor($points), $minLevel));
 
             if ($stations === []) {
                 $out("No station at level {$minLevel} or above.");
-                $out('Check the antenna (a ~75 cm wire in the ANT jack), or try --min-level=5.');
+                $out('Check the antenna (a ~75 cm wire in the ANT jack), or lower the bar with --min-level=N.');
 
                 return 1;
             }
@@ -42,9 +45,10 @@ final class FmRadio
             $out('');
             foreach ($stations as $station) {
                 $out(sprintf(
-                    '%6.1f MHz  %-15s %2d  %s',
+                    '%6.1f MHz  %s %2d  %s',
                     $station['frequency'],
-                    str_repeat('█', $station['level']),
+                    // sprintf pads bytes, and █ is three of them
+                    str_repeat('█', $station['level']) . str_repeat(' ', 15 - $station['level']),
                     $station['level'],
                     $station['stereo'] ? 'stereo' : 'mono',
                 ));

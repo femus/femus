@@ -34,14 +34,14 @@ it('status decodes frequency, level and stereo', function () {
 
 it('scan tunes muted at every step and reads each point', function () {
     $board = new FakeBoard(new StreamSelectLoop());
-    foreach ([100.0, 100.1, 100.2] as $mhz) {
+    foreach ([100.0, 100.0, 100.1, 100.2] as $mhz) {   // the first reading is thrown away
         $board->fakeI2c()->queueRead(teaStatus($mhz, 5));
     }
 
     $points = $board->tea5767()->scan(100.0, 100.2, settle: 0);
 
     expect(array_column($points, 'frequency'))->toBe([100.0, 100.1, 100.2])
-        ->and($board->fakeI2c()->writes)->toHaveCount(3)
+        ->and($board->fakeI2c()->writes)->toHaveCount(4)
         ->and(ord($board->fakeI2c()->writes[0][1][0]) & 0x80)->toBe(0x80);
 });
 
@@ -54,4 +54,16 @@ it('stations keeps one peak per hump and drops the noise floor', function () {
     ];
 
     expect(array_column(Tea5767::stations($scan, 7), 'frequency'))->toBe([88.2, 88.5]);
+});
+
+it('by default stations stand 3 above the noise floor', function () {
+    $point = fn (float $mhz, int $level) => ['frequency' => $mhz, 'level' => $level, 'stereo' => false];
+    // a live Halifax scan: empty air sits at 7–9, the real stations at 10+
+    $scan = [
+        $point(90.3, 9), $point(90.5, 13), $point(90.7, 8), $point(90.9, 7), $point(91.1, 8),
+        $point(91.3, 9), $point(91.5, 8), $point(101.3, 12), $point(101.5, 7),
+    ];
+
+    expect(Tea5767::noiseFloor($scan))->toBe(8)
+        ->and(array_column(Tea5767::stations($scan), 'frequency'))->toBe([90.5, 101.3]);
 });

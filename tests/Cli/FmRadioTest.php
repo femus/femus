@@ -20,6 +20,7 @@ function fmRun(callable $call): array
 
 it('scan lists stations and ends tuned to the strongest', function () {
     $board = new FakeBoard(new StreamSelectLoop());
+    $board->fakeI2c()->queueRead(teaStatus(87.5, 15));   // junk first reading, dropped
     for ($i = 0; $i <= 205; $i++) {
         $mhz = round(87.5 + $i * 0.1, 1);
         $level = match ($mhz) { 95.7 => 9, 101.3 => 13, default => 3 };
@@ -27,22 +28,23 @@ it('scan lists stations and ends tuned to the strongest', function () {
     }
     $radio = new FmRadio(fn () => $board->tea5767(), settle: 0);
 
-    [$code, $output] = fmRun(fn ($out) => $radio->scan(null, 7, $out));
+    [$code, $output] = fmRun(fn ($out) => $radio->scan(null, null, $out));
 
     expect($code)->toBe(0)
         ->and($output)->toContain(' 95.7 MHz')
         ->and($output)->toContain('101.3 MHz')
+        ->and($output)->toContain('Noise floor 3/15, counting stations from 6.')
         ->and($output)->toContain('2 stations. Tuned to 101.3 MHz')
         ->and(end($board->fakeI2c()->writes)[1])->toBe("\x30\x69\x10\x12\x40");   // unmuted, on 101.3
 });
 
 it('scan with nothing above the threshold points at the antenna', function () {
     $board = new FakeBoard(new StreamSelectLoop());
-    for ($i = 0; $i <= 205; $i++) {
-        $board->fakeI2c()->queueRead(teaStatus(round(87.5 + $i * 0.1, 1), 2));
+    for ($i = 0; $i <= 206; $i++) {
+        $board->fakeI2c()->queueRead(teaStatus(87.5 + min($i, 205) * 0.1, 7));
     }
 
-    [$code, $output] = fmRun(fn ($out) => (new FmRadio(fn () => $board->tea5767(), settle: 0))->scan(null, 7, $out));
+    [$code, $output] = fmRun(fn ($out) => (new FmRadio(fn () => $board->tea5767(), settle: 0))->scan(null, null, $out));
 
     expect($code)->toBe(1)->and($output)->toContain('antenna');
 });
@@ -50,7 +52,7 @@ it('scan with nothing above the threshold points at the antenna', function () {
 it('a silent module turns into a wiring checklist', function () {
     $board = new FakeBoard(new StreamSelectLoop());   // nothing queued: the read times out
 
-    [$code, $output] = fmRun(fn ($out) => (new FmRadio(fn () => $board->tea5767(), settle: 0))->scan(null, 7, $out));
+    [$code, $output] = fmRun(fn ($out) => (new FmRadio(fn () => $board->tea5767(), settle: 0))->scan(null, null, $out));
 
     expect($code)->toBe(1)->and($output)->toContain('SDA to A4');
 });

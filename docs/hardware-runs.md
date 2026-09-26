@@ -258,9 +258,23 @@ Written without hardware; tests run against a fake I2C bus.
 1. Wire the module per docs/devices/tea5767.md (5V, GND, SDA→A4, SCL→A5), antenna wire in ANT, headphones in.
 2. `vendor/bin/femus fm:scan` — the table lists the local stations; the strongest one plays in the headphones.
 3. `vendor/bin/femus fm:tune <MHz>` on another listed station — it switches, the reported level is close to the scan's.
-4. If every level reads the same, raise the settle time (`FmRadio` / `scan(settle:)`) — 50 ms is a guess.
+4. If every level reads the same, raise the settle time (`FmRadio` / `scan(settle:)`).
 5. Record results below.
 
 ### Run 1
-- Date: (pending)
-- Result: (pending)
+- Date: 2026-09-25, Halifax
+- Board: Nano (FT232, `/dev/cu.usbserial-A50285BI`, the messenger's node B) reflashed from
+  RadioBleBridge to FemusFirmata. `femus firmware:flash` failed before touching the board:
+  the avrdude bundled with arduino-cli is an Intel build and this Mac has no Rosetta
+  (`bad CPU type in executable`). Flashed with Homebrew's native avrdude 8.3 instead:
+  `avrdude -c arduino -p m328p -P <port> -b 115200 -U flash:w:firmware/build/FemusFirmata.ino.hex:i`
+  — the write completed, the verify pass lost sync, `femus scan` then reported the board femus-ready.
+- Result: ✅ the module answers at 0x60, `fm:tune 101.3` plays music in the headphones.
+- Findings, fixed in code:
+  - Empty air reads 6–9 on the chip's level meter, real stations 10–13. A fixed threshold of 7
+    listed 45 "stations"; the bar is now the band's median level + 3 → 12 stations, matching
+    the local dial (90.5 CBC Radio One, 101.3, 104.3 Q104, 95.6 ≈ News 95.7…).
+  - The first reading after power-up is junk (87.5 MHz at level 15) — `scan()` now drops it.
+  - Settle time 50 ms and 200 ms give identical readings; 50 ms stays. A full scan takes ~17 s,
+    the I2C round trip over Firmata dominates.
+- Open: the stereo flag never came up, even at level 13 — antenna or signal strength, not checked yet.
