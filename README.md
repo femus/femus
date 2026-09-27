@@ -178,7 +178,9 @@ Under active development, pre-1.0. Working today: everything above — the core 
 verified on real hardware (Arduino Nano, Raspberry Pi 4), the newest drivers on the
 simulated board with live runs pending (see [docs/hardware-runs.md](docs/hardware-runs.md)).
 On the roadmap: ultrasonic HC-SR04 and DHT11 (need firmware support), SPI, servos,
-GPS (NMEA), ESP8266 as a WiFi node — see [docs](docs/) for device guides and hardware notes.
+GPS (NMEA), ESP8266 as a WiFi node. Radio and audio next: RDA5807M (FM with RDS station
+names and volume), Si4713 (an FM transmitter with RDS), recording broadcasts through a USB
+sound card, and Bluetooth audio out — see [docs](docs/) for device guides and hardware notes.
 
 ## License
 
