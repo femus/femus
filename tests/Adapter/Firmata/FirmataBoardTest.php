@@ -124,3 +124,15 @@ it('close lets go of the port and the loop stops watching it', function () {
     expect(is_resource($stream))->toBeFalse();
     $board->loop()->tick(0);                     // a closed stream still registered would blow up select()
 });
+
+it('a port that hits EOF is let go instead of spinning the loop', function () {
+    $transport = new InMemoryTransport();
+    $board = readyBoard($transport);
+    $stream = $transport->stream();
+
+    $transport->hangUp();                        // the far end is gone, as with a pulled USB cable
+    $board->loop()->tick(0.01);
+
+    expect(is_resource($stream))->toBeFalse();
+    $board->close();                             // closing again is harmless
+});

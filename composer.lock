@@ -4,20 +4,20 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "652979fe7a01985f27ce34c96ce90227",
+    "content-hash": "579680984ead8263a4d961e63b0567ba",
     "packages": [
         {
             "name": "sanchescom/php-serial",
-            "version": "3.0.0",
+            "version": "3.0.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/sanchescom/php-serial.git",
-                "reference": "3e2a51ca78137ba9d23ab6c995d55a5c6e86534d"
+                "reference": "f129df52b3fa82b441370636309a371d1a5567c3"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/sanchescom/php-serial/zipball/3e2a51ca78137ba9d23ab6c995d55a5c6e86534d",
-                "reference": "3e2a51ca78137ba9d23ab6c995d55a5c6e86534d",
+                "url": "https://api.github.com/repos/sanchescom/php-serial/zipball/f129df52b3fa82b441370636309a371d1a5567c3",
+                "reference": "f129df52b3fa82b441370636309a371d1a5567c3",
                 "shasum": ""
             },
             "require": {
@@ -61,9 +61,9 @@
                 "uart"
             ],
             "support": {
-                "source": "https://github.com/sanchescom/php-serial/tree/3.0.0"
+                "source": "https://github.com/sanchescom/php-serial/tree/3.0.1"
             },
-            "time": "2026-09-18T05:03:23+00:00"
+            "time": "2026-09-27T02:51:31+00:00"
         }
     ],
     "packages-dev": [

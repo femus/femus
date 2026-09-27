@@ -43,6 +43,8 @@ final class FirmataBoard extends AbstractBoard
 
     private bool $ready = false;
 
+    private bool $closed = false;
+
     public function __construct(
         private readonly Transport $transport,
         Loop $loop,
@@ -57,10 +59,17 @@ final class FirmataBoard extends AbstractBoard
         $this->parser->onDigitalMessage($this->handleDigitalMessage(...));
         $this->parser->onAnalogMessage($this->handleAnalogMessage(...));
 
-        $loop->addReadStream(
-            $transport->stream(),
-            fn () => $this->parser->push($transport->readAvailable()),
-        );
+        $loop->addReadStream($transport->stream(), function () use ($transport): void {
+            $bytes = $transport->readAvailable();
+            if ($bytes === '' && feof($transport->stream())) {
+                // the cable is out: a dead port stays "readable" forever and spins select().
+                // Let it go; the next write or I2C read reports the board as lost.
+                $this->close();
+
+                return;
+            }
+            $this->parser->push($bytes);
+        });
     }
 
     public static function open(string $device, int $baudRate = 57600, ?Loop $loop = null): self
@@ -77,6 +86,10 @@ final class FirmataBoard extends AbstractBoard
      */
     public function close(): void
     {
+        if ($this->closed) {
+            return;
+        }
+        $this->closed = true;
         $this->loop->removeReadStream($this->transport->stream());
         $this->transport->close();
     }

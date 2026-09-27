@@ -294,7 +294,8 @@ Written without hardware; tests run against a fake I2C bus.
   polling ran clean after the fix.
 - Pulling the USB cable mid-sweep: the page turns red ("Lost the board: the USB cable is out.
   Retrying…"), the chart stays; plugging it back resumes the sweep within a couple of seconds.
-  `FirmataBoard::close()` takes the dead port out of the loop. Open: while the cable is out,
-  php-serial's `readAvailable()` swallows `Device not configured` as a PHP notice — ~244 000 of them
-  in a second before femus notices — instead of reporting the device as gone. Fix belongs in
-  sanchescom/php-serial.
+  `FirmataBoard::close()` takes the dead port out of the loop.
+- While the cable was out, php-serial's `readAvailable()` raised a `Device not configured` notice
+  on every call — ~244 000 in a second. Fixed in sanchescom/php-serial 3.0.1 (notice suppressed,
+  EOF still reports the loss), and FirmataBoard now lets go of a port at EOF on its own.
+  Re-run with the cable pulled: 0 notices, the page went red and came back when plugged in.
