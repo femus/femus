@@ -113,3 +113,14 @@ it('awaitReady actively queries the protocol version', function () {
     // boards on Bluetooth links do not reset on connect — we must ask (0xF9)
     expect($transport->written)->toContain("\xF9");
 });
+
+it('close lets go of the port and the loop stops watching it', function () {
+    $transport = new InMemoryTransport();
+    $board = readyBoard($transport);
+    $stream = $transport->stream();
+
+    $board->close();
+
+    expect(is_resource($stream))->toBeFalse();
+    $board->loop()->tick(0);                     // a closed stream still registered would blow up select()
+});

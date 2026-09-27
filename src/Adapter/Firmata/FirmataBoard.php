@@ -71,6 +71,16 @@ final class FirmataBoard extends AbstractBoard
         return $board;
     }
 
+    /**
+     * Lets go of the port and takes it out of the event loop, so the same loop can open the
+     * board again after its cable was pulled — a dead port left registered spins select().
+     */
+    public function close(): void
+    {
+        $this->loop->removeReadStream($this->transport->stream());
+        $this->transport->close();
+    }
+
     public function awaitReady(): void
     {
         $deadline = hrtime(true) / 1e9 + $this->handshakeTimeout;
