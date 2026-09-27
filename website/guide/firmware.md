@@ -58,6 +58,20 @@ in the order worth walking: power (a USB-TTL adapter cannot feed a modem's 2 A p
 shared GND, the level converter's LV pin, then TX/RX crossed. Every one of those has
 cost this project an evening.
 
+## femus fm:scan and fm:tune
+
+A [TEA5767 FM receiver](/devices/tea5767) on the board's I2C pins:
+
+```bash
+vendor/bin/femus fm:scan                 # list the stations, stay on the strongest
+vendor/bin/femus fm:tune 101.3           # switch to another one
+vendor/bin/femus fm:scan --min-level=9   # set the station bar by hand
+```
+
+A station is a peak at least 3 above the band's own noise floor, so the list adapts to your
+antenna. If the board answers but the module does not, the command says so and points at
+SDA/SCL first. For the live chart in the browser, see `examples/fm-spectrum.php`.
+
 ## The firmware model
 
 You never write or edit Arduino code with femus. Two sketches ship **precompiled**
@@ -92,6 +106,27 @@ What it does:
 
 The hex is identical for both Nano bootloaders — `--fqbn` only affects upload speed,
 so if flashing fails with `programmer is not responding`, try the other one.
+
+### `bad CPU type in executable` on an Apple Silicon Mac
+
+The uploader that arduino-cli downloads (avrdude) is an Intel build. Without Rosetta, macOS
+refuses to start it and the flash fails before it touches the board. Either install Rosetta
+once and `firmware:flash` works again:
+
+```bash
+softwareupdate --install-rosetta --agree-to-license
+```
+
+or flash the bundled hex with a native avrdude from Homebrew:
+
+```bash
+brew install avrdude
+avrdude -c arduino -p m328p -P /dev/cu.usbserial-XXXX -b 115200 \
+  -U flash:w:vendor/femus/femus/firmware/build/FemusFirmata.ino.hex:i
+```
+
+Use `-b 57600` for an old-bootloader Nano. If the write reaches 100% but the verify pass
+reports `programmer is out of sync`, run `femus scan`: a `femus-ready` board flashed fine.
 
 ## Building from source
 

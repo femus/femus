@@ -253,7 +253,7 @@ gram calibration + the PantryJar layer on top)
 
 Written without hardware; tests run against a fake I2C bus.
 
-### Testing Checklist (Pending Human Execution)
+### Testing Checklist (done — Run 1)
 
 1. Wire the module per docs/devices/tea5767.md (5V, GND, SDA→A4, SCL→A5), antenna wire in ANT, headphones in.
 2. `vendor/bin/femus fm:scan` — the table lists the local stations; the strongest one plays in the headphones.
