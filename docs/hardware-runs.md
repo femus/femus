@@ -292,3 +292,9 @@ Written without hardware; tests run against a fake I2C bus.
   another read was still waiting, and the second request wiped the first one's reply slot — the
   first timed out. `FirmataI2cBus` now keeps replies in a queue; a minute of listening with the page
   polling ran clean after the fix.
+- Pulling the USB cable mid-sweep: the page turns red ("Lost the board: the USB cable is out.
+  Retrying…"), the chart stays; plugging it back resumes the sweep within a couple of seconds.
+  `FirmataBoard::close()` takes the dead port out of the loop. Open: while the cable is out,
+  php-serial's `readAvailable()` swallows `Device not configured` as a PHP notice — ~244 000 of them
+  in a second before femus notices — instead of reporting the device as gone. Fix belongs in
+  sanchescom/php-serial.
