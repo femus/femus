@@ -35,6 +35,12 @@ final class InMemoryTransport implements Transport
         fwrite($this->remote, $bytes);
     }
 
+    /** The far end goes away, as a board does when its USB cable is pulled. */
+    public function hangUp(): void
+    {
+        fclose($this->remote);
+    }
+
     public function stream()
     {
         return $this->local;
@@ -48,6 +54,8 @@ final class InMemoryTransport implements Transport
     public function close(): void
     {
         fclose($this->local);
-        fclose($this->remote);
+        if (is_resource($this->remote)) {
+            fclose($this->remote);
+        }
     }
 }
