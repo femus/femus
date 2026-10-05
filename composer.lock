@@ -8,16 +8,16 @@
     "packages": [
         {
             "name": "sanchescom/php-serial",
-            "version": "3.0.1",
+            "version": "3.0.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/sanchescom/php-serial.git",
-                "reference": "f129df52b3fa82b441370636309a371d1a5567c3"
+                "reference": "f94f8d34f5e83640813df519c0efd9b6f9ba079f"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/sanchescom/php-serial/zipball/f129df52b3fa82b441370636309a371d1a5567c3",
-                "reference": "f129df52b3fa82b441370636309a371d1a5567c3",
+                "url": "https://api.github.com/repos/sanchescom/php-serial/zipball/f94f8d34f5e83640813df519c0efd9b6f9ba079f",
+                "reference": "f94f8d34f5e83640813df519c0efd9b6f9ba079f",
                 "shasum": ""
             },
             "require": {
@@ -61,9 +61,9 @@
                 "uart"
             ],
             "support": {
-                "source": "https://github.com/sanchescom/php-serial/tree/3.0.1"
+                "source": "https://github.com/sanchescom/php-serial/tree/3.0.2"
             },
-            "time": "2026-09-27T02:51:31+00:00"
+            "time": "2026-10-05T05:03:10+00:00"
         }
     ],
     "packages-dev": [
