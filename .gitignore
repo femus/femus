@@ -14,3 +14,6 @@
 
 # raw recordings and photo sources
 /media/
+
+# council drafts, never published
+/.drafts/
