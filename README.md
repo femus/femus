@@ -106,6 +106,8 @@ compile from source instead, `--fqbn` for non-default boards.
 | `Tea5767` | FM receiver (I2C) — tune, signal level, band scan | `femus fm:scan`, `examples/fm-spectrum.php` |
 | `Ds18b20` | 1-Wire thermometer on a Raspberry Pi | `examples/pi-temperature.php` |
 
+Bench-verified so far: `Led`, `Button`, `Lcd1602Parallel`, `LoadCell`, `Tea5767`, the 433 MHz radio with the BLE bridge, and the GSM stack on an A7670G. The rest pass their tests on the fake board; their live runs are listed as pending in [docs/hardware-runs.md](docs/hardware-runs.md).
+
 ### 433 MHz packet radio
 
 Addressed packets with CRC between two boards (RadioHead ASK under the hood),
