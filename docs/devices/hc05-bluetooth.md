@@ -1,7 +1,7 @@
 # HC-05 Bluetooth Module (Wireless Firmata)
 
 Replace the USB cable with an HC-05 (or HC-06) Bluetooth serial module.
-femus talks the same Firmata protocol over the wireless UART — no code changes
+femus talks the same [Firmata protocol](../../website/guide/firmware.md) over the wireless UART — no code changes
 are needed beyond specifying the Bluetooth serial port instead of `/dev/ttyUSB0`.
 
 ## Wiring to Arduino (Firmata)
@@ -125,4 +125,6 @@ php examples/blink.php /dev/cu.HC-05-DevB
 
 Replace `/dev/cu.HC-05-DevB` with the actual port name shown in macOS. No
 changes to the PHP code are needed — femus uses the same Firmata protocol
-over the Bluetooth UART as over USB.
+over the Bluetooth UART as over USB. See
+[`examples/blink.php`](https://github.com/femus/femus/blob/main/examples/blink.php)
+and the [quick start](../../website/guide/quick-start.md) for what the script does.

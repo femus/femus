@@ -130,7 +130,7 @@ internet and no cellular, using the bundled BLE bridge firmware and the
 ### GSM / SMS
 
 `Femus\Gsm` speaks AT over any serial transport — send an SMS from PHP through
-a SIM800L module: `examples/sms-send.php`.
+an AT modem (verified on a SIMCOM A7670G): `examples/sms-send.php`.
 
 ### Testing without hardware
 
@@ -147,7 +147,7 @@ expect($board->pin(13)->read())->toBeTrue();  // the LED turned on
 ```
 
 Simulate analog readings, scale weights, I2C replies and incoming radio messages the same
-way. The whole femus test suite (230+ Pest tests) runs like this in CI — so can yours.
+way. The whole femus test suite (280+ Pest tests) runs like this in CI — so can yours.
 
 ## Multiple boards
 

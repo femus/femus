@@ -1,9 +1,9 @@
 # 433 MHz Radio Link (Station Node A)
 
 Main femus board station: 433 MHz ASK radio link with addressed packets and CRC, using FS1000A (TX) and MX-RM-5V (RX) modules.
-Communicates with Node B (RadioBleBridge) and other nodes in the same network.
+Communicates with Node B ([RadioBleBridge](radio-ble-bridge.md)) and other nodes in the same network.
 
----
+See the [radio guide](../../website/guide/radio.md) for the full API walkthrough.
 
 ## Wiring to Arduino Nano
 
@@ -29,8 +29,6 @@ Communicates with Node B (RadioBleBridge) and other nodes in the same network.
 | GND | GND | Common ground |
 | ANT | - | Solder a **17.3 cm** wire for quarter-wave monopole antenna |
 
----
-
 ## Antenna
 
 **Critical:** Without an antenna, range is < 1 meter and packet loss is severe.
@@ -52,8 +50,6 @@ Each module requires a **17.3 cm quarter-wave monopole antenna** soldered to the
 
 Typical range with antenna: **50–100 meters** line-of-sight, depending on obstacles and antenna orientation.
 
----
-
 ## Firmware
 
 Flash the Arduino Nano with **FemusFirmata** (includes radio support):
@@ -63,9 +59,9 @@ arduino-cli compile --fqbn arduino:avr:nano:cpu=atmega328old firmware/FemusFirma
 arduino-cli upload  --fqbn arduino:avr:nano:cpu=atmega328old -p <port> firmware/FemusFirmata
 ```
 
-See `firmware/README.md` for library setup and IDE instructions.
-
----
+See the [firmware guide](../../website/guide/firmware.md) and the
+[firmware README](https://github.com/femus/femus/blob/main/firmware/README.md)
+for library setup and IDE instructions.
 
 ## Quick Start
 
@@ -108,8 +104,6 @@ php examples/radio-chat.php <port> 1 127
 
 Node 1 will broadcast; all listening nodes receive (but cannot reply via broadcast).
 
----
-
 ## Addressing
 
 | Address | Meaning |
@@ -118,8 +112,6 @@ Node 1 will broadcast; all listening nodes receive (but cannot reply via broadca
 | 127 | Broadcast (all nodes receive) |
 
 Each node has a unique address (1, 2, 3, …). Nodes can listen to all incoming messages (via `onMessage` callback) and send to specific addresses or broadcast.
-
----
 
 ## API Overview
 
@@ -143,8 +135,6 @@ $radio->send(RadioLink::BROADCAST, 'Hello everyone');  // Broadcast
 $board->run();
 ```
 
----
-
 ## Troubleshooting
 
 | Issue | Solution |
@@ -154,9 +144,7 @@ $board->run();
 | **TX/RX swapped (messages only go one way)** | Swap D11 and D12 wires; D11 = RX, D12 = TX |
 | **D11/D12 conflicts (LCD example plugged in)** | Unplug LCD wires; D11 and D12 are shared with radio module |
 | **Random garbled/lost messages** | Check power supply (clean 5V, ≥1A); use USB powerbank if needed; separate GND rail for radio |
-| **Firmware upload fails** | Ensure FemusFirmata libraries are installed: ConfigurableFirmata, HX711, RadioHead. See firmware/README.md |
-
----
+| **Firmware upload fails** | Ensure FemusFirmata libraries are installed: ConfigurableFirmata, HX711, RadioHead. See the [firmware README](https://github.com/femus/femus/blob/main/firmware/README.md) |
 
 ## Protocol Details
 
@@ -170,23 +158,19 @@ Messages include:
 
 Unaddressed messages and CRC failures are discarded by the firmware.
 
----
-
 ## Pin Conflict: D11/D12
 
 **Warning:** Pins D11 and D12 are used by both radio and the parallel LCD1602 example
-(`examples/lcd-clock-parallel.php`). To use radio:
+([`examples/lcd-clock-parallel.php`](https://github.com/femus/femus/blob/main/examples/lcd-clock-parallel.php)). To use radio:
 
 1. Unplug all wires from D11 and D12 (if LCD is connected)
 2. Connect FS1000A DATA to D12 and MX-RM-5V DATA to D11
 3. Run radio examples
 4. To use LCD again, disconnect radio wires and reconnect LCD wires
 
----
-
 ## Integration with RadioBleBridge (Node B)
 
-Node B (see `docs/devices/radio-ble-bridge.md`) listens on address 2 by default and bridges
+Node B (see the [RadioBleBridge page](radio-ble-bridge.md)) listens on address 2 by default and bridges
 iPhone BLE messages to 433 MHz radio.
 
 Typical setup:
@@ -196,17 +180,15 @@ Typical setup:
 
 To test:
 1. Flash Node B Arduino: `vendor/bin/femus firmware:flash radio-bridge`
-2. Wire BLE + radio modules to Node B (see radio-ble-bridge.md)
+2. Wire BLE + radio modules to Node B (see the [RadioBleBridge page](radio-ble-bridge.md))
 3. Flash Node A: `vendor/bin/femus firmware:flash femus`; connect Node A to USB
 4. Run radio-chat.php on Node A
 5. Connect iPhone to Node B's HM-10 BLE device
 6. Type in iPhone BLE terminal → Node A receives
 7. Type in Node A terminal → iPhone BLE terminal receives (echoed via radio)
 
----
+## Related Pages
 
-## Related Documents
-
-- **FemusFirmata:** `firmware/README.md` — radio sysex protocol and wiring details
-- **RadioBleBridge:** `docs/devices/radio-ble-bridge.md` — Node B (BLE + radio bridge)
-- **Hardware Runs:** `docs/hardware-runs.md` — testing checklist and verification logs
+- **[Radio guide](../../website/guide/radio.md)** — API and messenger walkthrough
+- **[Firmware guide](../../website/guide/firmware.md)** and the [firmware README](https://github.com/femus/femus/blob/main/firmware/README.md) — radio sysex protocol and wiring details
+- **[RadioBleBridge](radio-ble-bridge.md)** — Node B (BLE + radio bridge)

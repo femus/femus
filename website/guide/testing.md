@@ -79,5 +79,5 @@ it('button: bounce within the debounce window is suppressed', function () {
 });
 ```
 
-The entire femus suite — 150+ Pest tests covering drivers, the Firmata protocol,
+The entire femus suite — 280+ Pest tests covering drivers, the Firmata protocol,
 radio framing and the CLI — runs exactly this way on every push. Your project can too.

@@ -1,6 +1,6 @@
 # GSM & SMS
 
-`Femus\Gsm` is an AT-command stack for GSM modems (tested with the SIM800L module):
+`Femus\Gsm` is an AT-command stack for GSM modems (verified on a SIMCOM A7670G; any modem that speaks AT):
 send and receive SMS from PHP over any serial transport.
 
 ```php

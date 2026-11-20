@@ -138,12 +138,7 @@ Manual hardware verification with live Arduino is pending. When executed, verify
 6. Test integration with Node B (RadioBleBridge): connect Node A to Node B via 433 MHz, send/receive via BLE
 7. Record results below
 
-### Run 1
-- Date: (pending)
-- Board: Arduino Nano + FemusFirmata (radio support)
-- Wiring: FS1000A DATA→D12 VCC→5V GND→GND, MX-RM-5V DATA→D11 VCC→5V GND→GND
-- Antenna: 17.3 cm copper wire on ANT pads of both modules
-- Result: (pending)
+Runs: the bench bring-up (2026-08-06) and the end-to-end messenger run (2026-09-17) below.
 
 ## Release 2026-08-06-radio-messenger (bench bring-up)
 

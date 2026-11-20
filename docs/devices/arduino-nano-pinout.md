@@ -1,7 +1,8 @@
 # Arduino Nano V3 Pinout Reference
 
 Hold the board with the **mini-USB connector pointing up (away from you)**.
-Landmarks: the RST push-button sits mid-board; the "L" LED (the one blink.php
+Landmarks: the RST push-button sits mid-board; the "L" LED (the one
+[blink.php](https://github.com/femus/femus/blob/main/examples/blink.php)
 drives) is near the bottom-right corner next to D13.
 
 ```
@@ -28,14 +29,14 @@ drives) is near the bottom-right corner next to D13.
 
 | Pin | Used by | Example |
 |-----|---------|---------|
-| D2  | Button (internal pull-up) | button-led.php |
-| D2  | HX711 SCK (⚠️ conflicts with the button — not at the same time) | scale.php |
-| D3  | HX711 DT | scale.php |
-| D13 | Onboard LED | blink.php, button-led.php |
-| A0  | Analog sensors (water level, photoresistor) | water-level.php |
-| A4  | I2C SDA (LCD1602, GY-521) | lcd-clock.php, gyro-dump.php |
-| A5  | I2C SCL (LCD1602, GY-521) | lcd-clock.php, gyro-dump.php |
-| D0/D1 | UART — shared with USB; also HC-05 wireless link | hc05-bluetooth.md |
+| D2  | Button (internal pull-up) | [button-led.php](https://github.com/femus/femus/blob/main/examples/button-led.php) |
+| D2  | HX711 SCK (⚠️ conflicts with the button — not at the same time) | [scale.php](https://github.com/femus/femus/blob/main/examples/scale.php) |
+| D3  | HX711 DT | [scale.php](https://github.com/femus/femus/blob/main/examples/scale.php) |
+| D13 | Onboard LED | [blink.php](https://github.com/femus/femus/blob/main/examples/blink.php), [button-led.php](https://github.com/femus/femus/blob/main/examples/button-led.php) |
+| A0  | Analog sensors (water level, photoresistor) | [water-level.php](https://github.com/femus/femus/blob/main/examples/water-level.php) |
+| A4  | I2C SDA (LCD1602, GY-521) | [lcd-clock.php](https://github.com/femus/femus/blob/main/examples/lcd-clock.php), [gyro-dump.php](https://github.com/femus/femus/blob/main/examples/gyro-dump.php) |
+| A5  | I2C SCL (LCD1602, GY-521) | [lcd-clock.php](https://github.com/femus/femus/blob/main/examples/lcd-clock.php), [gyro-dump.php](https://github.com/femus/femus/blob/main/examples/gyro-dump.php) |
+| D0/D1 | UART — shared with USB; also HC-05 wireless link | [HC-05 Bluetooth](hc05-bluetooth.md) |
 | 5V / GND | Module power | everything |
 
 Notes:
@@ -44,4 +45,4 @@ Notes:
 - A4/A5 double as the I2C bus — while an LCD or GY-521 is connected, those
   two analog channels are unavailable.
 - D0/D1 are shared with the USB-serial chip: disconnect anything wired to
-  them (e.g. HC-05) before flashing over USB.
+  them (e.g. HC-05) before [flashing over USB](../../website/guide/firmware.md).

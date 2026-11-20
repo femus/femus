@@ -2,12 +2,15 @@
 
 This guide covers any AT-compatible GSM/GPRS modem: SIM800L, SIM5216E, Cinterion EHS5-E, and similar. The modem communicates over a serial port (USB-to-TTL adapter) using AT commands.
 
+See the [GSM guide](../../website/guide/gsm.md) for the full API walkthrough, and the
+[SMS gateway guide](../../website/guide/sms-gateway.md) for a complete application built on top of it.
+
 ## Supported Modems
 
 - **SIM800L** (very common, cheap, 2G-only — auto-baud, minimal power)
-- **SIM5216E** (smaller footprint variant of SIM800)
-- **SIMCOM A7670G** (LTE Cat-1, verified — see the section below; wiring differs from the SIM800L)
+- **SIM5216E** (SIMCom 3G/WCDMA module — same AT workflow; check 3G is still live in your region)
 - **Cinterion EHS5-E** (industrial, 3G, higher quality)
+- **SIMCOM A7670G** (LTE Cat-1, verified — see the section below; wiring differs from the SIM800L)
 - Others with standard AT command set
 
 ## SIMCOM A7670G (LTE Cat-1) — verified 2026-09-19
@@ -53,7 +56,7 @@ check first.
 
 ### SIM800L (most common)
 
-**Voltage**: 3.4 – 4.2 V (**never the 5 V pin**)  
+**Voltage**: 3.4 – 4.2 V (**never the 5 V pin**)
 **Peak current**: 2 A during TX burst (RX ≈ 100 mA)
 
 | Supply | ✓ Suitable | Notes |
@@ -168,7 +171,7 @@ $modem->onSmsReceived(function ($sms) {
 $modem->run();  // event loop
 ```
 
-See `examples/sms-send.php` for a complete standalone script.
+See [`examples/sms-send.php`](https://github.com/femus/femus/blob/main/examples/sms-send.php) for a complete standalone script.
 
 ## SMS API
 
@@ -197,7 +200,7 @@ $listener(Sms $sms): void {
 }
 ```
 
-Register a callback. When an SMS arrives, the modem sends an unsolicited `+CMTI` notification, and the callback is invoked with the parsed message. Requires `$loop->run()` (event loop) to be active.
+Register a callback. When an SMS arrives, the modem sends an unsolicited `+CMTI` notification, and the callback is invoked with the parsed message. Requires the event loop to be running (`$modem->run()`).
 
 ## Troubleshooting
 
@@ -208,7 +211,7 @@ Register a callback. When an SMS arrives, the modem sends an unsolicited `+CMTI`
 | SMS sends but never arrives | Wrong number format or low signal | Check phone format matches +XXXX convention; verify signal quality |
 | Modem resets during send | Insufficient power | Increase power supply capacity (2 A+ buck converter or LiPo); reduce TX power if modem supports it |
 | Incoming SMS stop arriving, then come in a burst later | SIM message storage full (`+SMS FULL`, e.g. 20/20) | `AT+CMGD=1,4` deletes all stored messages; `femus modem:probe` warns before it fills |
-| USB adapter not visible on macOS | Driver missing (CH340/CP2102 etc.) | Install appropriate driver (e.g., https://github.com/WCHSoftware/ch340_ch341_linux) |
+| USB adapter not visible on macOS | Driver missing (CH340/CP2102 etc.) | Install the vendor driver for your chip (CH340: WCH website; CP2102: Silicon Labs) |
 
 ## Testing Checklist
 
@@ -220,6 +223,7 @@ Register a callback. When an SMS arrives, the modem sends an unsolicited `+CMTI`
 6. Run `php examples/sms-send.php /dev/cu.usbserial-XXXX +1234567890 "test"` — SMS arrives within 5 seconds
 7. Reply to the SMS — `onSmsReceived` callback in demo script captures it
 
----
+## Related Pages
 
-See also: `docs/hardware-runs.md` for real hardware test results.
+- **[GSM guide](../../website/guide/gsm.md)** — AT channel and modem API
+- **[SMS gateway guide](../../website/guide/sms-gateway.md)** — SMS-to-AI gateway built on this modem

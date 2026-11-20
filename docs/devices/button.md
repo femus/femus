@@ -53,4 +53,5 @@ $board->run();
 ## Verification
 
 `php examples/button-led.php /dev/ttyUSB0` — hold the button and the on-board
-LED (pin 13) lights up.
+LED (pin 13) lights up. See
+[button-led.php](https://github.com/femus/femus/blob/main/examples/button-led.php).

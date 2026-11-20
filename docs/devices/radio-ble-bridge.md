@@ -4,7 +4,7 @@ Phone node (Node B) of the femus radio messenger. Bridges iPhone Bluetooth (HM-1
 to a 433 MHz ASK radio (FS1000A TX + MX-RM-5V RX). A standalone sketch with no Firmata — each
 line received from BLE is sent via radio, and each radio message is echoed to BLE.
 
----
+See the [radio guide](../../website/guide/radio.md) for the full messenger walkthrough.
 
 ## Wiring to Arduino Nano
 
@@ -31,8 +31,7 @@ onboard regulator, so **VCC takes 5 V directly**, while the logic pins are 3.3 V
 
 Only the board→module direction needs level shifting (D8 → RXD, 5 V down to 3.3 V).
 The module's TXD outputs 3.3 V, which is above the AVR's logic-high threshold, so
-**TXD → D7 runs direct** — verified on the bench (node B bring-up). Two options for
-the RXD line — **this build uses Option A**.
+**TXD → D7 runs direct**. There are two options for the RXD line.
 
 #### Option A (recommended): level converter + AMS1117-3.3
 
@@ -51,8 +50,6 @@ Level converter:
 HM-10 TXD → Nano D7 direct — no channel needed (3.3 V → 5 V input is fine)
 ```
 
-Match HV1↔LV1 and HV2↔LV2 by the channel numbers printed on the converter.
-
 #### Option B (simplest, no extra modules): resistor divider
 
 No level converter or AMS1117 — drop only the D8→RXD line with a 1k/2k divider; D7←TXD
@@ -67,8 +64,6 @@ Arduino D7 ─────────────────── HM-10 TXD (
 ```
 
 The divider gives ~3.33 V: `5V × 2kΩ / (1kΩ + 2kΩ) ≈ 3.33V`. Fine for 9600 baud UART.
-
----
 
 > **Different wiring?** The radio pins are `#define RADIO_RX_PIN` / `RADIO_TX_PIN` at
 > the top of `RadioBleBridge.ino` (default D11/D12). Change them to match your board
@@ -85,8 +80,6 @@ The divider gives ~3.33 V: `5V × 2kΩ / (1kΩ + 2kΩ) ≈ 3.33V`. Fine for 9600
 | GND | GND | Common ground |
 | ANT | - | Solder a **17.3 cm** wire for quarter-wave monopole antenna |
 
----
-
 ### MX-RM-5V Receiver (433 MHz)
 
 | MX-RM-5V pin | Arduino Nano pin | Notes |
@@ -96,12 +89,10 @@ The divider gives ~3.33 V: `5V × 2kΩ / (1kΩ + 2kΩ) ≈ 3.33V`. Fine for 9600
 | GND | GND | Common ground |
 | ANT | - | Solder a **17.3 cm** wire for quarter-wave monopole antenna |
 
----
-
 ## Breadboard Layout
 
-> The diagram below shows **Option B (divider)**. For the build in use here
-> (**Option A: level converter + AMS1117**), see the HM-10 wiring section above —
+> The diagram below shows **Option B (divider)**. If you use
+> **Option A (level converter + AMS1117)**, see the HM-10 wiring section above —
 > the D8→RXD line routes through the converter instead of the divider; TXD→D7 is
 > direct in both options.
 
@@ -136,12 +127,10 @@ The divider gives ~3.33 V: `5V × 2kΩ / (1kΩ + 2kΩ) ≈ 3.33V`. Fine for 9600
   * HM-10 VCC: check module tolerance; may require 3.3V instead of 5V.
 ```
 
----
-
 ## Power
 
 The whole node runs off a single **5 V** rail. On the bench, power the Nano from **any USB
-source** (a spare Mac port, a hub, or a phone charger) — the phone node talks to the iPhone
+source** (a spare computer port, a hub, or a phone charger) — the phone node talks to the iPhone
 over BLE, so its USB is used only for power, not data.
 
 Distribution from the Nano 5V pin:
@@ -152,8 +141,6 @@ Distribution from the Nano 5V pin:
 Current budget: HM-10 ≈40 mA + FS1000A ≈20 mA + MX-RM-5V ≈5 mA + Nano ≈30 mA ≈ 100 mA
 typical — well within USB's 500 mA. For field use later, a USB powerbank (5 V, ≥1 A) gives
 many hours; a 5000 mAh pack ≈ 12 h.
-
----
 
 ## HM-10 BLE Configuration
 
@@ -178,32 +165,26 @@ iOS apps connect to the HM-10 using CoreBluetooth:
 The RadioBleBridge sketch reads lines from HM-10 UART and sends them via 433 MHz radio;
 incoming radio messages are echoed back to the BLE UART (terminated by `\n`).
 
----
-
 ## Addressing
 
-Node addresses (this node's and the peer's) are configured dynamically from the phone over BLE
-and stored in EEPROM. No firmware rebuild is required. Use the commands described in the
-section below: `/addr`, `/peer` and `/show`.
-
----
+Node addresses (this node's own address and the peer's) are configured dynamically from
+the phone over BLE and stored in EEPROM. No firmware rebuild is needed. Use the commands
+described in the next section: `/addr`, `/peer`, and `/show`.
 
 ## Address Configuration (over BLE)
 
-Node addresses are not hard-coded — they are set from the phone and stored in EEPROM
-(they survive reboots). Lines starting with `/` are intercepted by the bridge
+Node addresses are not hardcoded — they are set from the phone and stored in EEPROM
+(they survive a reboot). Lines starting with `/` are intercepted by the bridge
 and are NOT sent over the radio:
 
-- `/addr N` — this node's address (0–255), replies `ok addr=N`
-- `/peer N` — the peer's address (0–255), replies `ok peer=N`
-- `/show` — current addresses, replies `addr=N peer=M`
-- unknown `/…` — replies `err unknown`
+- `/addr N` — this node's own address (0–255), reply `ok addr=N`
+- `/peer N` — the peer's address (0–255), reply `ok peer=N`
+- `/show` — current addresses, reply `addr=N peer=M`
+- unknown `/…` — reply `err unknown`
 
-With a clean EEPROM the defaults node=2, peer=1 are applied (the messenger's phone
-node), so a bridge with no settings flashed works with the station out of the box.
+With a blank EEPROM the defaults node=2, peer=1 apply (the messenger's phone node),
+so a freshly flashed bridge works with the station right away without any configuration.
 EEPROM format: byte 0 — marker `0xF3`, byte 1 — node, byte 2 — peer.
-
----
 
 ## Line Protocol
 
@@ -221,8 +202,6 @@ Messages are **line-oriented**, delimited by `\n` or `\r`:
 
 Maximum line length: **50 bytes** (including any terminator stripping).
 
----
-
 ## Antenna
 
 > **Bench note:** for a first bring-up with the two nodes ~10 cm apart you can skip antennas
@@ -235,8 +214,6 @@ Copper wire, 17.3 cm, soldered to the ANT pad on each module.
 ```
 
 Typical range: 50–100 meters line-of-sight, depending on antenna orientation and obstacles.
-
----
 
 ## Compile & Upload
 
@@ -253,19 +230,17 @@ arduino-cli compile --fqbn arduino:avr:nano:cpu=atmega328old firmware/RadioBleBr
 3. Ensure **RadioHead** library is installed (Library Manager).
 4. Click **Upload**.
 
----
-
 ## Testing
 
 1. **Power on** the Arduino + HM-10 + radio stack via USB powerbank.
-2. On iOS (via a SwiftUI app or third-party BLE terminal):
+2. On iOS (via a SwiftUI app such as
+   [FemusRadioTerminal](https://github.com/femus/femus/tree/main/ios/FemusRadioTerminal),
+   or a third-party BLE terminal):
    - Connect to BLE device `HM-10` or `BT05`.
    - Select service `FFE0`, characteristic `FFE1`.
    - Send `"HELLO\n"`.
 3. The message is transmitted via 433 MHz radio to Node 1.
 4. If Node 1 replies (e.g., `"ACK\n"`), it appears in the BLE terminal.
-
----
 
 ## Troubleshooting
 
@@ -276,9 +251,8 @@ arduino-cli compile --fqbn arduino:avr:nano:cpu=atmega328old firmware/RadioBleBr
 | Radio messages not arriving | Check antenna soldering; verify FS1000A/MX-RM-5V pin connections (D12 TX, D11 RX); test line length ≤50 bytes |
 | Random garbled characters in BLE | Power supply noise; ensure clean 5V rail and separate GND for radio modules |
 
----
+## Related Pages
 
-## Related Documents
-
-- **FemusFirmata:** `firmware/README.md` — main board firmware with Firmata + radio support.
-- **HC-05 Bluetooth:** `docs/devices/hc05-bluetooth.md` — wireless Firmata over HC-05.
+- **[Radio guide](../../website/guide/radio.md)** — femus radio messenger overview
+- **[Firmware guide](../../website/guide/firmware.md)** and the [firmware README](https://github.com/femus/femus/blob/main/firmware/README.md) — main board firmware with Firmata + radio support
+- **[HC-05 Bluetooth](hc05-bluetooth.md)** — wireless Firmata over HC-05

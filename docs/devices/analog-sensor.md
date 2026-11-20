@@ -8,7 +8,7 @@
 | + (power)    | 5V      |
 | − (ground)   | GND     |
 
-Channels A0–A5 correspond to analogSensor(0)…analogSensor(5).
+Channels A0–A5 correspond to `analogSensor(0)`…`analogSensor(5)`.
 
 ## Breadboard
 
@@ -51,4 +51,6 @@ $sensor->onChange(fn (float $v) => print("{$v}\n"));
 
 ## Verification
 
-`php examples/water-level.php <port>` — dip the sensor in a glass of water, the percentage rises.
+`php examples/water-level.php <port>` — dip the sensor in a glass of water and
+the percentage rises. See
+[water-level.php](https://github.com/femus/femus/blob/main/examples/water-level.php).
