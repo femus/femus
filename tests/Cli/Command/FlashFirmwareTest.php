@@ -117,3 +117,26 @@ it('honors an explicit --fqbn and --port', function () {
         '/project/firmware/FemusFirmata',
     ]);
 });
+
+it('falls back to the system avrdude when the bundled one cannot run on this CPU', function () {
+    // calls: 0 version, 1 core install, 2 upload (dies), 3 avrdude
+    $runner = new FakeCommandRunner(results: [2 => new CommandResult(1, 'bad CPU type in executable')]);
+    $root = makeRootWithHex('FemusFirmata.ino.hex');
+    $lines = [];
+    $code = makeFlash($runner, [], $root)->run('femus', ['port' => '/dev/ttyUSB9'], static function (string $l) use (&$lines): void {
+        $lines[] = $l;
+    });
+
+    expect($code)->toBe(0)
+        ->and(end($runner->calls)[0])->toBe('avrdude')
+        ->and(implode("\n", $lines))->toContain('system avrdude');
+});
+
+it('does not fall back on an ordinary upload failure', function () {
+    $runner = new FakeCommandRunner(results: [2 => new CommandResult(1, 'programmer is not responding')]);
+    $root = makeRootWithHex('FemusFirmata.ino.hex');
+    $code = makeFlash($runner, [], $root)->run('femus', ['port' => '/dev/ttyUSB9'], static fn (string $l) => null);
+
+    expect($code)->toBe(1)
+        ->and(end($runner->calls)[1])->toBe('upload');
+});

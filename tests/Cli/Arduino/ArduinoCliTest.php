@@ -44,3 +44,15 @@ it('builds core and lib install argv', function () {
     expect($runner->calls[0])->toBe(['arduino-cli', 'core', 'install', 'arduino:avr'])
         ->and($runner->calls[1])->toBe(['arduino-cli', 'lib', 'install', 'RadioHead']);
 });
+
+it('builds the system avrdude argv with the baud of the bootloader', function () {
+    $runner = new FakeCommandRunner();
+    $cli = new ArduinoCli($runner);
+    $cli->uploadHexWithSystemAvrdude('build/F.hex', 'arduino:avr:nano:cpu=atmega328old', '/dev/ttyUSB0');
+    $cli->uploadHexWithSystemAvrdude('build/F.hex', 'arduino:avr:nano', '/dev/ttyUSB0');
+    expect($runner->calls[0])->toBe([
+        'avrdude', '-c', 'arduino', '-p', 'm328p',
+        '-P', '/dev/ttyUSB0', '-b', '57600',
+        '-U', 'flash:w:build/F.hex:i',
+    ])->and($runner->calls[1][8])->toBe('115200');
+});

@@ -40,6 +40,22 @@ final class ArduinoCli
         ]);
     }
 
+    /**
+     * Upload a hex with the avrdude on PATH instead of the one arduino-cli bundles.
+     * The bundled one is an Intel build: on an Apple Silicon Mac without Rosetta it dies with "bad CPU type".
+     */
+    public function uploadHexWithSystemAvrdude(string $hexFile, string $fqbn, string $port): CommandResult
+    {
+        // ponytail: assumes an ATmega328 board (Nano, Uno); map fqbn to mcu when another board shows up
+        $baud = str_contains($fqbn, 'atmega328old') ? '57600' : '115200';
+
+        return $this->runner->run([
+            'avrdude', '-c', 'arduino', '-p', 'm328p',
+            '-P', $port, '-b', $baud,
+            '-U', "flash:w:{$hexFile}:i",
+        ]);
+    }
+
     public function compileAndUpload(string $sketchDir, string $fqbn, string $port): CommandResult
     {
         return $this->runner->run([

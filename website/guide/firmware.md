@@ -110,8 +110,9 @@ so if flashing fails with `programmer is not responding`, try the other one.
 ### `bad CPU type in executable` on an Apple Silicon Mac
 
 The uploader that arduino-cli downloads (avrdude) is an Intel build. Without Rosetta, macOS
-refuses to start it and the flash fails before it touches the board. Either install Rosetta
-once and `firmware:flash` works again:
+refuses to start it. When `firmware:flash` sees that error while flashing the bundled hex, it
+retries with the `avrdude` on your PATH, so `brew install avrdude` is enough. `--build` still
+needs Rosetta for the compile step. Either install Rosetta once:
 
 ```bash
 softwareupdate --install-rosetta --agree-to-license

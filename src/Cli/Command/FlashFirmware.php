@@ -75,7 +75,12 @@ final class FlashFirmware
         if (!array_key_exists('build', $options) && is_file($hexFile)) {
             $out("Flashing {$target} ({$fqbn}, prebuilt hex) ...");
 
-            if (!$this->arduino->uploadHex($hexFile, $fqbn, $port)->succeeded()) {
+            $upload = $this->arduino->uploadHex($hexFile, $fqbn, $port);
+            if (!$upload->succeeded() && str_contains($upload->output, 'bad CPU type')) {
+                $out('arduino-cli ships an Intel avrdude; retrying with the system avrdude ...');
+                $upload = $this->arduino->uploadHexWithSystemAvrdude($hexFile, $fqbn, $port);
+            }
+            if (!$upload->succeeded()) {
                 $out('Flash failed.');
 
                 return 1;
