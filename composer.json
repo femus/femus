@@ -3,6 +3,8 @@
     "description": "PHP hardware framework: sensors, relays, Arduino (Firmata) and Raspberry Pi from plain PHP",
     "license": "MIT",
     "type": "library",
+    "keywords": ["arduino", "firmata", "raspberry-pi", "gpio", "hardware", "iot", "mcp"],
+    "homepage": "https://femus.github.io/femus/",
     "require": { "php": "^8.2",
         "sanchescom/php-serial": "^3.0.1" },
     "require-dev": { "pestphp/pest": "^3.0" },
