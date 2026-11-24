@@ -68,17 +68,13 @@ Build it yourself — see the [radio guide](https://femus.github.io/femus/guide/
 ## Quick start
 
 ```bash
-composer require femus/femus            # not on Packagist yet — see note below
+composer require femus/femus
 vendor/bin/femus scan                   # find your board and check it's femus-ready
 vendor/bin/femus firmware:flash femus   # flashes the bundled firmware to your Arduino
 vendor/bin/femus modem:probe            # meeting a GSM modem? it reports baud, SIM, network
 vendor/bin/femus fm:scan                # TEA5767 on the board? lists FM stations, plays the strongest
 php vendor/femus/femus/examples/blink.php
 ```
-
-> **Until the Packagist release**, install from the repository — add to your `composer.json`:
-> `"repositories": [{"type": "vcs", "url": "https://github.com/femus/femus"}]`,
-> then `composer require femus/femus:dev-main`.
 
 Serial I/O comes from [sanchescom/php-serial](https://github.com/sanchescom/php-serial) — the femus
 transport, extracted into its own package (fopen-then-stty, non-blocking, macOS/Linux/Windows).
@@ -149,7 +145,7 @@ expect($board->pin(13)->read())->toBeTrue();  // the LED turned on
 ```
 
 Simulate analog readings, scale weights, I2C replies and incoming radio messages the same
-way. The whole femus test suite (280+ Pest tests) runs like this in CI — so can yours.
+way. The whole femus test suite (290+ Pest tests) runs like this in CI — so can yours.
 
 ## Multiple boards
 
