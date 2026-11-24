@@ -106,7 +106,7 @@ compile from source instead, `--fqbn` for non-default boards.
 | `Tea5767` | FM receiver (I2C) — tune, signal level, band scan | `femus fm:scan`, `examples/fm-spectrum.php` |
 | `Ds18b20` | 1-Wire thermometer on a Raspberry Pi | `examples/pi-temperature.php` |
 
-Bench-verified so far: `Led`, `Button`, `Lcd1602Parallel`, `LoadCell`, `Tea5767`, the 433 MHz radio with the BLE bridge, and the GSM stack on an A7670G. The rest pass their tests on the fake board; their live runs are listed as pending in [docs/hardware-runs.md](docs/hardware-runs.md).
+Bench-verified so far: `Led`, `Button`, `Lcd1602Parallel`, `LoadCell`, `Tea5767`, the 433 MHz radio with the BLE bridge, the GSM stack on an A7670G, and the `femus mcp` tools. The rest pass their tests on the fake board; their live runs are listed as pending in [docs/hardware-runs.md](docs/hardware-runs.md).
 
 ### 433 MHz packet radio
 
@@ -177,8 +177,8 @@ See [firmware/README.md](firmware/README.md) for wiring and details.
 ## Status & roadmap
 
 Under active development, pre-1.0. Working today: everything above — the core is
-verified on real hardware (Arduino Nano, Raspberry Pi 4), the newest drivers on the
-simulated board with live runs pending (see [docs/hardware-runs.md](docs/hardware-runs.md)).
+verified on real hardware (Arduino Nano); the Raspberry Pi GPIO driver and the newest
+drivers pass on the simulated board with live runs pending (see [docs/hardware-runs.md](docs/hardware-runs.md)).
 On the roadmap: ultrasonic HC-SR04 and DHT11 (need firmware support), SPI, servos,
 GPS (NMEA), ESP8266 as a WiFi node. Radio and audio next: RDA5807M (FM with RDS station
 names and volume), Si4713 (an FM transmitter with RDS), recording broadcasts through a USB

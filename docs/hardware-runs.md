@@ -294,3 +294,17 @@ Written without hardware; tests run against a fake I2C bus.
   on every call — ~244 000 in a second. Fixed in sanchescom/php-serial 3.0.1 (notice suppressed,
   EOF still reports the loss), and FirmataBoard now lets go of a port at EOF on its own.
   Re-run with the cable pulled: 0 notices, the page went red and came back when plugged in.
+
+## Release 2026-08-07-mcp (`femus mcp`)
+
+### Run 1
+- Date: 2026-11-24, Halifax
+- Board: Nano (FT232, `/dev/cu.usbserial-A50285BI`, the messenger's node B) running FemusFirmata; macOS host, PHP 8.2.
+- How: JSON-RPC lines piped into `php bin/femus mcp` the way an MCP client sends them
+  (`initialize`, `notifications/initialized`, `tools/call`), one call per tool.
+- Result: ✅ `scan_ports` lists the port; `digital_write` sets D13 HIGH then LOW (the on-board LED
+  follows); `digital_read` D2 with the pull-up reads HIGH (nothing wired to it); `analog_read` A0
+  reads 0.51 (raw 525, floating input). Every call opens the board cold, so each takes ~3 s
+  (DTR reset, bootloader, handshake).
+- Not run: `flash_firmware` — the same code path as `firmware:flash`, verified in the runs above;
+  the board was not reflashed.
